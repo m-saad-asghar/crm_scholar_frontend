@@ -6,9 +6,79 @@ import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon';
+import ProductIcon from '@mui/icons-material/ProductionQuantityLimits';
+import CategoryIcon from '@mui/icons-material/Category';
+import SubjectIcon from '@mui/icons-material/Subject';
+import WrapTextIcon from '@mui/icons-material/WrapText';
+import BlindsClosedIcon from '@mui/icons-material/BlindsClosed';
+import PressIcon from '@mui/icons-material/Compress';
+import PaperIcon from '@mui/icons-material/Note';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
+  {
+    title: 'Products',
+    path: '/products',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ProductIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Category',
+    path: '/products/category',
+    icon: (
+      <SvgIcon fontSize="small">
+        <CategoryIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Subject',
+    path: '/products/subject',
+    icon: (
+      <SvgIcon fontSize="small">
+        <SubjectIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Binder',
+    path: '/products/binder',
+    icon: (
+      <SvgIcon fontSize="small">
+        <BlindsClosedIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Lamination',
+    path: '/products/lamination',
+    icon: (
+      <SvgIcon fontSize="small">
+        <WrapTextIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Press',
+    path: '/products/press',
+    icon: (
+      <SvgIcon fontSize="small">
+        <PressIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Paper',
+    path: '/products/paper',
+    icon: (
+      <SvgIcon fontSize="small">
+        <PaperIcon />
+      </SvgIcon>
+    )
+  },
   {
     title: 'Overview',
     path: '/',
