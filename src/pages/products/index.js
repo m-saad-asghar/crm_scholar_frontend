@@ -364,6 +364,7 @@ const Page = () => {
 
   return (
     <>
+      {/*Add Product Modal*/}
       <Modal
         open={addProductModal}
         onClose={closeAddProduct}
@@ -638,8 +639,8 @@ const Page = () => {
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={closeAddProduct}>Cancel</Button>
             <Button variant="contained" onClick={addProduct}>Submit</Button>
+            <Button variant="contained" onClick={closeAddProduct}>Cancel</Button>
           </Grid>
         </Box>
       </Modal>
