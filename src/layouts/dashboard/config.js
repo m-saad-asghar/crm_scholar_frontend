@@ -23,7 +23,8 @@ export const items = [
       <SvgIcon fontSize="small">
         <ProductIcon />
       </SvgIcon>
-    )
+    ),
+    
   },
   {
     title: 'Product - Category',
@@ -44,8 +45,8 @@ export const items = [
     )
   },
   {
-    title: 'Product - Binder',
-    path: '/products/binder',
+    title: 'Product - Paper',
+    path: '/products/paper',
     icon: (
       <SvgIcon fontSize="small">
         <BlindsClosedIcon />
@@ -53,32 +54,24 @@ export const items = [
     )
   },
   {
-    title: 'Product - Lamination',
-    path: '/products/lamination',
+    title: 'Product - Plates',
+    path: '/products/plates',
+    icon: (
+      <SvgIcon fontSize="small">
+        <BlindsClosedIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - For Board',
+    path: '/products/productfor',
     icon: (
       <SvgIcon fontSize="small">
         <WrapTextIcon />
       </SvgIcon>
     )
   },
-  {
-    title: 'Product - Press',
-    path: '/products/press',
-    icon: (
-      <SvgIcon fontSize="small">
-        <PressIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - Paper',
-    path: '/products/paper',
-    icon: (
-      <SvgIcon fontSize="small">
-        <PaperIcon />
-      </SvgIcon>
-    )
-  },
+  
   {
     title: 'Overview',
     path: '/',
@@ -89,14 +82,33 @@ export const items = [
     )
   },
   {
-    title: 'Customers',
-    path: '/customers',
+    title: 'Vendor',
+    path: '/vendor',
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />
       </SvgIcon>
     )
   },
+  {
+    title: 'Purchase',
+    path: '/purchase',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Godown',
+    path: '/godown',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    )
+  },
+  
   {
     title: 'Companies',
     path: '/companies',
