@@ -403,6 +403,7 @@ const Page = () => {
                 <Input id="face_price" aria-describedby="add-face-price"
                        onChange={onChangeFacePrice} value={facePrice}/>
               </Grid>
+              {/*
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
                   labelId="add_grades"
@@ -421,6 +422,7 @@ const Page = () => {
                   <MenuItem value="12">12th</MenuItem>
                 </Select>
               </Grid>
+  */}
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="pages" style={{ position: 'unset' }}>Pages</InputLabel>
                 <Input id="pages" aria-describedby="add-pages" onChange={onChangePages}
@@ -498,6 +500,7 @@ const Page = () => {
                   <MenuItem value="lahore">Lahore Board</MenuItem>
                 </Select>
               </Grid>
+              {/*
               <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
                   labelId="binder_product"
@@ -516,6 +519,7 @@ const Page = () => {
                   <MenuItem value="4">23x36/16</MenuItem>
                 </Select>
               </Grid>
+              
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="warning_level" style={{ position: 'unset' }}>Warning
                   Level</InputLabel>
@@ -552,6 +556,7 @@ const Page = () => {
                   <MenuItem value="other">Other</MenuItem>
                 </Select>
               </Grid>
+  */}
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
                   labelId="category"
@@ -568,6 +573,7 @@ const Page = () => {
                   <MenuItem value="subjective">Subjective</MenuItem>
                 </Select>
               </Grid>
+              {/*
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
                   labelId="type"
@@ -584,6 +590,7 @@ const Page = () => {
                   <MenuItem value="subjective">Subjective</MenuItem>
                 </Select>
               </Grid>
+              
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
                   labelId="uom"
@@ -616,6 +623,7 @@ const Page = () => {
                   <MenuItem value="21">21 Edition</MenuItem>
                 </Select>
               </Grid>
+*/}
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
                   labelId="subject"
