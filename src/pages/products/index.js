@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -13,11 +13,14 @@ import { applyPagination } from 'src/utils/apply-pagination';
 import FilledInput from '@mui/material/FilledInput';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
 
 const style = {
@@ -194,7 +197,8 @@ const useCustomerIds = (customers) => {
   );
 };
 
-const Page = () => {
+const Products = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addProductModal, setAddProductModal] = useState(false);
@@ -204,6 +208,7 @@ const Page = () => {
   const [facePrice, setFacePrice] = useState('');
   const [grade, setGrade] = useState('0');
   const [pages, setPages] = useState('');
+  const [inner_pages, setInnerPages] = useState('');
   const [rulePages, setRulePages] = useState('');
   const [farmay, setFarmay] = useState('');
   const [sheetSize, setSheetSize] = useState('0');
@@ -220,9 +225,27 @@ const Page = () => {
   const [uom, setUom] = useState('0');
   const [edition, setEdition] = useState('0');
   const [subject, setSubject] = useState('0');
+  const [isProductLoading, setIsProductLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [products, setProducts] = useState([]);
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+  useEffect(() => {
+    fetch(baseUrl + 'get_products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setProducts(data.products);
+        console.log("products", data.products)
+      })
+      .catch(error => console.error(error));
+  }, []);
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -269,6 +292,7 @@ const Page = () => {
     setSubject('0');
   };
   const addProduct = () => {
+    setIsProductLoading(true);
     const data = {
       product_bar_code: productBarCode,
       product_short_name: productShortName,
@@ -276,6 +300,7 @@ const Page = () => {
       face_price: facePrice,
       grade: grade,
       pages: pages,
+      inner_pages: inner_pages,
       rule_pages: rulePages,
       farmay: farmay,
       sheet_size: sheetSize,
@@ -293,7 +318,29 @@ const Page = () => {
       edition: edition,
       subject: subject
     };
-    console.log('add product data', data);
+
+      fetch(baseUrl + 'add_new_product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          setIsProductLoading(false);
+          if (data.success == 1){
+            toast.success("Product is Successfully Saved!")
+            setAddProductModal(false);
+            // Update Products
+          }else{
+            toast.error("Something Went Wrong!")
+          }
+        })
+        .catch(error => toast.error("Something Went Wrong!"))
+        .finally(() => {
+          setIsProductLoading(false);
+        });
   };
   const onChangeProductBarcode = (e) => {
     setProductBarCode(e.target.value);
@@ -312,6 +359,9 @@ const Page = () => {
   };
   const onChangePages = (e) => {
     setPages(e.target.value);
+  };
+  const onChangeInnerPages = (e) => {
+    setInnerPages(e.target.value);
   };
   const onChangeRulePages = (e) => {
     setRulePages(e.target.value);
@@ -364,6 +414,17 @@ const Page = () => {
 
   return (
     <>
+      <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
+      <ToastContainer />
       {/*Add Product Modal*/}
       <Modal
         open={addProductModal}
@@ -428,17 +489,30 @@ const Page = () => {
                 <Input id="pages" aria-describedby="add-pages" onChange={onChangePages}
                        value={pages}/>
               </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
+
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="inner_pages" style={{ position: 'unset' }}>Inner Pages</InputLabel>
+                <Input id="inner_pages" aria-describedby="add-inner-pages" onChange={onChangeInnerPages}
+                       value={inner_pages}/>
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="rule_pages" style={{ position: 'unset' }}>Rule
                   Pages</InputLabel>
                 <Input id="rule_pages" aria-describedby="add-rule-pages"
                        onChange={onChangeRulePages} value={rulePages}/>
               </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="farmay" style={{ position: 'unset' }}>Amount of
                   Farmay</InputLabel>
                 <Input id="farmay" aria-describedby="add-farmay" onChange={onChangeFarmay}
                        value={farmay}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="book_weight" style={{ position: 'unset' }}>Book
+                  Weight</InputLabel>
+                <Input id="book_weight" aria-describedby="add-book-weight"
+                       onChange={onChangeBookWeight} value={bookWeight}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
@@ -460,29 +534,23 @@ const Page = () => {
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
-                  labelId="title_sheet_size"
-                  id="title_sheet_size"
-                  label="Title Sheet Size"
+                  labelId="subject"
+                  id="subject"
+                  label="subject"
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeTitleSheetSize}
-                  value={titleSheetSize}
+                  onChange={onChangeSubject}
+                  value={subject}
                 >
                   <MenuItem value="0">
-                    <em>Select Title Sheet Size</em>
+                    <em>Select Subject</em>
                   </MenuItem>
-                  <MenuItem value="1">23x36/4</MenuItem>
-                  <MenuItem value="2">23x36/4</MenuItem>
-                  <MenuItem value="3">23x36/4</MenuItem>
-                  <MenuItem value="4">23x36/4</MenuItem>
+                  <MenuItem value="1">Physics</MenuItem>
+                  <MenuItem value="2">Chemistry</MenuItem>
+                  <MenuItem value="3">Math</MenuItem>
+                  <MenuItem value="4">Biology</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="book_weight" style={{ position: 'unset' }}>Book
-                  Weight</InputLabel>
-                <Input id="book_weight" aria-describedby="add-book-weight"
-                       onChange={onChangeBookWeight} value={bookWeight}/>
-              </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
                   labelId="book_for"
                   id="book_for"
@@ -494,10 +562,10 @@ const Page = () => {
                   <MenuItem value="0">
                     <em>Select Book For</em>
                   </MenuItem>
-                  <MenuItem value="federal">Federal Board</MenuItem>
-                  <MenuItem value="lahore">Lahore Board</MenuItem>
-                  <MenuItem value="federal">Federal Board</MenuItem>
-                  <MenuItem value="lahore">Lahore Board</MenuItem>
+                  <MenuItem value="1">Federal Board</MenuItem>
+                  <MenuItem value="2">Lahore Board</MenuItem>
+                  <MenuItem value="3">Federal Board</MenuItem>
+                  <MenuItem value="4">Lahore Board</MenuItem>
                 </Select>
               </Grid>
               {/*
@@ -557,7 +625,7 @@ const Page = () => {
                 </Select>
               </Grid>
   */}
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Grid item xs={12} sm={6} md={4} lg={6}>
                 <Select
                   labelId="category"
                   id="category"
@@ -569,8 +637,8 @@ const Page = () => {
                   <MenuItem value="0">
                     <em>Select Category</em>
                   </MenuItem>
-                  <MenuItem value="objective">Objective</MenuItem>
-                  <MenuItem value="subjective">Subjective</MenuItem>
+                  <MenuItem value="1">Objective</MenuItem>
+                  <MenuItem value="2">Subjective</MenuItem>
                 </Select>
               </Grid>
               {/*
@@ -624,22 +692,22 @@ const Page = () => {
                 </Select>
               </Grid>
 */}
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
-                  labelId="subject"
-                  id="subject"
-                  label="subject"
+                  labelId="title_sheet_size"
+                  id="title_sheet_size"
+                  label="Title Sheet Size"
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeSubject}
-                  value={subject}
+                  onChange={onChangeTitleSheetSize}
+                  value={titleSheetSize}
                 >
                   <MenuItem value="0">
-                    <em>Select Subject</em>
+                    <em>Select Title Sheet Size</em>
                   </MenuItem>
-                  <MenuItem value="physics">Physics</MenuItem>
-                  <MenuItem value="chemistry">Chemistry</MenuItem>
-                  <MenuItem value="math">Math</MenuItem>
-                  <MenuItem value="biology">Biology</MenuItem>
+                  <MenuItem value="1">23x36/4</MenuItem>
+                  <MenuItem value="2">23x36/4</MenuItem>
+                  <MenuItem value="3">23x36/4</MenuItem>
+                  <MenuItem value="4">23x36/4</MenuItem>
                 </Select>
               </Grid>
             </Grid>
@@ -647,8 +715,13 @@ const Page = () => {
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addProduct}>Submit</Button>
-            <Button variant="contained" onClick={closeAddProduct}>Cancel</Button>
+            <Button variant="contained" disabled={isProductLoading} onClick={addProduct}> {isProductLoading ? (
+              <CircularProgress
+                size={20}
+                style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+              />
+            ) : 'Submit'}</Button>
+            <Button variant="contained" disabled={isProductLoading}  onClick={closeAddProduct}>Cancel</Button>
           </Grid>
         </Box>
       </Modal>
@@ -737,10 +810,10 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => (
+Products.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
 
-export default Page;
+export default Products;
