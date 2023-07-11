@@ -262,13 +262,13 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="product_for_id" style={{ position: 'unset' }}>Id
-                  </InputLabel>
-                <Input id="product_for_id" aria-describedby="add-product_for-id"
-                       onChange={onChangeProductForId} value={productForID}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="product_for_id" style={{ position: 'unset' }}>Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="product_for_id" aria-describedby="add-product_for-id"*/}
+              {/*         onChange={onChangeProductForId} value={productForID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={12} lg={12}>
                 <InputLabel htmlFor="product_for_name" style={{ position: 'unset' }}>Name</InputLabel>
                 <Input id="product_for_name" aria-describedby="add-product_for-name"
                        onChange={onChangeProductForName} value={productForName}/>
@@ -304,7 +304,7 @@ const Page = () => {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Product For--
+                  Product For
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}

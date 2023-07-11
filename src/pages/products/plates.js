@@ -262,13 +262,13 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="plates_id" style={{ position: 'unset' }}>Plates Id
-                  </InputLabel>
-                <Input id="plates_id" aria-describedby="add-plates-id"
-                       onChange={onChangePlatesId} value={platesID}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="plates_id" style={{ position: 'unset' }}>Plates Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="plates_id" aria-describedby="add-plates-id"*/}
+              {/*         onChange={onChangePlatesId} value={platesID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={12} lg={12}>
                 <InputLabel htmlFor="plates_name" style={{ position: 'unset' }}>Plates Name</InputLabel>
                 <Input id="plates_name" aria-describedby="add-plates-name"
                        onChange={onChangePlatesName} value={platesName}/>

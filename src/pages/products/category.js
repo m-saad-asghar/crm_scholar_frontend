@@ -262,13 +262,13 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="category_id" style={{ position: 'unset' }}>Category Id
-                  </InputLabel>
-                <Input id="category_id" aria-describedby="add-category-id"
-                       onChange={onChangeCategoryId} value={categoryID}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="category_id" style={{ position: 'unset' }}>Category Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="category_id" aria-describedby="add-category-id"*/}
+              {/*         onChange={onChangeCategoryId} value={categoryID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={12} lg={12}>
                 <InputLabel htmlFor="category_name" style={{ position: 'unset' }}>Category Name</InputLabel>
                 <Input id="category_name" aria-describedby="add-category-name"
                        onChange={onChangeCategoryName} value={categoryName}/>

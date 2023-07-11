@@ -208,6 +208,7 @@ const Products = () => {
   const [facePrice, setFacePrice] = useState('');
   const [grade, setGrade] = useState('0');
   const [pages, setPages] = useState('');
+  const [inner_pages, setInnerPages] = useState('');
   const [rulePages, setRulePages] = useState('');
   const [farmay, setFarmay] = useState('');
   const [sheetSize, setSheetSize] = useState('0');
@@ -225,9 +226,26 @@ const Products = () => {
   const [edition, setEdition] = useState('0');
   const [subject, setSubject] = useState('0');
   const [isProductLoading, setIsProductLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [products, setProducts] = useState([]);
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+  useEffect(() => {
+    fetch(baseUrl + 'get_products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setProducts(data.products);
+        console.log("products", data.products)
+      })
+      .catch(error => console.error(error));
+  }, []);
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -282,6 +300,7 @@ const Products = () => {
       face_price: facePrice,
       grade: grade,
       pages: pages,
+      inner_pages: inner_pages,
       rule_pages: rulePages,
       farmay: farmay,
       sheet_size: sheetSize,
@@ -312,6 +331,7 @@ const Products = () => {
           setIsProductLoading(false);
           if (data.success == 1){
             toast.success("Product is Successfully Saved!")
+            setAddProductModal(false);
             // Update Products
           }else{
             toast.error("Something Went Wrong!")
@@ -339,6 +359,9 @@ const Products = () => {
   };
   const onChangePages = (e) => {
     setPages(e.target.value);
+  };
+  const onChangeInnerPages = (e) => {
+    setInnerPages(e.target.value);
   };
   const onChangeRulePages = (e) => {
     setRulePages(e.target.value);
@@ -391,6 +414,16 @@ const Products = () => {
 
   return (
     <>
+      <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
       <ToastContainer />
       {/*Add Product Modal*/}
       <Modal
@@ -456,17 +489,30 @@ const Products = () => {
                 <Input id="pages" aria-describedby="add-pages" onChange={onChangePages}
                        value={pages}/>
               </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
+
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="inner_pages" style={{ position: 'unset' }}>Inner Pages</InputLabel>
+                <Input id="inner_pages" aria-describedby="add-inner-pages" onChange={onChangeInnerPages}
+                       value={inner_pages}/>
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="rule_pages" style={{ position: 'unset' }}>Rule
                   Pages</InputLabel>
                 <Input id="rule_pages" aria-describedby="add-rule-pages"
                        onChange={onChangeRulePages} value={rulePages}/>
               </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="farmay" style={{ position: 'unset' }}>Amount of
                   Farmay</InputLabel>
                 <Input id="farmay" aria-describedby="add-farmay" onChange={onChangeFarmay}
                        value={farmay}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="book_weight" style={{ position: 'unset' }}>Book
+                  Weight</InputLabel>
+                <Input id="book_weight" aria-describedby="add-book-weight"
+                       onChange={onChangeBookWeight} value={bookWeight}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
@@ -488,29 +534,23 @@ const Products = () => {
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
-                  labelId="title_sheet_size"
-                  id="title_sheet_size"
-                  label="Title Sheet Size"
+                  labelId="subject"
+                  id="subject"
+                  label="subject"
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeTitleSheetSize}
-                  value={titleSheetSize}
+                  onChange={onChangeSubject}
+                  value={subject}
                 >
                   <MenuItem value="0">
-                    <em>Select Title Sheet Size</em>
+                    <em>Select Subject</em>
                   </MenuItem>
-                  <MenuItem value="1">23x36/4</MenuItem>
-                  <MenuItem value="2">23x36/4</MenuItem>
-                  <MenuItem value="3">23x36/4</MenuItem>
-                  <MenuItem value="4">23x36/4</MenuItem>
+                  <MenuItem value="1">Physics</MenuItem>
+                  <MenuItem value="2">Chemistry</MenuItem>
+                  <MenuItem value="3">Math</MenuItem>
+                  <MenuItem value="4">Biology</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="book_weight" style={{ position: 'unset' }}>Book
-                  Weight</InputLabel>
-                <Input id="book_weight" aria-describedby="add-book-weight"
-                       onChange={onChangeBookWeight} value={bookWeight}/>
-              </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
                   labelId="book_for"
                   id="book_for"
@@ -522,10 +562,10 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Book For</em>
                   </MenuItem>
-                  <MenuItem value="federal">Federal Board</MenuItem>
-                  <MenuItem value="lahore">Lahore Board</MenuItem>
-                  <MenuItem value="federal">Federal Board</MenuItem>
-                  <MenuItem value="lahore">Lahore Board</MenuItem>
+                  <MenuItem value="1">Federal Board</MenuItem>
+                  <MenuItem value="2">Lahore Board</MenuItem>
+                  <MenuItem value="3">Federal Board</MenuItem>
+                  <MenuItem value="4">Lahore Board</MenuItem>
                 </Select>
               </Grid>
               {/*
@@ -585,7 +625,7 @@ const Products = () => {
                 </Select>
               </Grid>
   */}
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Grid item xs={12} sm={6} md={4} lg={6}>
                 <Select
                   labelId="category"
                   id="category"
@@ -597,8 +637,8 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Category</em>
                   </MenuItem>
-                  <MenuItem value="objective">Objective</MenuItem>
-                  <MenuItem value="subjective">Subjective</MenuItem>
+                  <MenuItem value="1">Objective</MenuItem>
+                  <MenuItem value="2">Subjective</MenuItem>
                 </Select>
               </Grid>
               {/*
@@ -652,22 +692,22 @@ const Products = () => {
                 </Select>
               </Grid>
 */}
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
-                  labelId="subject"
-                  id="subject"
-                  label="subject"
+                  labelId="title_sheet_size"
+                  id="title_sheet_size"
+                  label="Title Sheet Size"
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeSubject}
-                  value={subject}
+                  onChange={onChangeTitleSheetSize}
+                  value={titleSheetSize}
                 >
                   <MenuItem value="0">
-                    <em>Select Subject</em>
+                    <em>Select Title Sheet Size</em>
                   </MenuItem>
-                  <MenuItem value="physics">Physics</MenuItem>
-                  <MenuItem value="chemistry">Chemistry</MenuItem>
-                  <MenuItem value="math">Math</MenuItem>
-                  <MenuItem value="biology">Biology</MenuItem>
+                  <MenuItem value="1">23x36/4</MenuItem>
+                  <MenuItem value="2">23x36/4</MenuItem>
+                  <MenuItem value="3">23x36/4</MenuItem>
+                  <MenuItem value="4">23x36/4</MenuItem>
                 </Select>
               </Grid>
             </Grid>
