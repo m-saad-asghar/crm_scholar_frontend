@@ -4,10 +4,11 @@ import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography, Modal } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, Table } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CustomersTable } from 'src/sections/customer/customers-table';
+import { VoucherTable } from 'src/sections/purchase/pv_table';
 import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import FilledInput from '@mui/material/FilledInput';
@@ -176,6 +177,25 @@ const data = [
   }
 ];
 
+const productData = [
+  {
+    id: '24',
+    code: '1234',
+    name: 'Physics',
+    rate: 100,
+
+  },
+  {
+    id: '25',
+    code: '1235',
+    name: 'Physics',
+    rate: 110,
+    
+  }
+]
+
+
+
 const useCustomers = (page, rowsPerPage) => {
   return useMemo(
     () => {
@@ -184,7 +204,17 @@ const useCustomers = (page, rowsPerPage) => {
     [page, rowsPerPage]
   );
 };
-
+{/*
+const useVoucherItems = (page, rowsPerPage) => {
+  return useMemo(
+    () => {
+      const iData = itemData;
+      return applyPagination(iData, page, rowsPerPage);
+    },
+    [page, rowsPerPage]
+  );
+};
+*/}
 const useCustomerIds = (customers) => {
   return useMemo(
     () => {
@@ -193,18 +223,34 @@ const useCustomerIds = (customers) => {
     [customers]
   );
 };
+const useItemIds = (voucherItems) => {
+return useMemo( () => {
+  return voucherItems.map((voucherItems) => voucherItems.id);
+})
+};
 
 const Page = () => {
+
+  const [tableData, setTableData] = useState([]);
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addPurchaseModal, setAddPurchaseModal] = useState(false);
   const [purchaseVoucherNo, setPurchaseVoucherNo] = useState('');
   const [vendorName, setVendorName] = useState('');
   const [productType, setProductType] = useState('0');
-  const [productName, setProductName] = useState('');
+  const [productName, setProductName] = useState('0');
+  const [productCode, setProductCode] = useState('0');
+  const [productGodown, setProductGodown] = useState('0');
+  const [productQty, setProductQty] = useState('');
+  const [productRate, setProductRate] = useState('');
+  const [productAmount, setProductAmount] = useState('');
+
   
   const customers = useCustomers(page, rowsPerPage);
+  
   const customersIds = useCustomerIds(customers);
+  
   const customersSelection = useSelection(customersIds);
   const handlePageChange = useCallback(
     (event, value) => {
@@ -232,6 +278,13 @@ const Page = () => {
     setVendorName('');
     setProductType('0');
     setProductName('');
+    setProductCode('');
+    setProductGodown('');
+    setProductQty('');
+    setProductRate('');
+    setProductAmount('');
+
+    setTableData([]);
     
   };
   const addPurchase = () => {
@@ -242,6 +295,17 @@ const Page = () => {
       
     };
     console.log('add purchase data', data);
+  };
+  const onClickAddButton = () => {
+    const newItem = {
+      product_code: productCode,
+      product_name: productName,
+      product_godown: productGodown,
+      product_qty: productQty,
+      product_rate: productRate,
+      product_amount: productAmount,
+    };
+    setTableData((prevTableData) => [...prevTableData, newItem]);
   };
   const onChangePurchaseVoucherNo = (e) => {
     setPurchaseVoucherNo(e.target.value);
@@ -256,7 +320,55 @@ const Page = () => {
   }
 
   const onChangeProductName = (e) => {
+    
     setProductName(e.target.value);
+
+    
+
+  }
+  const onClickProductName = ( pid) =>{
+    console.log(pid);
+    const selectedProduct = productData.find(
+      (product) => product.id === pid 
+    );
+    
+
+  if (selectedProduct) {
+    setProductCode(selectedProduct.code);
+  } else {
+    setProductCode('');
+  }
+  }
+  const onChangeProductCode = (e) => {
+   
+    setProductCode(e.target.value);
+
+    
+  
+  }
+  const onClickProductCode = (pid) => {
+    const selectedProduct = productData.find(
+      (product) => product.id === pid 
+    );
+    
+
+  if (selectedProduct) {
+    setProductName(selectedProduct.name);
+  } else {
+    setProductName('');
+  }
+  }
+  const onChangeProductGodown = (e) => {
+    setProductGodown(e.target.value);
+  }
+  const onChangeProductQty = (e) => {
+    setProductQty(e.target.value);
+  }
+  const onChangeProductRate = (e) => {
+    setProductRate(e.target.value);
+  }
+  const onChangeProductAmount = (e) => {
+    setProductAmount(e.target.value);
   }
 
   return (
@@ -292,7 +404,7 @@ const Page = () => {
               </Grid>
               
 
-<Grid item xs={12} sm={4} md={4} lg={4}>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
                   labelId="product_type"
                   id="product_type"
@@ -312,25 +424,132 @@ const Page = () => {
               
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
+                  labelId="product_code"
+                  id="product_code"
+                  label="Product Code"
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeProductCode}
+                  value={productCode}
+                >
+                  <MenuItem value="0">
+                    <em>Select Product Code</em>
+                  </MenuItem>
+                  
+                 { productData.map((product) => (
+                    <MenuItem key={product.id} value={product.code}
+                    onClick={onClickProductCode.bind(this, product.id)}>
+                      {product.code}
+                    </MenuItem>
+                  ))
+                 }
+                
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <Select
                   labelId="product_name"
                   id="product_name"
                   label="Product Name"
                   style={{ minWidth: '95%' }}
                   onChange={onChangeProductName}
+                  
                   value={productName}
                 >
                   <MenuItem value="0">
-                    <em>Select Product Type</em>
+                    <em>Select Product Name</em>
                   </MenuItem>
-                  <MenuItem value="1">23x36/53</MenuItem>
-                  <MenuItem value="2">20x30/55</MenuItem>
+                  {
+                   productData.map((product) => (
+                    <MenuItem data-key={product.id} value={product.name} 
+                    onChange={onClickProductName.bind(this, product.id)}>
+                      {product.name}
+                    </MenuItem>
+                  ))
+                  }
+
+{/*
+productData.map((product, index) => (
+            product.name === productName && (
+              <MenuItem key={index} value={product.name}>
+                {product.name}
+              </MenuItem>
+            )
+          ))
+            */}
+  
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <Select
+                  labelId="product_godown"
+                  id="product_godown"
+                  label="Product Godown"
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeProductGodown}
+                  value={productGodown}
+                >
+                  <MenuItem value="0">
+                    <em>Select Godown</em>
+                  </MenuItem>
+                  <MenuItem value="1">1234</MenuItem>
+                  <MenuItem value="2">1235</MenuItem>
                   
                 </Select>
               </Grid>
-
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="product_qty" style={{ position: 'unset' }}>Qty
+                  </InputLabel>
+                <Input id="product_qty" aria-describedby="add-product_qty"
+                       onChange={onChangeProductQty} value={productQty}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="product_rate" style={{ position: 'unset' }}>Rate
+                  </InputLabel>
+                <Input id="product_rate" aria-describedby="add-product_rate"
+                       onChange={onChangeProductRate} value={productRate}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="product_amount" style={{ position: 'unset' }}>Amount
+                  </InputLabel>
+                <Input id="product_amount" aria-describedby="add-product_amount"
+                       onChange={onChangeProductAmount} value={productAmount}/>
+              </Grid>
+              
+              <Button variant="contained" onClick={onClickAddButton}>Add</Button>
              
               
             </Grid>
+
+            {/* Grid Table */}
+            <Table>
+<thead>
+  <tr>
+    <th>Product Code</th>
+    <th>Product Name</th>
+    <th>Godown</th>
+    <th>Qty</th>
+    <th>Rate</th>
+    <th>Amount</th>
+  </tr>
+</thead>
+<tbody>
+{tableData.map((rowData, index) => (
+  <tr key={index}>
+  <td>{rowData.product_code}</td>
+  <td>{rowData.product_name}</td>
+  <td>{rowData.product_godown}</td>
+  <td>{rowData.product_qty}</td>
+  <td>{rowData.product_rate}</td>
+  <td>{rowData.product_amount}</td>
+  
+</tr>
+))}
+</tbody>
+
+
+            </Table>
+
+
             {/*</FormControl>*/}
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
