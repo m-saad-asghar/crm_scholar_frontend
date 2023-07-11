@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -13,11 +13,14 @@ import { applyPagination } from 'src/utils/apply-pagination';
 import FilledInput from '@mui/material/FilledInput';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
 
 const style = {
@@ -194,7 +197,8 @@ const useCustomerIds = (customers) => {
   );
 };
 
-const Page = () => {
+const Products = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addProductModal, setAddProductModal] = useState(false);
@@ -220,6 +224,7 @@ const Page = () => {
   const [uom, setUom] = useState('0');
   const [edition, setEdition] = useState('0');
   const [subject, setSubject] = useState('0');
+  const [isProductLoading, setIsProductLoading] = useState(false);
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
@@ -269,6 +274,7 @@ const Page = () => {
     setSubject('0');
   };
   const addProduct = () => {
+    setIsProductLoading(true);
     const data = {
       product_bar_code: productBarCode,
       product_short_name: productShortName,
@@ -293,7 +299,28 @@ const Page = () => {
       edition: edition,
       subject: subject
     };
-    console.log('add product data', data);
+
+      fetch(baseUrl + 'add_new_product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          setIsProductLoading(false);
+          if (data.success == 1){
+            toast.success("Product is Successfully Saved!")
+            // Update Products
+          }else{
+            toast.error("Something Went Wrong!")
+          }
+        })
+        .catch(error => toast.error("Something Went Wrong!"))
+        .finally(() => {
+          setIsProductLoading(false);
+        });
   };
   const onChangeProductBarcode = (e) => {
     setProductBarCode(e.target.value);
@@ -364,6 +391,7 @@ const Page = () => {
 
   return (
     <>
+      <ToastContainer />
       {/*Add Product Modal*/}
       <Modal
         open={addProductModal}
@@ -647,8 +675,13 @@ const Page = () => {
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addProduct}>Submit</Button>
-            <Button variant="contained" onClick={closeAddProduct}>Cancel</Button>
+            <Button variant="contained" disabled={isProductLoading} onClick={addProduct}> {isProductLoading ? (
+              <CircularProgress
+                size={20}
+                style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+              />
+            ) : 'Submit'}</Button>
+            <Button variant="contained" disabled={isProductLoading}  onClick={closeAddProduct}>Cancel</Button>
           </Grid>
         </Box>
       </Modal>
@@ -737,10 +770,10 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => (
+Products.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
 
-export default Page;
+export default Products;
