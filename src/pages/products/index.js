@@ -22,6 +22,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
+//import { error } from 'console';
 
 const style = {
   position: 'absolute',
@@ -212,9 +213,12 @@ const Products = () => {
   const [rulePages, setRulePages] = useState('');
   const [farmay, setFarmay] = useState('');
   const [sheetSize, setSheetSize] = useState('0');
+  const [loadSheetSizes, setLoadSheetSizes] = useState([]);
   const [titleSheetSize, setTitleSheetSize] = useState('0');
+  const [loadTitleSizes, setLoadTitleSizes] = useState([]);
   const [bookWeight, setBookWeight] = useState('');
   const [bookFor, setBookFor] = useState('0');
+  const [loadBookFor, setLoadBookFor] = useState([]);
   const [binderProduct, setBinderProduct] = useState('0');
   const [warningLevel, setWarningLevel] = useState('');
   const [deadLevel, setDeadLevel] = useState('');
@@ -228,10 +232,15 @@ const Products = () => {
   const [isProductLoading, setIsProductLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [loadCategory, setLoadCategory] = useState([]);
+  const [loadSubjects, setLoadSubjects] = useState([]);
+
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+  
   useEffect(() => {
+    
     fetch(baseUrl + 'get_products', {
       method: 'POST',
       headers: {
@@ -246,6 +255,9 @@ const Products = () => {
       })
       .catch(error => console.error(error));
   }, []);
+
+  
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -261,8 +273,95 @@ const Products = () => {
   );
 
   const openAddProduct = () => {
+    
+    
+    console.log('Open Product');
+    fetch(baseUrl + 'get_subjects',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadSubjects(data.subject);
+      console.log("subject", data.subject)
+
+    })
+    .catch(error => console.error(error));
+ 
+    fetch(baseUrl + 'get_category',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadCategory(data.category);
+      console.log("category", data.category)
+
+    })
+    .catch(error => console.error(error));
+
+    fetch(baseUrl + 'get_sheet_sizes',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadSheetSizes(data.sheets);
+      console.log("sheet", data.sheets)
+
+    })
+    .catch(error => console.error(error));
+
+    fetch(baseUrl + 'get_sheet_sizes',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadTitleSizes(data.sheets);
+      console.log("sheet", data.sheets)
+
+    })
+    .catch(error => console.error(error));
+
+    fetch(baseUrl + 'get_book_for_board',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadBookFor(data.boards);
+      console.log("boards", data.boards)
+
+    })
+    .catch(error => console.error(error));
+    
     setAddProductModal(true);
   };
+  
+  
+    
+ 
+
+  
+    
+
+    
+
+  
+  
+  
+
   const closeAddProduct = () => {
     setAddProductModal(false);
     resetForm();
@@ -275,6 +374,7 @@ const Products = () => {
     setGrade('0');
     setPages('');
     setRulePages('');
+    setInnerPages('');
     setFarmay('');
     setSheetSize('0');
     setTitleSheetSize('0');
@@ -319,6 +419,7 @@ const Products = () => {
       subject: subject
     };
 
+    
       fetch(baseUrl + 'add_new_product', {
         method: 'POST',
         headers: {
@@ -341,7 +442,13 @@ const Products = () => {
         .finally(() => {
           setIsProductLoading(false);
         });
+        closeAddProduct(true);
   };
+
+    
+
+    
+      
   const onChangeProductBarcode = (e) => {
     setProductBarCode(e.target.value);
   };
@@ -371,6 +478,7 @@ const Products = () => {
   };
   const onChangeSheetSize = (e) => {
     setSheetSize(e.target.value);
+    console.log(sheetSize);
   };
   const onChangeTitleSheetSize = (e) => {
     setTitleSheetSize(e.target.value);
@@ -411,6 +519,7 @@ const Products = () => {
   const onChangeSubject = (e) => {
     setSubject(e.target.value);
   };
+  
 
   return (
     <>
@@ -526,10 +635,14 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Sheet Size</em>
                   </MenuItem>
-                  <MenuItem value="1">23x36/8</MenuItem>
-                  <MenuItem value="2">23x36/8</MenuItem>
-                  <MenuItem value="3">23x36/8</MenuItem>
-                  <MenuItem value="4">23x36/8</MenuItem>
+                  {
+                    loadSheetSizes.map((sheets) => (
+                      <MenuItem key={sheets.id} value={sheets.id}
+                      >
+                        {sheets.sheet_size}
+                      </MenuItem>
+                    ) )
+                  }
                 </Select>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
@@ -544,10 +657,13 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Subject</em>
                   </MenuItem>
-                  <MenuItem value="1">Physics</MenuItem>
-                  <MenuItem value="2">Chemistry</MenuItem>
-                  <MenuItem value="3">Math</MenuItem>
-                  <MenuItem value="4">Biology</MenuItem>
+                  {
+                    loadSubjects.map((subject) => (
+                      <MenuItem key={subject.id} value={subject.id}>
+                        {subject.subject}
+                      </MenuItem>
+                    ))
+                  }
                 </Select>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
@@ -562,10 +678,13 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Book For</em>
                   </MenuItem>
-                  <MenuItem value="1">Federal Board</MenuItem>
-                  <MenuItem value="2">Lahore Board</MenuItem>
-                  <MenuItem value="3">Federal Board</MenuItem>
-                  <MenuItem value="4">Lahore Board</MenuItem>
+                  {
+                    loadBookFor.map((boards) => (
+                      <MenuItem key={boards.id} value={boards.id}>
+                        {boards.name}
+                      </MenuItem>
+                    ))
+                  }
                 </Select>
               </Grid>
               {/*
@@ -637,8 +756,13 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Category</em>
                   </MenuItem>
-                  <MenuItem value="1">Objective</MenuItem>
-                  <MenuItem value="2">Subjective</MenuItem>
+                 {
+                  loadCategory.map((items) => (
+                    <MenuItem key={items.id} value={items.id}>
+                      {items.category}
+                    </MenuItem>
+                  ))
+                 }
                 </Select>
               </Grid>
               {/*
@@ -704,10 +828,13 @@ const Products = () => {
                   <MenuItem value="0">
                     <em>Select Title Sheet Size</em>
                   </MenuItem>
-                  <MenuItem value="1">23x36/4</MenuItem>
-                  <MenuItem value="2">23x36/4</MenuItem>
-                  <MenuItem value="3">23x36/4</MenuItem>
-                  <MenuItem value="4">23x36/4</MenuItem>
+                  {
+                    loadTitleSizes.map((titles) => (
+                      <MenuItem key={titles.id} value={titles.id}>
+                        {titles.sheet_size}
+                      </MenuItem>
+                    ) )
+                  }
                 </Select>
               </Grid>
             </Grid>

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -16,6 +16,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
+import { ToastContainer, toast } from 'react-toastify';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
@@ -195,15 +197,39 @@ const useCustomerIds = (customers) => {
 };
 
 const Page = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addSubjectModal, setAddSubjectModal] = useState(false);
   const [subjectID, setSubjectID] = useState('');
   const [subjectName, setSubjectName] = useState('');
-  
+  const [subjects, setSubjects] = useState([]);
+  const [isSubjectLoading, setIsSubjectLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+
+  useEffect(() => {
+    
+    fetch(baseUrl + 'get_subjects', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setSubjects(data.subject);
+        console.log("subject", data.subject)
+      })
+      .catch(error => console.error(error));
+  }, []);
+
+
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -226,18 +252,43 @@ const Page = () => {
     resetForm();
   };
   const resetForm = () => {
-    setSubjectID('');
+    
     setSubjectName('');
     
   };
   const addSubject = () => {
+    setIsSubjectLoading(true);
     const data = {
-      subject_id: subjectID,
-      subject_name: subjectName,
+      
+      subject: subjectName,
       
     };
+    fetch(baseUrl + 'add_new_subject', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsSubjectLoading(false);
+        if (data.success == 1){
+          toast.success("Subject is Successfully Saved!")
+          setAddSubjectModal(false);
+          // Update Products
+        }else{
+          toast.error("Something Went Wrong!")
+        }
+      })
+      .catch(error => toast.error("Something Went Wrong!"))
+      .finally(() => {
+        setIsSubjectLoading(false);
+      });
+      closeAddSubject(true);
     console.log('add Subject data', data);
   };
+
   const onChangeSubjectId = (e) => {
     setSubjectID(e.target.value);
   };
@@ -248,6 +299,17 @@ const Page = () => {
 
   return (
     <>
+    <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
+      <ToastContainer />
       {/*Add Subject Modal*/}
       <Modal
         open={addSubjectModal}
