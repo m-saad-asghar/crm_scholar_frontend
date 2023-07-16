@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -13,12 +13,16 @@ import { applyPagination } from 'src/utils/apply-pagination';
 import FilledInput from '@mui/material/FilledInput';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
+//import { error } from 'console';
 
 const style = {
   position: 'absolute',
@@ -62,118 +66,7 @@ const data = [
     name: 'Fran Perez',
     phone: '712-351-5711'
   },
-  {
-    id: '5e887b7602bdbc4dbb234b27',
-    address: {
-      city: 'North Canton',
-      country: 'USA',
-      state: 'Ohio',
-      street: '4894  Lakeland Park Drive'
-    },
-    avatar: '/assets/avatars/avatar-jie-yan-song.png',
-    createdAt: subDays(subHours(now, 4), 2).getTime(),
-    email: 'jie.yan.song@devias.io',
-    name: 'Jie Yan Song',
-    phone: '770-635-2682'
-  },
-  {
-    id: '5e86809283e28b96d2d38537',
-    address: {
-      city: 'Madrid',
-      country: 'Spain',
-      name: 'Anika Visser',
-      street: '4158  Hedge Street'
-    },
-    avatar: '/assets/avatars/avatar-anika-visser.png',
-    createdAt: subDays(subHours(now, 11), 2).getTime(),
-    email: 'anika.visser@devias.io',
-    name: 'Anika Visser',
-    phone: '908-691-3242'
-  },
-  {
-    id: '5e86805e2bafd54f66cc95c3',
-    address: {
-      city: 'San Diego',
-      country: 'USA',
-      state: 'California',
-      street: '75247'
-    },
-    avatar: '/assets/avatars/avatar-miron-vitold.png',
-    createdAt: subDays(subHours(now, 7), 3).getTime(),
-    email: 'miron.vitold@devias.io',
-    name: 'Miron Vitold',
-    phone: '972-333-4106'
-  },
-  {
-    id: '5e887a1fbefd7938eea9c981',
-    address: {
-      city: 'Berkeley',
-      country: 'USA',
-      state: 'California',
-      street: '317 Angus Road'
-    },
-    avatar: '/assets/avatars/avatar-penjani-inyene.png',
-    createdAt: subDays(subHours(now, 5), 4).getTime(),
-    email: 'penjani.inyene@devias.io',
-    name: 'Penjani Inyene',
-    phone: '858-602-3409'
-  },
-  {
-    id: '5e887d0b3d090c1b8f162003',
-    address: {
-      city: 'Carson City',
-      country: 'USA',
-      state: 'Nevada',
-      street: '2188  Armbrester Drive'
-    },
-    avatar: '/assets/avatars/avatar-omar-darboe.png',
-    createdAt: subDays(subHours(now, 15), 4).getTime(),
-    email: 'omar.darobe@devias.io',
-    name: 'Omar Darobe',
-    phone: '415-907-2647'
-  },
-  {
-    id: '5e88792be2d4cfb4bf0971d9',
-    address: {
-      city: 'Los Angeles',
-      country: 'USA',
-      state: 'California',
-      street: '1798  Hickory Ridge Drive'
-    },
-    avatar: '/assets/avatars/avatar-siegbert-gottfried.png',
-    createdAt: subDays(subHours(now, 2), 5).getTime(),
-    email: 'siegbert.gottfried@devias.io',
-    name: 'Siegbert Gottfried',
-    phone: '702-661-1654'
-  },
-  {
-    id: '5e8877da9a65442b11551975',
-    address: {
-      city: 'Murray',
-      country: 'USA',
-      state: 'Utah',
-      street: '3934  Wildrose Lane'
-    },
-    avatar: '/assets/avatars/avatar-iulia-albu.png',
-    createdAt: subDays(subHours(now, 8), 6).getTime(),
-    email: 'iulia.albu@devias.io',
-    name: 'Iulia Albu',
-    phone: '313-812-8947'
-  },
-  {
-    id: '5e8680e60cba5019c5ca6fda',
-    address: {
-      city: 'Salt Lake City',
-      country: 'USA',
-      state: 'Utah',
-      street: '368 Lamberts Branch Road'
-    },
-    avatar: '/assets/avatars/avatar-nasimiyu-danai.png',
-    createdAt: subDays(subHours(now, 1), 9).getTime(),
-    email: 'nasimiyu.danai@devias.io',
-    name: 'Nasimiyu Danai',
-    phone: '801-301-7894'
-  }
+  
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -195,19 +88,44 @@ const useCustomerIds = (customers) => {
 };
 
 const Page = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addPaperProductModal, setAddPaperProductModal] = useState(false);
-  const [paperID, setPaperID] = useState('');
+  
   const [paperName, setPaperName] = useState('');
   const [paperLength, setPaperLength] = useState('');
   const [paperWidth, setPaperWidth] = useState('');
-  const [paperPortion, setPaperPortion] = useState('');
+  const [paperWeight, setPaperWeight] = useState('');
   const [paperType, setPaperType] = useState('0');
+  const [loadPaperTypes, setLoadPaperTypes] = useState([]);
   
+  const [paperSizes, setPaperSizes] = useState([]);
+  const [isPaperSizeLoading, setIsPaperSizeLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+
+  useEffect(() => {
+    
+    fetch(baseUrl + 'get_papers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setPaperSizes(data.papers);
+        console.log("paper Size", data.papers);
+      })
+      .catch(error => console.error(error));
+  }, []);
+
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -224,35 +142,82 @@ const Page = () => {
 
   const openAddPaperProduct = () => {
     setAddPaperProductModal(true);
+
+    fetch(baseUrl + 'get_paper_types',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadPaperTypes(data.paper_types);
+      console.log("paper type", data.paper_types)
+
+    })
+    .catch(error => console.error(error));
+
   };
   const closeAddPaperProduct = () => {
     setAddPaperProductModal(false);
     resetForm();
   };
   const resetForm = () => {
-    setPaperID('');
+    
     setPaperName('');
     setPaperLength('');
     setPaperWidth('');
-    setPaperPortion('');
+    setPaperWeight('');
     setPaperType('0');
     
   };
   const addPaperProduct = () => {
+    setIsPaperSizeLoading(true);
     const data = {
-      paper_id: paperID,
-      paper_name: paperName,
-      paper_length: paperLength,
-      paper_width: paperWidth,
-      paper_portion: paperPortion,
-      paper_product: paperProduct,
+      
+      paper: paperName,
+      length: paperLength,
+      width: paperWidth,
+      weight: paperWeight,
+      paper_type: paperType,
       
     };
+
+    fetch(baseUrl + 'add_new_paper', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsPaperSizeLoading(false);
+        console.log("Data Success: " + data.success);
+        if (data.success == 1){
+          toast.success("Paper Size is Successfully Saved!");
+          setAddPaperProductModal(false);
+          // Update Products
+        }else{
+          toast.error("Something Went Wrong!");
+        }
+      })
+      .catch(error => {
+        console.error("Error: ", error);
+        toast.error("Something Went Wrong!");
+      })
+
+      
+      .finally(() => {
+        setIsPaperSizeLoading(false);
+      });
+      closeAddPaperProduct(true);
+
     console.log('add Paper Product data', data);
+
+
   };
-  const onChangePaperId = (e) => {
-    setPaperID(e.target.value);
-  };
+  
   const onChangePaperName = (e) => {
     setPaperName(e.target.value);
   };
@@ -262,8 +227,8 @@ const Page = () => {
   const onChangePaperWidth = (e) => {
     setPaperWidth(e.target.value);
   }
-  const onChangePaperPortion = (e) => {
-    setPaperPortion(e.target.value);
+  const onChangePaperWeight = (e) => {
+    setPaperWeight(e.target.value);
   }
   const onChangePaperType = (e) => {
     setPaperType(e.target.value);
@@ -272,6 +237,17 @@ const Page = () => {
 
   return (
     <>
+    <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
+      <ToastContainer />
       {/*Add Paper Product Modal*/}
       <Modal
         open={addPaperProductModal}
@@ -286,15 +262,10 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
+              
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_id" style={{ position: 'unset' }}>Paper Id
-                  </InputLabel>
-                <Input id="paper_id" aria-describedby="add-paper-id"
-                       onChange={onChangePaperId} value={paperID}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_name" style={{ position: 'unset' }}>Paper Name</InputLabel>
-                <Input id="paper_name" aria-describedby="add-paper-name"
+                <InputLabel htmlFor="paper_size" style={{ position: 'unset' }}>Paper Size</InputLabel>
+                <Input id="paper_size" aria-describedby="add-paper-size"
                        onChange={onChangePaperName} value={paperName}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
@@ -308,9 +279,9 @@ const Page = () => {
                        onChange={onChangePaperWidth} value={paperWidth}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_portion" style={{ position: 'unset' }}>Paper Portion</InputLabel>
-                <Input id="paper_portion" aria-describedby="add-paper-portion"
-                       onChange={onChangePaperPortion} value={paperPortion}/>
+                <InputLabel htmlFor="paper_weight" style={{ position: 'unset' }}>Paper Weight</InputLabel>
+                <Input id="paper_weight" aria-describedby="add-paper-weight"
+                       onChange={onChangePaperWeight} value={paperWeight}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <Select
@@ -324,10 +295,13 @@ const Page = () => {
                   <MenuItem value="0">
                     <em>Select Paper Type</em>
                   </MenuItem>
-                  <MenuItem value="1">Paper</MenuItem>
-                  <MenuItem value="2">Bleach Card</MenuItem>
-                  <MenuItem value="3">Art Card</MenuItem>
-                  <MenuItem value="4">Art Paper</MenuItem>
+                  {
+                    loadPaperTypes.map((ptypes) => (
+                      <MenuItem key={ptypes.id} value={ptypes.id}>
+                        {ptypes.child_type}
+                      </MenuItem>
+                    ))
+                  }
                 </Select>
               </Grid>
               </Grid>

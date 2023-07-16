@@ -16,10 +16,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-
-
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
 import MenuItem from '@mui/material/MenuItem';
@@ -54,6 +50,35 @@ const data = [
     name: 'Carson Darrin',
     phone: '304-428-3097'
   },
+  {
+    id: '5e887b209c28ac3dd97f6db5',
+    address: {
+      city: 'Atlanta',
+      country: 'USA',
+      state: 'Georgia',
+      street: '1865  Pleasant Hill Road'
+    },
+    avatar: '/assets/avatars/avatar-fran-perez.png',
+    createdAt: subDays(subHours(now, 1), 2).getTime(),
+    email: 'fran.perez@devias.io',
+    name: 'Fran Perez',
+    phone: '712-351-5711'
+  },
+  {
+    id: '5e887b7602bdbc4dbb234b27',
+    address: {
+      city: 'North Canton',
+      country: 'USA',
+      state: 'Ohio',
+      street: '4894  Lakeland Park Drive'
+    },
+    avatar: '/assets/avatars/avatar-jie-yan-song.png',
+    createdAt: subDays(subHours(now, 4), 2).getTime(),
+    email: 'jie.yan.song@devias.io',
+    name: 'Jie Yan Song',
+    phone: '770-635-2682'
+  },
+  
   
 ];
 
@@ -79,27 +104,20 @@ const Page = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addVendorModal, setAddVendorModal] = useState(false);
+  const [addPaperTypeModal, setAddPaperTypeModal] = useState(false);
   
-  const [vendorName, setVendorName] = useState('');
-  const [vendorType, setVendorType] = useState([]);
-  const [vendorAddress, setVendorAddress] = useState('');
-  const [vendorContactNo, setVendorContactNo] = useState('');
-  const [loadVendorTypes, setLoadVendorTypes] = useState([]);
-
-  const [vendorNames, setVendorNames] = useState([]);
-  const [isVendorLoading, setIsVendorLoading] = useState(false);
+  const [paperType, setPaperType] = useState('');
+  const [paperTypes, setPaperTypes] = useState([]);
+  const [isPaperTypeLoading, setIsPaperTypeLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
-  
-  const [selectedOptions, setSelectedOptions] = useState([]);
 
   useEffect(() => {
     
-    fetch(baseUrl + 'get_vendors', {
+    fetch(baseUrl + 'get_paper_types', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -108,11 +126,12 @@ const Page = () => {
       .then(response => response.json())
       .then(data => {
         setIsDataLoading(false);
-        setVendorNames(data.vendors);
-        console.log("vendors", data.vendors);
+        setPaperTypes(data.paper_types);
+        console.log("paper types", data.paper_types)
       })
       .catch(error => console.error(error));
   }, []);
+
 
   const handlePageChange = useCallback(
     (event, value) => {
@@ -128,53 +147,26 @@ const Page = () => {
     []
   );
 
-  
-
-
-  const openAddVendor = () => {
-    setAddVendorModal(true);
-
-fetch(baseUrl + 'get_vendor_types', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Types: ' + data.vendor_types);
-    setLoadVendorTypes(data.vendor_types)
-    
-  })
-  .catch(error => console.error(error));
-
-
+  const openAddPaperType = () => {
+    setAddPaperTypeModal(true);
   };
-  const closeAddVendor = () => {
-    setAddVendorModal(false);
+  const closeAddPaperType = () => {
+    setAddPaperTypeModal(false);
     resetForm();
   };
   const resetForm = () => {
     
-    setVendorName('');
-    setVendorAddress('');
-    setVendorContactNo('');
-    setVendorType([]);
-    
+    setPaperType('');
     
   };
-  const addVendor = () => {
-    setIsVendorLoading(true);
+  const addPaperType = () => {
+    setIsPaperTypeLoading(true);
     const data = {
+      paper_type: paperType,
       
-      name: vendorName,
-      address: vendorAddress,
-      contact_no: vendorContactNo,
-      vendor_type: vendorType,
-            
     };
 
-    fetch(baseUrl + 'add_new_vendor', {
+    fetch(baseUrl + 'add_new_paper_type', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -183,49 +175,29 @@ fetch(baseUrl + 'get_vendor_types', {
     })
       .then(response => response.json())
       .then(data => {
-        setIsVendorLoading(false);
-        //console.log("Data Success: " + data.vendors);
+        setIsPaperTypeLoading(false);
         if (data.success == 1){
-          toast.success("Vendor is Successfully Saved!");
-          setAddVendorModal(false);
-          closeAddVendor(true);
+          toast.success("Paper Type is Successfully Saved!")
+          setAddPaperTypeModal(false);
           // Update Products
         }else{
-          toast.error("Something Went Wrong!");
+          toast.error("Something Went Wrong!")
         }
       })
       .catch(error => {
-        console.error("Error Vendor: ", error);
+        console.error("Error: ", error);
         toast.error("Something Went Wrong!");
       })
-
-      
       .finally(() => {
-        setIsVendorLoading(false);
+        setIsPaperTypeLoading(false);
       });
-      
-    console.log('add Vendor data', data);
+      closeAddPaperType(true);
+    console.log('add Paper Type data', data);
   };
   
-  const onChangeVendorName = (e) => {
-    setVendorName(e.target.value);
-  };
   
-  const onChangeVendorAddress = (e) => {
-    setVendorAddress(e.target.value);
-  };
-  const onChangeVendorContactNo = (e) => {
-    setVendorContactNo(e.target.value);
-  };
-  const onChangeVendorType = (e, newValue) => {
-    
-    
-    
-    setVendorType(newValue);
-    
-  };
-  const handleIsOptionEqualToValue = (option, value) => {
-    return option.id === value.id && option.vendor_type === value.vendor_type;
+  const onChangePaperType = (e) => {
+    setPaperType(e.target.value);
   };
   
 
@@ -242,80 +214,44 @@ fetch(baseUrl + 'get_vendor_types', {
           />}
       </Modal>
       <ToastContainer />
-      {/*Add Vendor Modal*/}
+      {/*Add Category Modal*/}
       <Modal
-        open={addVendorModal}
-        onClose={closeAddVendor}
+        open={addPaperTypeModal}
+        onClose={closeAddPaperType}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Vendor
+            + Add Paper Type
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_name" style={{ position: 'unset' }}>Vendor
-                  Name</InputLabel>
-                <Input id="vendor_name" aria-describedby="add-vendor-name"
-                       onChange={onChangeVendorName} value={vendorName}/>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="category_id" style={{ position: 'unset' }}>Category Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="category_id" aria-describedby="add-category-id"*/}
+              {/*         onChange={onChangeCategoryId} value={categoryID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <InputLabel htmlFor="paper_type" style={{ position: 'unset' }}>Paper Type</InputLabel>
+                <Input id="paper_type" aria-describedby="add-paper_type"
+                       onChange={onChangePaperType} value={paperType}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_address" style={{ position: 'unset' }}>Vendor
-                  Address</InputLabel>
-                <Input id="vendor_address" aria-describedby="add-vendor-address"
-                       onChange={onChangeVendorAddress} value={vendorAddress}/>
               </Grid>
-
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_contact_no" style={{ position: 'unset' }}>Vendor
-                  Contact No</InputLabel>
-                <Input id="vendor_contact_no" aria-describedby="add-vendor_contact_no"
-                       onChange={onChangeVendorContactNo} value={vendorContactNo}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-              <Stack spacing={3} sx={{ width: 500 }}>
-              <Autocomplete
-        multiple
-        id="vendor_types"
-        options={loadVendorTypes}
-        getOptionLabel={(option) => option.vendor_type}
-        value={vendorType}
-        onChange={onChangeVendorType}
-        isOptionEqualToValue={handleIsOptionEqualToValue}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label="Vendor Type"
-            placeholder="Vendor Types"
-          />
-        )}
-      />
-      </Stack>
-              </Grid>
-              
-             
-              
-                  </Grid>          
-              
-              
             {/*</FormControl>*/}
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addVendor}>Submit</Button>
-            <Button variant="contained" onClick={closeAddVendor}>Cancel</Button>
+            <Button variant="contained" onClick={addPaperType}>Submit</Button>
+            <Button variant="contained" onClick={closeAddPaperType}>Cancel</Button>
           </Grid>
-          
         </Box>
       </Modal>
       <Head>
         <title>
-          Vendors | Scholar CRM
+          Paper Type | Scholar CRM
         </title>
       </Head>
       <Box
@@ -334,7 +270,7 @@ fetch(baseUrl + 'get_vendor_types', {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Vendors
+                  Paper Type
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -365,7 +301,7 @@ fetch(baseUrl + 'get_vendor_types', {
               </Stack>
               <div>
                 <Button
-                  onClick={openAddVendor}
+                  onClick={openAddPaperType}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -373,7 +309,7 @@ fetch(baseUrl + 'get_vendor_types', {
                   )}
                   variant="contained"
                 >
-                  Add Vendor
+                  Add Paper Type
                 </Button>
               </div>
             </Stack>

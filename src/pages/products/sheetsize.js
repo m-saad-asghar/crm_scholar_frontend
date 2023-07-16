@@ -13,18 +13,16 @@ import { applyPagination } from 'src/utils/apply-pagination';
 import FilledInput from '@mui/material/FilledInput';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-
-
-import CircularProgress from '@mui/material/CircularProgress';
-import { ToastContainer, toast } from 'react-toastify';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
+//import { error } from 'console';
 
 const style = {
   position: 'absolute',
@@ -54,6 +52,20 @@ const data = [
     name: 'Carson Darrin',
     phone: '304-428-3097'
   },
+  {
+    id: '5e887b209c28ac3dd97f6db5',
+    address: {
+      city: 'Atlanta',
+      country: 'USA',
+      state: 'Georgia',
+      street: '1865  Pleasant Hill Road'
+    },
+    avatar: '/assets/avatars/avatar-fran-perez.png',
+    createdAt: subDays(subHours(now, 1), 2).getTime(),
+    email: 'fran.perez@devias.io',
+    name: 'Fran Perez',
+    phone: '712-351-5711'
+  },
   
 ];
 
@@ -79,27 +91,22 @@ const Page = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addVendorModal, setAddVendorModal] = useState(false);
-  
-  const [vendorName, setVendorName] = useState('');
-  const [vendorType, setVendorType] = useState([]);
-  const [vendorAddress, setVendorAddress] = useState('');
-  const [vendorContactNo, setVendorContactNo] = useState('');
-  const [loadVendorTypes, setLoadVendorTypes] = useState([]);
-
-  const [vendorNames, setVendorNames] = useState([]);
-  const [isVendorLoading, setIsVendorLoading] = useState(false);
+  const [addSheetSizeModal, setAddSheetSizeModal] = useState(false);
+  const [sheetSizeName, setSheetSizeName] = useState('');
+  const [sheetLength, setSheetLength] = useState('');
+  const [sheetWidth, setSheetWidth] = useState('');
+  const [sheetPortion, setSheetPortion] = useState('');
+  const [sheetSizes, setSheetSizes] = useState([]);
+  const [isSheetSizeLoading, setIsSheetSizeLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  
+
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
-  
-  const [selectedOptions, setSelectedOptions] = useState([]);
 
   useEffect(() => {
     
-    fetch(baseUrl + 'get_vendors', {
+    fetch(baseUrl + 'get_sheet_sizes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -108,11 +115,13 @@ const Page = () => {
       .then(response => response.json())
       .then(data => {
         setIsDataLoading(false);
-        setVendorNames(data.vendors);
-        console.log("vendors", data.vendors);
+        setSheetSizes(data.sheets);
+        console.log("sheetSize", data.sheets);
       })
       .catch(error => console.error(error));
   }, []);
+
+
 
   const handlePageChange = useCallback(
     (event, value) => {
@@ -128,53 +137,32 @@ const Page = () => {
     []
   );
 
-  
-
-
-  const openAddVendor = () => {
-    setAddVendorModal(true);
-
-fetch(baseUrl + 'get_vendor_types', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Types: ' + data.vendor_types);
-    setLoadVendorTypes(data.vendor_types)
-    
-  })
-  .catch(error => console.error(error));
-
-
+  const openAddSheetSize = () => {
+    setAddSheetSizeModal(true);
   };
-  const closeAddVendor = () => {
-    setAddVendorModal(false);
+  const closeAddSheetSize = () => {
+    setAddSheetSizeModal(false);
     resetForm();
   };
   const resetForm = () => {
     
-    setVendorName('');
-    setVendorAddress('');
-    setVendorContactNo('');
-    setVendorType([]);
-    
+    setSheetSizeName('');
+    setSheetLength('');
+    setSheetWidth('');
+    setSheetPortion('');
     
   };
-  const addVendor = () => {
-    setIsVendorLoading(true);
+  const addSheetSize = () => {
+    setIsSheetSizeLoading(true);
     const data = {
       
-      name: vendorName,
-      address: vendorAddress,
-      contact_no: vendorContactNo,
-      vendor_type: vendorType,
-            
+      sheet: sheetSizeName,
+      length: sheetLength,
+      width: sheetWidth,
+      portion: sheetPortion,
+      
     };
-
-    fetch(baseUrl + 'add_new_vendor', {
+    fetch(baseUrl + 'add_new_sheet_size', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -183,49 +171,35 @@ fetch(baseUrl + 'get_vendor_types', {
     })
       .then(response => response.json())
       .then(data => {
-        setIsVendorLoading(false);
-        //console.log("Data Success: " + data.vendors);
+        setIsSheetSizeLoading(false);
         if (data.success == 1){
-          toast.success("Vendor is Successfully Saved!");
-          setAddVendorModal(false);
-          closeAddVendor(true);
+          toast.success("Sheet Size is Successfully Saved!")
+          setAddSheetSizeModal(false);
           // Update Products
         }else{
-          toast.error("Something Went Wrong!");
+          toast.error("Something Went Wrong!")
         }
       })
-      .catch(error => {
-        console.error("Error Vendor: ", error);
-        toast.error("Something Went Wrong!");
-      })
-
-      
+      .catch(error => toast.error("Something Went Wrong!"))
       .finally(() => {
-        setIsVendorLoading(false);
+        setIsSheetSizeLoading(false);
       });
-      
-    console.log('add Vendor data', data);
+      closeAddSheetSize(true);
+    console.log('add SheetSize data', data);
   };
+
   
-  const onChangeVendorName = (e) => {
-    setVendorName(e.target.value);
+  const onChangeSheetSizeName = (e) => {
+    setSheetSizeName(e.target.value);
   };
-  
-  const onChangeVendorAddress = (e) => {
-    setVendorAddress(e.target.value);
+  const onChangeSheetLength = (e) => {
+    setSheetLength(e.target.value);
   };
-  const onChangeVendorContactNo = (e) => {
-    setVendorContactNo(e.target.value);
+  const onChangeSheetWidth = (e) => {
+    setSheetWidth(e.target.value);
   };
-  const onChangeVendorType = (e, newValue) => {
-    
-    
-    
-    setVendorType(newValue);
-    
-  };
-  const handleIsOptionEqualToValue = (option, value) => {
-    return option.id === value.id && option.vendor_type === value.vendor_type;
+  const onChangeSheetPortion = (e) => {
+    setSheetPortion(e.target.value);
   };
   
 
@@ -242,80 +216,59 @@ fetch(baseUrl + 'get_vendor_types', {
           />}
       </Modal>
       <ToastContainer />
-      {/*Add Vendor Modal*/}
+      {/*Add SheetSize Modal*/}
       <Modal
-        open={addVendorModal}
-        onClose={closeAddVendor}
+        open={addSheetSizeModal}
+        onClose={closeAddSheetSize}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Vendor
+            + Add Sheet Size
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_name" style={{ position: 'unset' }}>Vendor
-                  Name</InputLabel>
-                <Input id="vendor_name" aria-describedby="add-vendor-name"
-                       onChange={onChangeVendorName} value={vendorName}/>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="sheetSize_id" style={{ position: 'unset' }}>SheetSize Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="sheetSize_id" aria-describedby="add-sheetSize-id"*/}
+              {/*         onChange={onChangeSheetSizeId} value={sheetSizeID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_size" style={{ position: 'unset' }}>Sheet Size</InputLabel>
+                <Input id="sheet_size" aria-describedby="add-sheet-size"
+                       onChange={onChangeSheetSizeName} value={sheetSizeName}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_address" style={{ position: 'unset' }}>Vendor
-                  Address</InputLabel>
-                <Input id="vendor_address" aria-describedby="add-vendor-address"
-                       onChange={onChangeVendorAddress} value={vendorAddress}/>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_length" style={{ position: 'unset' }}>Sheet Length</InputLabel>
+                <Input id="sheet_length" aria-describedby="add-sheet-length"
+                       onChange={onChangeSheetLength} value={sheetLength}/>
               </Grid>
-
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_contact_no" style={{ position: 'unset' }}>Vendor
-                  Contact No</InputLabel>
-                <Input id="vendor_contact_no" aria-describedby="add-vendor_contact_no"
-                       onChange={onChangeVendorContactNo} value={vendorContactNo}/>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_width" style={{ position: 'unset' }}>Sheet Width</InputLabel>
+                <Input id="sheet_width" aria-describedby="add-sheet-width"
+                       onChange={onChangeSheetWidth} value={sheetWidth}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-              <Stack spacing={3} sx={{ width: 500 }}>
-              <Autocomplete
-        multiple
-        id="vendor_types"
-        options={loadVendorTypes}
-        getOptionLabel={(option) => option.vendor_type}
-        value={vendorType}
-        onChange={onChangeVendorType}
-        isOptionEqualToValue={handleIsOptionEqualToValue}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label="Vendor Type"
-            placeholder="Vendor Types"
-          />
-        )}
-      />
-      </Stack>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_portion" style={{ position: 'unset' }}>Sheet Portion</InputLabel>
+                <Input id="sheet_portion" aria-describedby="add-sheet-portion"
+                       onChange={onChangeSheetPortion} value={sheetPortion}/>
               </Grid>
-              
-             
-              
-                  </Grid>          
-              
-              
+              </Grid>
             {/*</FormControl>*/}
           </Typography>
-          <Grid item xs={12} sm={4} md={4} lg={4}
+          <Grid item xs={12} sm={6} md={6} lg={6}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addVendor}>Submit</Button>
-            <Button variant="contained" onClick={closeAddVendor}>Cancel</Button>
+            <Button variant="contained" onClick={addSheetSize}>Submit</Button>
+            <Button variant="contained" onClick={closeAddSheetSize}>Cancel</Button>
           </Grid>
-          
         </Box>
       </Modal>
       <Head>
         <title>
-          Vendors | Scholar CRM
+          Sheet Size | Scholar CRM
         </title>
       </Head>
       <Box
@@ -334,7 +287,7 @@ fetch(baseUrl + 'get_vendor_types', {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Vendors
+                  Sheet Size
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -365,7 +318,7 @@ fetch(baseUrl + 'get_vendor_types', {
               </Stack>
               <div>
                 <Button
-                  onClick={openAddVendor}
+                  onClick={openAddSheetSize}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -373,7 +326,7 @@ fetch(baseUrl + 'get_vendor_types', {
                   )}
                   variant="contained"
                 >
-                  Add Vendor
+                  Add Sheet Size
                 </Button>
               </div>
             </Stack>

@@ -639,7 +639,7 @@ const Products = () => {
                     loadSheetSizes.map((sheets) => (
                       <MenuItem key={sheets.id} value={sheets.id}
                       >
-                        {sheets.sheet_size}
+                        {sheets.sheet}
                       </MenuItem>
                     ) )
                   }
@@ -831,7 +831,7 @@ const Products = () => {
                   {
                     loadTitleSizes.map((titles) => (
                       <MenuItem key={titles.id} value={titles.id}>
-                        {titles.sheet_size}
+                        {titles.sheet}
                       </MenuItem>
                     ) )
                   }
