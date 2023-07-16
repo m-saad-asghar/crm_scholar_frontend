@@ -50,7 +50,7 @@ const data = [
     name: 'Carson Darrin',
     phone: '304-428-3097'
   },
-  
+
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -100,7 +100,7 @@ const Page = () => {
   );
 
   useEffect(() => {
-    
+
     fetch(baseUrl + 'get_plates', {
       method: 'POST',
       headers: {
@@ -124,14 +124,14 @@ const Page = () => {
     resetForm();
   };
   const resetForm = () => {
-    
+
     setPlate('');
     
   };
   const addPlates = () => {
     setIsPlatesLoading(true);
     const data = {
-      
+
       plate: plate,
       
     };
@@ -164,7 +164,7 @@ const Page = () => {
       closeAddPlates(true);
     console.log('add Plates data', data);
   };
-  
+
   const onChangePlate = (e) => {
     setPlate(e.target.value);
   };

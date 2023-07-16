@@ -54,7 +54,7 @@ const data = [
     name: 'Carson Darrin',
     phone: '304-428-3097'
   },
-  
+
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -80,7 +80,7 @@ const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addVendorModal, setAddVendorModal] = useState(false);
-  
+
   const [vendorName, setVendorName] = useState('');
   const [vendorType, setVendorType] = useState([]);
   const [vendorAddress, setVendorAddress] = useState('');
@@ -90,15 +90,15 @@ const Page = () => {
   const [vendorNames, setVendorNames] = useState([]);
   const [isVendorLoading, setIsVendorLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  
+
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
-  
+
   const [selectedOptions, setSelectedOptions] = useState([]);
 
   useEffect(() => {
-    
+
     fetch(baseUrl + 'get_vendors', {
       method: 'POST',
       headers: {
@@ -128,7 +128,7 @@ const Page = () => {
     []
   );
 
-  
+
 
 
   const openAddVendor = () => {
@@ -144,7 +144,7 @@ fetch(baseUrl + 'get_vendor_types', {
   .then(data => {
     console.log('Types: ' + data.vendor_types);
     setLoadVendorTypes(data.vendor_types)
-    
+
   })
   .catch(error => console.error(error));
 
@@ -155,23 +155,23 @@ fetch(baseUrl + 'get_vendor_types', {
     resetForm();
   };
   const resetForm = () => {
-    
+
     setVendorName('');
     setVendorAddress('');
     setVendorContactNo('');
     setVendorType([]);
-    
+
     
   };
   const addVendor = () => {
     setIsVendorLoading(true);
     const data = {
-      
+
       name: vendorName,
       address: vendorAddress,
       contact_no: vendorContactNo,
       vendor_type: vendorType,
-            
+
     };
 
     fetch(baseUrl + 'add_new_vendor', {
@@ -199,14 +199,14 @@ fetch(baseUrl + 'get_vendor_types', {
         toast.error("Something Went Wrong!");
       })
 
-      
+
       .finally(() => {
         setIsVendorLoading(false);
       });
-      
+
     console.log('add Vendor data', data);
   };
-  
+
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
   };
@@ -218,11 +218,11 @@ fetch(baseUrl + 'get_vendor_types', {
     setVendorContactNo(e.target.value);
   };
   const onChangeVendorType = (e, newValue) => {
-    
-    
-    
+
+
+
     setVendorType(newValue);
-    
+
   };
   const handleIsOptionEqualToValue = (option, value) => {
     return option.id === value.id && option.vendor_type === value.vendor_type;
@@ -256,7 +256,7 @@ fetch(baseUrl + 'get_vendor_types', {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              
+
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="vendor_name" style={{ position: 'unset' }}>Vendor
                   Name</InputLabel>
@@ -297,10 +297,10 @@ fetch(baseUrl + 'get_vendor_types', {
       />
       </Stack>
               </Grid>
-              
-             
-              
-                  </Grid>          
+
+
+
+                  </Grid>
               
               
             {/*</FormControl>*/}

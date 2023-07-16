@@ -223,7 +223,6 @@ const Page = () => {
       .then(data => {
         setIsDataLoading(false);
         setSubjects(data.subject);
-        console.log("subject", data.subject)
       })
       .catch(error => console.error(error));
   }, []);
@@ -286,7 +285,6 @@ const Page = () => {
         setIsSubjectLoading(false);
       });
       closeAddSubject(true);
-    console.log('add Subject data', data);
   };
 
   const onChangeSubjectId = (e) => {

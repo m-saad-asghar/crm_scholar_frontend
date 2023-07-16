@@ -66,7 +66,7 @@ const data = [
     name: 'Fran Perez',
     phone: '712-351-5711'
   },
-  
+
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -92,14 +92,14 @@ const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addPaperProductModal, setAddPaperProductModal] = useState(false);
-  
+
   const [paperName, setPaperName] = useState('');
   const [paperLength, setPaperLength] = useState('');
   const [paperWidth, setPaperWidth] = useState('');
   const [paperWeight, setPaperWeight] = useState('');
   const [paperType, setPaperType] = useState('0');
   const [loadPaperTypes, setLoadPaperTypes] = useState([]);
-  
+
   const [paperSizes, setPaperSizes] = useState([]);
   const [isPaperSizeLoading, setIsPaperSizeLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
@@ -109,7 +109,7 @@ const Page = () => {
   const customersSelection = useSelection(customersIds);
 
   useEffect(() => {
-    
+
     fetch(baseUrl + 'get_papers', {
       method: 'POST',
       headers: {
@@ -163,7 +163,7 @@ const Page = () => {
     resetForm();
   };
   const resetForm = () => {
-    
+
     setPaperName('');
     setPaperLength('');
     setPaperWidth('');
@@ -174,7 +174,7 @@ const Page = () => {
   const addPaperProduct = () => {
     setIsPaperSizeLoading(true);
     const data = {
-      
+
       paper: paperName,
       length: paperLength,
       width: paperWidth,
@@ -207,7 +207,7 @@ const Page = () => {
         toast.error("Something Went Wrong!");
       })
 
-      
+
       .finally(() => {
         setIsPaperSizeLoading(false);
       });
@@ -217,7 +217,7 @@ const Page = () => {
 
 
   };
-  
+
   const onChangePaperName = (e) => {
     setPaperName(e.target.value);
   };
@@ -262,7 +262,7 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              
+
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="paper_size" style={{ position: 'unset' }}>Paper Size</InputLabel>
                 <Input id="paper_size" aria-describedby="add-paper-size"

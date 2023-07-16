@@ -67,7 +67,7 @@ const data = [
     name: 'Fran Perez',
     phone: '712-351-5711'
   },
-  
+
 ];
 
 const productData = [
@@ -130,7 +130,7 @@ const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addPurchaseModal, setAddPurchaseModal] = useState(false);
-  
+
   const [vendorName, setVendorName] = useState('0');
   const [vendorCode, setVendorCode] = useState('');
   const [loadVendors, setLoadVendors] = useState([]);
@@ -138,7 +138,7 @@ const Page = () => {
   const [productName, setProductName] = useState('0');
   const [productID, setProductID] = useState('0');
   const [loadProducts, setLoadProducts] = useState([]);
-  
+
   const [productGodown, setProductGodown] = useState('0');
   const [productGodownID, setProductGodownID] = useState('');
   const [loadGodowns, setLoadGodowns] = useState([]);
@@ -182,7 +182,7 @@ const Page = () => {
     .then(response => response.json())
     .then(data => {
       setLoadVendors(data.vendors);
-     
+
 
     })
     .catch(error => console.error(error));
@@ -203,22 +203,22 @@ const Page = () => {
 
     setAddPurchaseModal(true);
 
-    
-    
+
+
   };
   const closeAddPurchase = () => {
     resetForm();
     setAddPurchaseModal(false);
-    
+
   };
   const resetForm = () => {
-    
+
     setVendorName('0');
     setProductType('0');
     setProductName('0');
     setLoadProducts([]);
     setLoadProductsForPlates([]);
-    
+
     setProductGodownID('0');
     setProductGodown('0');
     setProductQty('');
@@ -229,19 +229,19 @@ const Page = () => {
 
     setTableData([]);
     setDBData([]);
-    
+
   };
   const addPurchase = () => {
     const Voucher = {
-      
+
       vendor_code: vendorCode,
       total_amount: totalAmount,
-      
-      
+
+
     };
-    
-    
-    
+
+
+
 
     const data = {
       Voucher: Voucher,
@@ -270,7 +270,7 @@ console.log(data);
       toast.error("Something Went Wrong!");
     })
 
-    
+
     .finally(() => {
       //setIsPaperSizeLoading(false);
     });
@@ -278,7 +278,7 @@ console.log(data);
   };
   const onClickAddButton = () => {
     const newItem = {
-      
+
       product_name: productName,
       product_godown: productGodown,
       product_qty: productQty,
@@ -288,7 +288,7 @@ console.log(data);
     };
 console.log('productForPlatesID: ' + productForPlatesID);
     const newItemDB = {
-      
+
       product_id: productID,
       godown_id: productGodownID,
       product_qty: productQty,
@@ -313,13 +313,13 @@ console.log('productForPlatesID: ' + productForPlatesID);
 
 
   /*
-      It is very important if I want to see immigiate updates  
+      It is very important if I want to see immigiate updates
   useEffect(() => {
     console.log(dbData);
   }, [dbData]);
   */
  useEffect(() => {
-  
+
   let totalAmount = 0;
   tableData.forEach((data) => {
     totalAmount += parseFloat(data.product_amount);
@@ -361,7 +361,7 @@ console.log('Product Type: ' + e.target.value);
       .then(data => {
         setLoadProducts(data.plates);
         console.log("plates", data.plates)
-  
+
       })
       .catch(error => console.error(error));
 
@@ -374,8 +374,8 @@ console.log('Product Type: ' + e.target.value);
       .then(response => response.json())
       .then(data => {
         setLoadProductsForPlates(data.products);
-        
-  
+
+
       })
       .catch(error => console.error(error));
     }
@@ -397,15 +397,32 @@ console.log('Product Type: ' + e.target.value);
   const onClickProduct = (pid) => {
     setProductID(pid);
   }
-  
+  const onClickProductName = ( pid) =>{
+    const selectedProduct = productData.find(
+      (product) => product.id === pid
+    );
+
+
+  if (selectedProduct) {
+    setProductCode(selectedProduct.code);
+  } else {
+    setProductCode('');
+  }
+  }
+  const onChangeProductCode = (e) => {
+
+    setProductCode(e.target.value);
+
+
+
   const onClickVendorName = (vid) => {
     setVendorCode(vid);
   }
-  
+
   const onChangeProductGodown = (e) => {
     setProductGodown(e.target.value);
     console.log('Godown Name: ' + e.target.value);
-    
+
   };
   const onClickGodown = (gid) => {
     setProductGodownID(gid);
@@ -456,7 +473,7 @@ console.log('Product Type: ' + e.target.value);
             
             <Grid container spacing={2}>
             
-              
+
               
               <Grid item xs={12} sm={12} md={12} lg={12}>
               <Select
@@ -476,7 +493,7 @@ console.log('Product Type: ' + e.target.value);
                       onClick={() => onClickVendorName(vendor.code) }>{vendor.name}</MenuItem>
                     ))
                   }
-                  
+
                 </Select>
               </Grid>
               
@@ -499,7 +516,7 @@ console.log('Product Type: ' + e.target.value);
                 </Select>
               </Grid>
               
-              
+
               <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
                   labelId="product_name"
@@ -515,7 +532,7 @@ console.log('Product Type: ' + e.target.value);
                   </MenuItem>
                   {
                    loadProducts.map((product) => (
-                    <MenuItem data-key={product.id} value={productType === '1' ? product.paper : product.plate} 
+                    <MenuItem data-key={product.id} value={productType === '1' ? product.paper : product.plate}
                     onClick={() => onClickProduct(product.id)}>
                       {productType === '1' ? product.paper : product.plate}
                     </MenuItem>
@@ -526,7 +543,7 @@ console.log('Product Type: ' + e.target.value);
   
                 </Select>
               </Grid>
-              
+
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_qty" style={{ position: 'unset' }}>Qty
                   </InputLabel>
@@ -559,13 +576,13 @@ console.log('Product Type: ' + e.target.value);
                   </MenuItem>
                   {
                    loadGodowns.map((godown) => (
-                    <MenuItem data-key={godown.id} value={godown.name} 
+                    <MenuItem data-key={godown.id} value={godown.name}
                     onClick={() => onClickGodown(godown.id)}>
                       {godown.name}
                     </MenuItem>
                   ))
                   }
-                  
+
                 </Select>
               </Grid>
               <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -573,7 +590,7 @@ console.log('Product Type: ' + e.target.value);
                   labelId="product_for_plates"
                   id="product_for_plates"
                   label="Product for Plates"
-                  
+
                   style={{ minWidth: '95%' }}
                   onChange={onChangeProductForPlates}
                   value={productForPlates}
@@ -583,26 +600,26 @@ console.log('Product Type: ' + e.target.value);
                   </MenuItem>
                   {
                    loadProductsForPlates.map((product) => (
-                    <MenuItem data-key={product.id} value={product.name} 
+                    <MenuItem data-key={product.id} value={product.name}
                     onClick={() => onClickProductForPlates(product.id)}>
                       {product.name}
                     </MenuItem>
                   ))
                   }
-                  
+
                 </Select>
               </Grid>
               <Grid item xs={12} sm={2} md={2} lg={2}>
               <Button variant="contained" onClick={onClickAddButton}>Add</Button>
               </Grid>
-              
+
               <Grid item xs={12} sm={12} md={12} lg={12}>
               <Table className="table table-striped">
 <thead>
   <tr>
-    
+
     <th>Product Name</th>
-    
+
     <th>Qty</th>
     <th>Rate</th>
     <th>Amount</th>
@@ -613,15 +630,15 @@ console.log('Product Type: ' + e.target.value);
 <tbody>
 {tableData.map((rowData, index) => (
   <tr key={index}>
-  
+
   <td>{rowData.product_name}</td>
-  
+
   <td>{rowData.product_qty}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
   <td>{rowData.product_godown}</td>
   <td>{rowData.product_for}</td>
-  
+
 </tr>
 ))}
 </tbody>
@@ -629,7 +646,7 @@ console.log('Product Type: ' + e.target.value);
 
             </Table>
               </Grid>
-              
+
               <Grid item xs={12} sm={12} md={12} lg={12}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                 <InputLabel htmlFor="total_amount" style={{ position: 'unset', textAlign: 'right'  }}>Total Amount
@@ -638,12 +655,12 @@ console.log('Product Type: ' + e.target.value);
                         value={totalAmount} inputProps={{ style: { textAlign: 'right' } }}/>
                         </div>
               </Grid>
-              
+
             </Grid>
 
             {/* Grid Table */}
 
-            
+
 
 
             {/*</FormControl>*/}

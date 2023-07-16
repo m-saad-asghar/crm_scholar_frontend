@@ -50,7 +50,7 @@ const data = [
     name: 'Carson Darrin',
     phone: '304-428-3097'
   },
-  
+
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -76,15 +76,13 @@ const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addGodownModal, setAddGodownModal] = useState(false);
-  
+  const [godownID, setGodownID] = useState('');
   const [godownName, setGodownName] = useState('');
   const [godownAddress, setGodownAddress] = useState('');
   const [godownContactNo, setGodownContactNo] = useState('');
-  
   const [godownNames, setGodownNames] = useState([]);
   const [isGodownLoading, setIsGodownLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
-
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
@@ -103,7 +101,7 @@ const Page = () => {
   );
 
   useEffect(() => {
-    
+
     fetch(baseUrl + 'get_godowns', {
       method: 'POST',
       headers: {
@@ -128,7 +126,7 @@ const Page = () => {
     resetForm();
   };
   const resetForm = () => {
-    
+    setGodownID('');
     setGodownName('');
     setGodownAddress('');
     setGodownContactNo('');
@@ -171,7 +169,9 @@ const Page = () => {
       });
     console.log('add Godown data', data);
   };
-  
+  const onChangeGodownID = (e) => {
+    setGodownID(e.target.value);
+  };
   const onChangeGodownName = (e) => {
     setGodownName(e.target.value);
   };
@@ -212,7 +212,12 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="godown_id" style={{ position: 'unset' }}>Godown
+                  ID</InputLabel>
+                <Input id="godown_id" aria-describedby="add-godown-code"
+                       onChange={onChangeGodownID} value={godownID}/>
+              </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="godown_name" style={{ position: 'unset' }}>Godown
                   Name</InputLabel>

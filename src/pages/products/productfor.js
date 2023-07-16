@@ -211,7 +211,7 @@ const Page = () => {
   const customersSelection = useSelection(customersIds);
 
   useEffect(() => {
-    
+
     fetch(baseUrl + 'get_book_for_board', {
       method: 'POST',
       headers: {
@@ -250,14 +250,14 @@ const Page = () => {
     resetForm();
   };
   const resetForm = () => {
-    
+
     setProductForName('');
     
   };
   const addProductFor = () => {
     setIsProductForLoading(true);
     const data = {
-      
+
       board: productForName,
       
     };
