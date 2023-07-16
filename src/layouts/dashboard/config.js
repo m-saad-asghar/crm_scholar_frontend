@@ -24,7 +24,6 @@ export const items = [
         <ProductIcon />
       </SvgIcon>
     ),
-    
   },
   {
     title: 'Product - Category',
