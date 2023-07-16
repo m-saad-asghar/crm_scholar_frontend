@@ -66,7 +66,7 @@ const data = [
     name: 'Fran Perez',
     phone: '712-351-5711'
   },
-
+  
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -91,17 +91,13 @@ const Page = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addPaperProductModal, setAddPaperProductModal] = useState(false);
-
-  const [paperName, setPaperName] = useState('');
-  const [paperLength, setPaperLength] = useState('');
-  const [paperWidth, setPaperWidth] = useState('');
-  const [paperWeight, setPaperWeight] = useState('');
-  const [paperType, setPaperType] = useState('0');
-  const [loadPaperTypes, setLoadPaperTypes] = useState([]);
-
-  const [paperSizes, setPaperSizes] = useState([]);
-  const [isPaperSizeLoading, setIsPaperSizeLoading] = useState(false);
+  const [addSheetSizeModal, setAddSheetSizeModal] = useState(false);
+  const [sheetSizeName, setSheetSizeName] = useState('');
+  const [sheetLength, setSheetLength] = useState('');
+  const [sheetWidth, setSheetWidth] = useState('');
+  const [sheetPortion, setSheetPortion] = useState('');
+  const [sheetSizes, setSheetSizes] = useState([]);
+  const [isSheetSizeLoading, setIsSheetSizeLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   const customers = useCustomers(page, rowsPerPage);
@@ -109,8 +105,8 @@ const Page = () => {
   const customersSelection = useSelection(customersIds);
 
   useEffect(() => {
-
-    fetch(baseUrl + 'get_papers', {
+    
+    fetch(baseUrl + 'get_sheet_sizes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -119,11 +115,12 @@ const Page = () => {
       .then(response => response.json())
       .then(data => {
         setIsDataLoading(false);
-        setPaperSizes(data.papers);
-        console.log("paper Size", data.papers);
+        setSheetSizes(data.sheets);
+        console.log("sheetSize", data.sheets);
       })
       .catch(error => console.error(error));
   }, []);
+
 
 
   const handlePageChange = useCallback(
@@ -140,50 +137,32 @@ const Page = () => {
     []
   );
 
-  const openAddPaperProduct = () => {
-    setAddPaperProductModal(true);
-
-    fetch(baseUrl + 'get_paper_types',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadPaperTypes(data.paper_types);
-      console.log("paper type", data.paper_types)
-
-    })
-    .catch(error => console.error(error));
-
+  const openAddSheetSize = () => {
+    setAddSheetSizeModal(true);
   };
-  const closeAddPaperProduct = () => {
-    setAddPaperProductModal(false);
+  const closeAddSheetSize = () => {
+    setAddSheetSizeModal(false);
     resetForm();
   };
   const resetForm = () => {
-
-    setPaperName('');
-    setPaperLength('');
-    setPaperWidth('');
-    setPaperWeight('');
-    setPaperType('0');
+    
+    setSheetSizeName('');
+    setSheetLength('');
+    setSheetWidth('');
+    setSheetPortion('');
     
   };
-  const addPaperProduct = () => {
-    setIsPaperSizeLoading(true);
+  const addSheetSize = () => {
+    setIsSheetSizeLoading(true);
     const data = {
-
-      paper: paperName,
-      length: paperLength,
-      width: paperWidth,
-      weight: paperWeight,
-      paper_type: paperType,
+      
+      sheet: sheetSizeName,
+      length: sheetLength,
+      width: sheetWidth,
+      portion: sheetPortion,
       
     };
-
-    fetch(baseUrl + 'add_new_paper', {
+    fetch(baseUrl + 'add_new_sheet_size', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -192,47 +171,36 @@ const Page = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setIsPaperSizeLoading(false);
-        console.log("Data Success: " + data.success);
+        setIsSheetSizeLoading(false);
         if (data.success == 1){
-          toast.success("Paper Size is Successfully Saved!");
-          setAddPaperProductModal(false);
+          toast.success("Sheet Size is Successfully Saved!")
+          setAddSheetSizeModal(false);
           // Update Products
         }else{
-          toast.error("Something Went Wrong!");
+          toast.error("Something Went Wrong!")
         }
       })
-      .catch(error => {
-        console.error("Error: ", error);
-        toast.error("Something Went Wrong!");
-      })
-
-
+      .catch(error => toast.error("Something Went Wrong!"))
       .finally(() => {
-        setIsPaperSizeLoading(false);
+        setIsSheetSizeLoading(false);
       });
-      closeAddPaperProduct(true);
-
-    console.log('add Paper Product data', data);
-
-
+      closeAddSheetSize(true);
+    console.log('add SheetSize data', data);
   };
 
-  const onChangePaperName = (e) => {
-    setPaperName(e.target.value);
+  
+  const onChangeSheetSizeName = (e) => {
+    setSheetSizeName(e.target.value);
   };
-  const onChangePaperLength = (e) => {
-    setPaperLength(e.target.value);
-  }
-  const onChangePaperWidth = (e) => {
-    setPaperWidth(e.target.value);
-  }
-  const onChangePaperWeight = (e) => {
-    setPaperWeight(e.target.value);
-  }
-  const onChangePaperType = (e) => {
-    setPaperType(e.target.value);
-  }
+  const onChangeSheetLength = (e) => {
+    setSheetLength(e.target.value);
+  };
+  const onChangeSheetWidth = (e) => {
+    setSheetWidth(e.target.value);
+  };
+  const onChangeSheetPortion = (e) => {
+    setSheetPortion(e.target.value);
+  };
   
 
   return (
@@ -248,75 +216,59 @@ const Page = () => {
           />}
       </Modal>
       <ToastContainer />
-      {/*Add Paper Product Modal*/}
+      {/*Add SheetSize Modal*/}
       <Modal
-        open={addPaperProductModal}
-        onClose={closeAddPaperProduct}
+        open={addSheetSizeModal}
+        onClose={closeAddSheetSize}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Paper Product
+            + Add Sheet Size
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_size" style={{ position: 'unset' }}>Paper Size</InputLabel>
-                <Input id="paper_size" aria-describedby="add-paper-size"
-                       onChange={onChangePaperName} value={paperName}/>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="sheetSize_id" style={{ position: 'unset' }}>SheetSize Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="sheetSize_id" aria-describedby="add-sheetSize-id"*/}
+              {/*         onChange={onChangeSheetSizeId} value={sheetSizeID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_size" style={{ position: 'unset' }}>Sheet Size</InputLabel>
+                <Input id="sheet_size" aria-describedby="add-sheet-size"
+                       onChange={onChangeSheetSizeName} value={sheetSizeName}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_length" style={{ position: 'unset' }}>Paper Length</InputLabel>
-                <Input id="paper_length" aria-describedby="add-paper-length"
-                       onChange={onChangePaperLength} value={paperLength}/>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_length" style={{ position: 'unset' }}>Sheet Length</InputLabel>
+                <Input id="sheet_length" aria-describedby="add-sheet-length"
+                       onChange={onChangeSheetLength} value={sheetLength}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_width" style={{ position: 'unset' }}>Paper Width</InputLabel>
-                <Input id="paper_width" aria-describedby="add-paper-width"
-                       onChange={onChangePaperWidth} value={paperWidth}/>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_width" style={{ position: 'unset' }}>Sheet Width</InputLabel>
+                <Input id="sheet_width" aria-describedby="add-sheet-width"
+                       onChange={onChangeSheetWidth} value={sheetWidth}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_weight" style={{ position: 'unset' }}>Paper Weight</InputLabel>
-                <Input id="paper_weight" aria-describedby="add-paper-weight"
-                       onChange={onChangePaperWeight} value={paperWeight}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
-                  labelId="paper_type"
-                  id="paper_type"
-                  label="Paper Type"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangePaperType}
-                  value={paperType}
-                >
-                  <MenuItem value="0">
-                    <em>Select Paper Type</em>
-                  </MenuItem>
-                  {
-                    loadPaperTypes.map((ptypes) => (
-                      <MenuItem key={ptypes.id} value={ptypes.id}>
-                        {ptypes.child_type}
-                      </MenuItem>
-                    ))
-                  }
-                </Select>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                <InputLabel htmlFor="sheet_portion" style={{ position: 'unset' }}>Sheet Portion</InputLabel>
+                <Input id="sheet_portion" aria-describedby="add-sheet-portion"
+                       onChange={onChangeSheetPortion} value={sheetPortion}/>
               </Grid>
               </Grid>
             {/*</FormControl>*/}
           </Typography>
-          <Grid item xs={12} sm={4} md={4} lg={4}
+          <Grid item xs={12} sm={6} md={6} lg={6}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addPaperProduct}>Submit</Button>
-            <Button variant="contained" onClick={closeAddPaperProduct}>Cancel</Button>
+            <Button variant="contained" onClick={addSheetSize}>Submit</Button>
+            <Button variant="contained" onClick={closeAddSheetSize}>Cancel</Button>
           </Grid>
         </Box>
       </Modal>
       <Head>
         <title>
-          Paper Product | Scholar CRM
+          Sheet Size | Scholar CRM
         </title>
       </Head>
       <Box
@@ -335,7 +287,7 @@ const Page = () => {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Paper Product
+                  Sheet Size
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -366,7 +318,7 @@ const Page = () => {
               </Stack>
               <div>
                 <Button
-                  onClick={openAddPaperProduct}
+                  onClick={openAddSheetSize}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -374,7 +326,7 @@ const Page = () => {
                   )}
                   variant="contained"
                 >
-                  Add Paper Product
+                  Add Sheet Size
                 </Button>
               </div>
             </Stack>

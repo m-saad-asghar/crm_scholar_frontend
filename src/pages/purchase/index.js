@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -20,6 +20,10 @@ import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { textAlign } from '@mui/system';
+import { ToastContainer, toast } from 'react-toastify';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const style = {
   position: 'absolute',
@@ -63,118 +67,7 @@ const data = [
     name: 'Fran Perez',
     phone: '712-351-5711'
   },
-  {
-    id: '5e887b7602bdbc4dbb234b27',
-    address: {
-      city: 'North Canton',
-      country: 'USA',
-      state: 'Ohio',
-      street: '4894  Lakeland Park Drive'
-    },
-    avatar: '/assets/avatars/avatar-jie-yan-song.png',
-    createdAt: subDays(subHours(now, 4), 2).getTime(),
-    email: 'jie.yan.song@devias.io',
-    name: 'Jie Yan Song',
-    phone: '770-635-2682'
-  },
-  {
-    id: '5e86809283e28b96d2d38537',
-    address: {
-      city: 'Madrid',
-      country: 'Spain',
-      name: 'Anika Visser',
-      street: '4158  Hedge Street'
-    },
-    avatar: '/assets/avatars/avatar-anika-visser.png',
-    createdAt: subDays(subHours(now, 11), 2).getTime(),
-    email: 'anika.visser@devias.io',
-    name: 'Anika Visser',
-    phone: '908-691-3242'
-  },
-  {
-    id: '5e86805e2bafd54f66cc95c3',
-    address: {
-      city: 'San Diego',
-      country: 'USA',
-      state: 'California',
-      street: '75247'
-    },
-    avatar: '/assets/avatars/avatar-miron-vitold.png',
-    createdAt: subDays(subHours(now, 7), 3).getTime(),
-    email: 'miron.vitold@devias.io',
-    name: 'Miron Vitold',
-    phone: '972-333-4106'
-  },
-  {
-    id: '5e887a1fbefd7938eea9c981',
-    address: {
-      city: 'Berkeley',
-      country: 'USA',
-      state: 'California',
-      street: '317 Angus Road'
-    },
-    avatar: '/assets/avatars/avatar-penjani-inyene.png',
-    createdAt: subDays(subHours(now, 5), 4).getTime(),
-    email: 'penjani.inyene@devias.io',
-    name: 'Penjani Inyene',
-    phone: '858-602-3409'
-  },
-  {
-    id: '5e887d0b3d090c1b8f162003',
-    address: {
-      city: 'Carson City',
-      country: 'USA',
-      state: 'Nevada',
-      street: '2188  Armbrester Drive'
-    },
-    avatar: '/assets/avatars/avatar-omar-darboe.png',
-    createdAt: subDays(subHours(now, 15), 4).getTime(),
-    email: 'omar.darobe@devias.io',
-    name: 'Omar Darobe',
-    phone: '415-907-2647'
-  },
-  {
-    id: '5e88792be2d4cfb4bf0971d9',
-    address: {
-      city: 'Los Angeles',
-      country: 'USA',
-      state: 'California',
-      street: '1798  Hickory Ridge Drive'
-    },
-    avatar: '/assets/avatars/avatar-siegbert-gottfried.png',
-    createdAt: subDays(subHours(now, 2), 5).getTime(),
-    email: 'siegbert.gottfried@devias.io',
-    name: 'Siegbert Gottfried',
-    phone: '702-661-1654'
-  },
-  {
-    id: '5e8877da9a65442b11551975',
-    address: {
-      city: 'Murray',
-      country: 'USA',
-      state: 'Utah',
-      street: '3934  Wildrose Lane'
-    },
-    avatar: '/assets/avatars/avatar-iulia-albu.png',
-    createdAt: subDays(subHours(now, 8), 6).getTime(),
-    email: 'iulia.albu@devias.io',
-    name: 'Iulia Albu',
-    phone: '313-812-8947'
-  },
-  {
-    id: '5e8680e60cba5019c5ca6fda',
-    address: {
-      city: 'Salt Lake City',
-      country: 'USA',
-      state: 'Utah',
-      street: '368 Lamberts Branch Road'
-    },
-    avatar: '/assets/avatars/avatar-nasimiyu-danai.png',
-    createdAt: subDays(subHours(now, 1), 9).getTime(),
-    email: 'nasimiyu.danai@devias.io',
-    name: 'Nasimiyu Danai',
-    phone: '801-301-7894'
-  }
+
 ];
 
 const productData = [
@@ -230,23 +123,34 @@ return useMemo( () => {
 };
 
 const Page = () => {
-
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [tableData, setTableData] = useState([]);
+  const [dbData, setDBData] = useState([]);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addPurchaseModal, setAddPurchaseModal] = useState(false);
-  const [purchaseVoucherNo, setPurchaseVoucherNo] = useState('');
-  const [vendorName, setVendorName] = useState('');
+
+  const [vendorName, setVendorName] = useState('0');
+  const [vendorCode, setVendorCode] = useState('');
+  const [loadVendors, setLoadVendors] = useState([]);
   const [productType, setProductType] = useState('0');
   const [productName, setProductName] = useState('0');
-  const [productCode, setProductCode] = useState('0');
+  const [productID, setProductID] = useState('0');
+  const [loadProducts, setLoadProducts] = useState([]);
+
   const [productGodown, setProductGodown] = useState('0');
+  const [productGodownID, setProductGodownID] = useState('');
+  const [loadGodowns, setLoadGodowns] = useState([]);
   const [productQty, setProductQty] = useState('');
   const [productRate, setProductRate] = useState('');
   const [productAmount, setProductAmount] = useState('');
-
+  const [totalAmount, setTotalAmount] = useState('0');
+ const [productForPlates, setProductForPlates] = useState('0');
+  const [productForPlatesID, setProductForPlatesID] = useState('0');
+  const [loadProductsForPlates, setLoadProductsForPlates] = useState([]);
   
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const customers = useCustomers(page, rowsPerPage);
   
   const customersIds = useCustomerIds(customers);
@@ -267,48 +171,162 @@ const Page = () => {
   );
 
   const openAddPurchase = () => {
+
+
+    fetch(baseUrl + 'get_p_p_vendors',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadVendors(data.vendors);
+
+
+    })
+    .catch(error => console.error(error));
+
+    fetch(baseUrl + 'get_godowns',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadGodowns(data.godowns);
+      console.log("godowns", data.godowns)
+
+    })
+    .catch(error => console.error(error));
+
     setAddPurchaseModal(true);
+
+
+
   };
   const closeAddPurchase = () => {
-    setAddPurchaseModal(false);
     resetForm();
+    setAddPurchaseModal(false);
+
   };
   const resetForm = () => {
-    setPurchaseVoucherNo('');
-    setVendorName('');
+
+    setVendorName('0');
     setProductType('0');
-    setProductName('');
-    setProductCode('');
-    setProductGodown('');
+    setProductName('0');
+    setLoadProducts([]);
+    setLoadProductsForPlates([]);
+
+    setProductGodownID('0');
+    setProductGodown('0');
     setProductQty('');
     setProductRate('');
     setProductAmount('');
+    setProductForPlates('0');
+    setProductForPlatesID('0');
 
     setTableData([]);
-    
+    setDBData([]);
+
   };
   const addPurchase = () => {
-    const data = {
-      purchase_voucher_no: purchaseVoucherNo,
-      vendor_name: vendorName,
-      
-      
+    const Voucher = {
+
+      vendor_code: vendorCode,
+      total_amount: totalAmount,
+
+
     };
+
+
+
+
+    const data = {
+      Voucher: Voucher,
+      inventories: dbData,
+    };
+console.log(data);
+    fetch(baseUrl + 'add_new_voucher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(dt => {
+      if (data.success == 1){
+        toast.success("Purchase Voucher is Successfully Saved!");
+        setAddPurchaseModal(false);
+        // Update Products
+      }else{
+        toast.error("Something Went Wrong!");
+      }
+    })
+    .catch(error => {
+      console.error("Error: ", error);
+      toast.error("Something Went Wrong!");
+    })
+
+
+    .finally(() => {
+      //setIsPaperSizeLoading(false);
+    });
+      closeAddPurchase(true);
   };
   const onClickAddButton = () => {
     const newItem = {
-      product_code: productCode,
+
       product_name: productName,
       product_godown: productGodown,
       product_qty: productQty,
       product_rate: productRate,
       product_amount: productAmount,
+      product_for: productForPlates === '0' ? '' : productForPlates,
     };
+console.log('productForPlatesID: ' + productForPlatesID);
+    const newItemDB = {
+
+      product_id: productID,
+      godown_id: productGodownID,
+      product_qty: productQty,
+      product_rate: productRate,
+      product_amount: productAmount,
+      product_for: productForPlatesID === '0' ? 0 : productForPlatesID,
+    };
+
     setTableData((prevTableData) => [...prevTableData, newItem]);
+    setDBData((prevDBData) => [...prevDBData, newItemDB]);
+
+    setProductName('0');
+    setProductQty('');
+    setProductRate('');
+    setProductAmount('');
+    setProductGodown('0');
+    setProductGodownID('0');
+    setProductForPlates('0');
+    setProductForPlatesID('0');
+
   };
-  const onChangePurchaseVoucherNo = (e) => {
-    setPurchaseVoucherNo(e.target.value);
-  };
+
+
+  /*
+      It is very important if I want to see immigiate updates
+  useEffect(() => {
+    console.log(dbData);
+  }, [dbData]);
+  */
+ useEffect(() => {
+
+  let totalAmount = 0;
+  tableData.forEach((data) => {
+    totalAmount += parseFloat(data.product_amount);
+  });
+  setTotalAmount(totalAmount);
+  console.log(totalAmount);
+ }, [tableData]);
   
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
@@ -316,7 +334,58 @@ const Page = () => {
   
   const onChangeProductType = (e) => {
     setProductType(e.target.value);
-  }
+console.log('Product Type: ' + e.target.value);
+    if(e.target.value === '1'){
+      fetch(baseUrl + 'get_papers',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadProducts(data.papers);
+        console.log("papers", data.papers)
+        setLoadProductsForPlates([]);
+      })
+      .catch(error => console.error(error));
+    }
+    else if(e.target.value === '2'){
+      fetch(baseUrl + 'get_plates',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadProducts(data.plates);
+        console.log("plates", data.plates)
+
+      })
+      .catch(error => console.error(error));
+
+      fetch(baseUrl + 'get_p_f_plates',{    // Get Active Product ID and Product Name
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadProductsForPlates(data.products);
+
+
+      })
+      .catch(error => console.error(error));
+    }
+    else{
+      setLoadProducts([]);
+      setLoadProductsForPlates([]);
+    }
+
+    setProductName('0');
+  };
 
   const onChangeProductName = (e) => {
     
@@ -324,12 +393,15 @@ const Page = () => {
 
     
 
+  };
+  const onClickProduct = (pid) => {
+    setProductID(pid);
   }
   const onClickProductName = ( pid) =>{
     const selectedProduct = productData.find(
-      (product) => product.id === pid 
+      (product) => product.id === pid
     );
-    
+
 
   if (selectedProduct) {
     setProductCode(selectedProduct.code);
@@ -338,39 +410,53 @@ const Page = () => {
   }
   }
   const onChangeProductCode = (e) => {
-   
+
     setProductCode(e.target.value);
 
-    
-  
-  }
-  const onClickProductCode = (pid) => {
-    const selectedProduct = productData.find(
-      (product) => product.id === pid 
-    );
-    
 
-  if (selectedProduct) {
-    setProductName(selectedProduct.name);
-  } else {
-    setProductName('');
+
+  const onClickVendorName = (vid) => {
+    setVendorCode(vid);
   }
-  }
+
   const onChangeProductGodown = (e) => {
     setProductGodown(e.target.value);
-  }
-  const onChangeProductQty = (e) => {
+    console.log('Godown Name: ' + e.target.value);
+
+  };
+  const onClickGodown = (gid) => {
+    setProductGodownID(gid);
+    console.log('Godown ID: ' + gid);
+  };
+  function onChangeProductQty(e) {
     setProductQty(e.target.value);
   }
   const onChangeProductRate = (e) => {
     setProductRate(e.target.value);
-  }
+  };
   const onChangeProductAmount = (e) => {
     setProductAmount(e.target.value);
+  };
+  const onChangeProductForPlates = (e) => {
+    setProductForPlates(e.target.value);
+  }
+  const onClickProductForPlates = (pid) => {
+    setProductForPlatesID(pid);
   }
 
   return (
     <>
+    <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
+      <ToastContainer />
       {/*Add Purchase Voucher Modal*/}
       <Modal
         open={addPurchaseModal}
@@ -387,22 +473,32 @@ const Page = () => {
             
             <Grid container spacing={2}>
             
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="purchase_voucher_no" style={{ position: 'unset' }}>Purchase
-                  Voucher No</InputLabel>
-                <Input id="purchase_voucher_no" aria-describedby="add-purchase-voucher_no"
-                       onChange={onChangePurchaseVoucherNo} value={purchaseVoucherNo}/>
-              </Grid>
+
               
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_name" style={{ position: 'unset' }}>Vendor
-                  Name</InputLabel>
-                <Input id="vendor_name" aria-describedby="add-vendor-name"
-                       onChange={onChangeVendorName} value={vendorName}/>
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+              <Select
+                  labelId="Vendor"
+                  id="Vendor"
+                  label="Vendor Name"
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeVendorName}
+                  value={vendorName}
+                >
+                  <MenuItem value="0">
+                    <em>Select Vendor</em>
+                  </MenuItem>
+                  {
+                    loadVendors.map((vendor) => (
+                      <MenuItem key = {vendor.code} value={vendor.name}
+                      onClick={() => onClickVendorName(vendor.code) }>{vendor.name}</MenuItem>
+                    ))
+                  }
+
+                </Select>
               </Grid>
               
 
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
                   labelId="product_type"
                   id="product_type"
@@ -420,30 +516,8 @@ const Page = () => {
                 </Select>
               </Grid>
               
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
-                  labelId="product_code"
-                  id="product_code"
-                  label="Product Code"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeProductCode}
-                  value={productCode}
-                >
-                  <MenuItem value="0">
-                    <em>Select Product Code</em>
-                  </MenuItem>
-                  
-                 { productData.map((product) => (
-                    <MenuItem key={product.id} value={product.code}
-                    onClick={onClickProductCode.bind(this, product.id)}>
-                      {product.code}
-                    </MenuItem>
-                  ))
-                 }
-                
-                </Select>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
+
+              <Grid item xs={12} sm={6} md={6} lg={6}>
                 <Select
                   labelId="product_name"
                   id="product_name"
@@ -457,43 +531,19 @@ const Page = () => {
                     <em>Select Product Name</em>
                   </MenuItem>
                   {
-                   productData.map((product) => (
-                    <MenuItem data-key={product.id} value={product.name} 
-                    onChange={onClickProductName.bind(this, product.id)}>
-                      {product.name}
+                   loadProducts.map((product) => (
+                    <MenuItem data-key={product.id} value={productType === '1' ? product.paper : product.plate}
+                    onClick={() => onClickProduct(product.id)}>
+                      {productType === '1' ? product.paper : product.plate}
                     </MenuItem>
                   ))
                   }
 
-{/*
-productData.map((product, index) => (
-            product.name === productName && (
-              <MenuItem key={index} value={product.name}>
-                {product.name}
-              </MenuItem>
-            )
-          ))
-            */}
+
   
                 </Select>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
-                  labelId="product_godown"
-                  id="product_godown"
-                  label="Product Godown"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeProductGodown}
-                  value={productGodown}
-                >
-                  <MenuItem value="0">
-                    <em>Select Godown</em>
-                  </MenuItem>
-                  <MenuItem value="1">1234</MenuItem>
-                  <MenuItem value="2">1235</MenuItem>
-                  
-                </Select>
-              </Grid>
+
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_qty" style={{ position: 'unset' }}>Qty
                   </InputLabel>
@@ -512,40 +562,105 @@ productData.map((product, index) => (
                 <Input id="product_amount" aria-describedby="add-product_amount"
                        onChange={onChangeProductAmount} value={productAmount}/>
               </Grid>
-              
-              <Button variant="contained" onClick={onClickAddButton}>Add</Button>
-             
-              
-            </Grid>
+              <Grid item xs={12} sm={6} md={6} lg={6}>
+                <Select
+                  labelId="product_godown"
+                  id="product_godown"
+                  label="Product Godown"
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeProductGodown}
+                  value={productGodown}
+                >
+                  <MenuItem value="0">
+                    <em>Select Godown</em>
+                  </MenuItem>
+                  {
+                   loadGodowns.map((godown) => (
+                    <MenuItem data-key={godown.id} value={godown.name}
+                    onClick={() => onClickGodown(godown.id)}>
+                      {godown.name}
+                    </MenuItem>
+                  ))
+                  }
 
-            {/* Grid Table */}
-            <Table>
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} lg={6}>
+                <Select
+                  labelId="product_for_plates"
+                  id="product_for_plates"
+                  label="Product for Plates"
+
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeProductForPlates}
+                  value={productForPlates}
+                >
+                  <MenuItem value="0">
+                    <em>Select Product For Plates</em>
+                  </MenuItem>
+                  {
+                   loadProductsForPlates.map((product) => (
+                    <MenuItem data-key={product.id} value={product.name}
+                    onClick={() => onClickProductForPlates(product.id)}>
+                      {product.name}
+                    </MenuItem>
+                  ))
+                  }
+
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={2} md={2} lg={2}>
+              <Button variant="contained" onClick={onClickAddButton}>Add</Button>
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+              <Table className="table table-striped">
 <thead>
   <tr>
-    <th>Product Code</th>
+
     <th>Product Name</th>
-    <th>Godown</th>
+
     <th>Qty</th>
     <th>Rate</th>
     <th>Amount</th>
+    <th>Godown</th>
+    <th>For Product</th>
   </tr>
 </thead>
 <tbody>
 {tableData.map((rowData, index) => (
   <tr key={index}>
-  <td>{rowData.product_code}</td>
+
   <td>{rowData.product_name}</td>
-  <td>{rowData.product_godown}</td>
+
   <td>{rowData.product_qty}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
-  
+  <td>{rowData.product_godown}</td>
+  <td>{rowData.product_for}</td>
+
 </tr>
 ))}
 </tbody>
 
 
             </Table>
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <InputLabel htmlFor="total_amount" style={{ position: 'unset', textAlign: 'right'  }}>Total Amount
+                  </InputLabel>
+                <Input id="total_amount" aria-describedby="add-total_amount"
+                        value={totalAmount} inputProps={{ style: { textAlign: 'right' } }}/>
+                        </div>
+              </Grid>
+
+            </Grid>
+
+            {/* Grid Table */}
+
+
 
 
             {/*</FormControl>*/}

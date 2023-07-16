@@ -53,6 +53,15 @@ export const items = [
     )
   },
   {
+    title: 'Product - Paper Type',
+    path: '/products/papertype',
+    icon: (
+      <SvgIcon fontSize="small">
+        <BlindsClosedIcon />
+      </SvgIcon>
+    )
+  },
+  {
     title: 'Product - Plates',
     path: '/products/plates',
     icon: (
@@ -64,6 +73,15 @@ export const items = [
   {
     title: 'Product - For Board',
     path: '/products/productfor',
+    icon: (
+      <SvgIcon fontSize="small">
+        <WrapTextIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Product - Sheet Size',
+    path: '/products/sheetsize',
     icon: (
       <SvgIcon fontSize="small">
         <WrapTextIcon />

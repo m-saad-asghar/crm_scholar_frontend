@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -16,6 +16,12 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+
+
+import CircularProgress from '@mui/material/CircularProgress';
+import { ToastContainer, toast } from 'react-toastify';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
@@ -48,132 +54,7 @@ const data = [
     name: 'Carson Darrin',
     phone: '304-428-3097'
   },
-  {
-    id: '5e887b209c28ac3dd97f6db5',
-    address: {
-      city: 'Atlanta',
-      country: 'USA',
-      state: 'Georgia',
-      street: '1865  Pleasant Hill Road'
-    },
-    avatar: '/assets/avatars/avatar-fran-perez.png',
-    createdAt: subDays(subHours(now, 1), 2).getTime(),
-    email: 'fran.perez@devias.io',
-    name: 'Fran Perez',
-    phone: '712-351-5711'
-  },
-  {
-    id: '5e887b7602bdbc4dbb234b27',
-    address: {
-      city: 'North Canton',
-      country: 'USA',
-      state: 'Ohio',
-      street: '4894  Lakeland Park Drive'
-    },
-    avatar: '/assets/avatars/avatar-jie-yan-song.png',
-    createdAt: subDays(subHours(now, 4), 2).getTime(),
-    email: 'jie.yan.song@devias.io',
-    name: 'Jie Yan Song',
-    phone: '770-635-2682'
-  },
-  {
-    id: '5e86809283e28b96d2d38537',
-    address: {
-      city: 'Madrid',
-      country: 'Spain',
-      name: 'Anika Visser',
-      street: '4158  Hedge Street'
-    },
-    avatar: '/assets/avatars/avatar-anika-visser.png',
-    createdAt: subDays(subHours(now, 11), 2).getTime(),
-    email: 'anika.visser@devias.io',
-    name: 'Anika Visser',
-    phone: '908-691-3242'
-  },
-  {
-    id: '5e86805e2bafd54f66cc95c3',
-    address: {
-      city: 'San Diego',
-      country: 'USA',
-      state: 'California',
-      street: '75247'
-    },
-    avatar: '/assets/avatars/avatar-miron-vitold.png',
-    createdAt: subDays(subHours(now, 7), 3).getTime(),
-    email: 'miron.vitold@devias.io',
-    name: 'Miron Vitold',
-    phone: '972-333-4106'
-  },
-  {
-    id: '5e887a1fbefd7938eea9c981',
-    address: {
-      city: 'Berkeley',
-      country: 'USA',
-      state: 'California',
-      street: '317 Angus Road'
-    },
-    avatar: '/assets/avatars/avatar-penjani-inyene.png',
-    createdAt: subDays(subHours(now, 5), 4).getTime(),
-    email: 'penjani.inyene@devias.io',
-    name: 'Penjani Inyene',
-    phone: '858-602-3409'
-  },
-  {
-    id: '5e887d0b3d090c1b8f162003',
-    address: {
-      city: 'Carson City',
-      country: 'USA',
-      state: 'Nevada',
-      street: '2188  Armbrester Drive'
-    },
-    avatar: '/assets/avatars/avatar-omar-darboe.png',
-    createdAt: subDays(subHours(now, 15), 4).getTime(),
-    email: 'omar.darobe@devias.io',
-    name: 'Omar Darobe',
-    phone: '415-907-2647'
-  },
-  {
-    id: '5e88792be2d4cfb4bf0971d9',
-    address: {
-      city: 'Los Angeles',
-      country: 'USA',
-      state: 'California',
-      street: '1798  Hickory Ridge Drive'
-    },
-    avatar: '/assets/avatars/avatar-siegbert-gottfried.png',
-    createdAt: subDays(subHours(now, 2), 5).getTime(),
-    email: 'siegbert.gottfried@devias.io',
-    name: 'Siegbert Gottfried',
-    phone: '702-661-1654'
-  },
-  {
-    id: '5e8877da9a65442b11551975',
-    address: {
-      city: 'Murray',
-      country: 'USA',
-      state: 'Utah',
-      street: '3934  Wildrose Lane'
-    },
-    avatar: '/assets/avatars/avatar-iulia-albu.png',
-    createdAt: subDays(subHours(now, 8), 6).getTime(),
-    email: 'iulia.albu@devias.io',
-    name: 'Iulia Albu',
-    phone: '313-812-8947'
-  },
-  {
-    id: '5e8680e60cba5019c5ca6fda',
-    address: {
-      city: 'Salt Lake City',
-      country: 'USA',
-      state: 'Utah',
-      street: '368 Lamberts Branch Road'
-    },
-    avatar: '/assets/avatars/avatar-nasimiyu-danai.png',
-    createdAt: subDays(subHours(now, 1), 9).getTime(),
-    email: 'nasimiyu.danai@devias.io',
-    name: 'Nasimiyu Danai',
-    phone: '801-301-7894'
-  }
+
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -195,18 +76,44 @@ const useCustomerIds = (customers) => {
 };
 
 const Page = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addVendorModal, setAddVendorModal] = useState(false);
-  const [vendorCode, setVendorCode] = useState('');
+
   const [vendorName, setVendorName] = useState('');
-  const [vendorType, setVendorType] = useState('');
-  const [vendorAddress, setVendorAddress] = useState('0');
+  const [vendorType, setVendorType] = useState([]);
+  const [vendorAddress, setVendorAddress] = useState('');
   const [vendorContactNo, setVendorContactNo] = useState('');
-  
+  const [loadVendorTypes, setLoadVendorTypes] = useState([]);
+
+  const [vendorNames, setVendorNames] = useState([]);
+  const [isVendorLoading, setIsVendorLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  useEffect(() => {
+
+    fetch(baseUrl + 'get_vendors', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setVendorNames(data.vendors);
+        console.log("vendors", data.vendors);
+      })
+      .catch(error => console.error(error));
+  }, []);
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -221,34 +128,85 @@ const Page = () => {
     []
   );
 
+
+
+
   const openAddVendor = () => {
     setAddVendorModal(true);
+
+fetch(baseUrl + 'get_vendor_types', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Types: ' + data.vendor_types);
+    setLoadVendorTypes(data.vendor_types)
+
+  })
+  .catch(error => console.error(error));
+
+
   };
   const closeAddVendor = () => {
     setAddVendorModal(false);
     resetForm();
   };
   const resetForm = () => {
-    setVendorCode('');
+
     setVendorName('');
     setVendorAddress('');
     setVendorContactNo('');
-    setVendorType('0');
+    setVendorType([]);
+
     
   };
   const addVendor = () => {
+    setIsVendorLoading(true);
     const data = {
-      vendor_code: vendorCode,
-      vendor_name: vendorName,
-      vendor_address: vendorAddress,
-      vendor_contact_no: vendorContactNo,
+
+      name: vendorName,
+      address: vendorAddress,
+      contact_no: vendorContactNo,
       vendor_type: vendorType,
-      
+
     };
+
+    fetch(baseUrl + 'add_new_vendor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsVendorLoading(false);
+        //console.log("Data Success: " + data.vendors);
+        if (data.success == 1){
+          toast.success("Vendor is Successfully Saved!");
+          setAddVendorModal(false);
+          closeAddVendor(true);
+          // Update Products
+        }else{
+          toast.error("Something Went Wrong!");
+        }
+      })
+      .catch(error => {
+        console.error("Error Vendor: ", error);
+        toast.error("Something Went Wrong!");
+      })
+
+
+      .finally(() => {
+        setIsVendorLoading(false);
+      });
+
+    console.log('add Vendor data', data);
   };
-  const onChangeVendorCode = (e) => {
-    setVendorCode(e.target.value);
-  };
+
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
   };
@@ -259,13 +217,31 @@ const Page = () => {
   const onChangeVendorContactNo = (e) => {
     setVendorContactNo(e.target.value);
   };
-  const onChangeVendorType = (e) => {
-    setVendorType(e.target.value);
+  const onChangeVendorType = (e, newValue) => {
+
+
+
+    setVendorType(newValue);
+
+  };
+  const handleIsOptionEqualToValue = (option, value) => {
+    return option.id === value.id && option.vendor_type === value.vendor_type;
   };
   
 
   return (
     <>
+    <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
+      <ToastContainer />
       {/*Add Vendor Modal*/}
       <Modal
         open={addVendorModal}
@@ -280,12 +256,7 @@ const Page = () => {
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="vendor_code" style={{ position: 'unset' }}>Vendor
-                  code</InputLabel>
-                <Input id="vendor_code" aria-describedby="add-vendor-code"
-                       onChange={onChangeVendorCode} value={vendorCode}/>
-              </Grid>
+
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="vendor_name" style={{ position: 'unset' }}>Vendor
                   Name</InputLabel>
@@ -305,29 +276,31 @@ const Page = () => {
                 <Input id="vendor_contact_no" aria-describedby="add-vendor_contact_no"
                        onChange={onChangeVendorContactNo} value={vendorContactNo}/>
               </Grid>
-              
-             
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
-                  labelId="vendor_type"
-                  id="vendor_type"
-                  label="Vendor Type"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeVendorType}
-                  value={vendorType}
-                >
-                  <MenuItem value="0">
-                    <em>Select Vendor Type</em>
-                  </MenuItem>
-                  <MenuItem value="1">Paper</MenuItem>
-                  <MenuItem value="2">Press</MenuItem>
-                  <MenuItem value="3">Plates</MenuItem>
-                  <MenuItem value="4">Lamination</MenuItem>
-                  <MenuItem value="4">Spot UV</MenuItem>
-                  <MenuItem value="4">Binder</MenuItem>
-                </Select>
+              <Stack spacing={3} sx={{ width: 500 }}>
+              <Autocomplete
+        multiple
+        id="vendor_types"
+        options={loadVendorTypes}
+        getOptionLabel={(option) => option.vendor_type}
+        value={vendorType}
+        onChange={onChangeVendorType}
+        isOptionEqualToValue={handleIsOptionEqualToValue}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="standard"
+            label="Vendor Type"
+            placeholder="Vendor Types"
+          />
+        )}
+      />
+      </Stack>
               </Grid>
-                  </Grid>          
+
+
+
+                  </Grid>
               
               
             {/*</FormControl>*/}

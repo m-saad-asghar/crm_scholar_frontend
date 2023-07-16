@@ -13,16 +13,14 @@ import { applyPagination } from 'src/utils/apply-pagination';
 import FilledInput from '@mui/material/FilledInput';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
+import { ToastContainer, toast } from 'react-toastify';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
-//import { error } from 'console';
 
 const style = {
   position: 'absolute',
@@ -66,7 +64,22 @@ const data = [
     name: 'Fran Perez',
     phone: '712-351-5711'
   },
-
+  {
+    id: '5e887b7602bdbc4dbb234b27',
+    address: {
+      city: 'North Canton',
+      country: 'USA',
+      state: 'Ohio',
+      street: '4894  Lakeland Park Drive'
+    },
+    avatar: '/assets/avatars/avatar-jie-yan-song.png',
+    createdAt: subDays(subHours(now, 4), 2).getTime(),
+    email: 'jie.yan.song@devias.io',
+    name: 'Jie Yan Song',
+    phone: '770-635-2682'
+  },
+  
+  
 ];
 
 const useCustomers = (page, rowsPerPage) => {
@@ -91,26 +104,20 @@ const Page = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addPaperProductModal, setAddPaperProductModal] = useState(false);
-
-  const [paperName, setPaperName] = useState('');
-  const [paperLength, setPaperLength] = useState('');
-  const [paperWidth, setPaperWidth] = useState('');
-  const [paperWeight, setPaperWeight] = useState('');
-  const [paperType, setPaperType] = useState('0');
-  const [loadPaperTypes, setLoadPaperTypes] = useState([]);
-
-  const [paperSizes, setPaperSizes] = useState([]);
-  const [isPaperSizeLoading, setIsPaperSizeLoading] = useState(false);
+  const [addPaperTypeModal, setAddPaperTypeModal] = useState(false);
+  
+  const [paperType, setPaperType] = useState('');
+  const [paperTypes, setPaperTypes] = useState([]);
+  const [isPaperTypeLoading, setIsPaperTypeLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
-
+  
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
 
   useEffect(() => {
-
-    fetch(baseUrl + 'get_papers', {
+    
+    fetch(baseUrl + 'get_paper_types', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -119,8 +126,8 @@ const Page = () => {
       .then(response => response.json())
       .then(data => {
         setIsDataLoading(false);
-        setPaperSizes(data.papers);
-        console.log("paper Size", data.papers);
+        setPaperTypes(data.paper_types);
+        console.log("paper types", data.paper_types)
       })
       .catch(error => console.error(error));
   }, []);
@@ -140,50 +147,26 @@ const Page = () => {
     []
   );
 
-  const openAddPaperProduct = () => {
-    setAddPaperProductModal(true);
-
-    fetch(baseUrl + 'get_paper_types',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadPaperTypes(data.paper_types);
-      console.log("paper type", data.paper_types)
-
-    })
-    .catch(error => console.error(error));
-
+  const openAddPaperType = () => {
+    setAddPaperTypeModal(true);
   };
-  const closeAddPaperProduct = () => {
-    setAddPaperProductModal(false);
+  const closeAddPaperType = () => {
+    setAddPaperTypeModal(false);
     resetForm();
   };
   const resetForm = () => {
-
-    setPaperName('');
-    setPaperLength('');
-    setPaperWidth('');
-    setPaperWeight('');
-    setPaperType('0');
+    
+    setPaperType('');
     
   };
-  const addPaperProduct = () => {
-    setIsPaperSizeLoading(true);
+  const addPaperType = () => {
+    setIsPaperTypeLoading(true);
     const data = {
-
-      paper: paperName,
-      length: paperLength,
-      width: paperWidth,
-      weight: paperWeight,
       paper_type: paperType,
       
     };
 
-    fetch(baseUrl + 'add_new_paper', {
+    fetch(baseUrl + 'add_new_paper_type', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -192,47 +175,30 @@ const Page = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setIsPaperSizeLoading(false);
-        console.log("Data Success: " + data.success);
+        setIsPaperTypeLoading(false);
         if (data.success == 1){
-          toast.success("Paper Size is Successfully Saved!");
-          setAddPaperProductModal(false);
+          toast.success("Paper Type is Successfully Saved!")
+          setAddPaperTypeModal(false);
           // Update Products
         }else{
-          toast.error("Something Went Wrong!");
+          toast.error("Something Went Wrong!")
         }
       })
       .catch(error => {
         console.error("Error: ", error);
         toast.error("Something Went Wrong!");
       })
-
-
       .finally(() => {
-        setIsPaperSizeLoading(false);
+        setIsPaperTypeLoading(false);
       });
-      closeAddPaperProduct(true);
-
-    console.log('add Paper Product data', data);
-
-
+      closeAddPaperType(true);
+    console.log('add Paper Type data', data);
   };
-
-  const onChangePaperName = (e) => {
-    setPaperName(e.target.value);
-  };
-  const onChangePaperLength = (e) => {
-    setPaperLength(e.target.value);
-  }
-  const onChangePaperWidth = (e) => {
-    setPaperWidth(e.target.value);
-  }
-  const onChangePaperWeight = (e) => {
-    setPaperWeight(e.target.value);
-  }
+  
+  
   const onChangePaperType = (e) => {
     setPaperType(e.target.value);
-  }
+  };
   
 
   return (
@@ -248,75 +214,44 @@ const Page = () => {
           />}
       </Modal>
       <ToastContainer />
-      {/*Add Paper Product Modal*/}
+      {/*Add Category Modal*/}
       <Modal
-        open={addPaperProductModal}
-        onClose={closeAddPaperProduct}
+        open={addPaperTypeModal}
+        onClose={closeAddPaperType}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Paper Product
+            + Add Paper Type
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
             <Grid container spacing={2}>
-
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_size" style={{ position: 'unset' }}>Paper Size</InputLabel>
-                <Input id="paper_size" aria-describedby="add-paper-size"
-                       onChange={onChangePaperName} value={paperName}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_length" style={{ position: 'unset' }}>Paper Length</InputLabel>
-                <Input id="paper_length" aria-describedby="add-paper-length"
-                       onChange={onChangePaperLength} value={paperLength}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_width" style={{ position: 'unset' }}>Paper Width</InputLabel>
-                <Input id="paper_width" aria-describedby="add-paper-width"
-                       onChange={onChangePaperWidth} value={paperWidth}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_weight" style={{ position: 'unset' }}>Paper Weight</InputLabel>
-                <Input id="paper_weight" aria-describedby="add-paper-weight"
-                       onChange={onChangePaperWeight} value={paperWeight}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
-                  labelId="paper_type"
-                  id="paper_type"
-                  label="Paper Type"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangePaperType}
-                  value={paperType}
-                >
-                  <MenuItem value="0">
-                    <em>Select Paper Type</em>
-                  </MenuItem>
-                  {
-                    loadPaperTypes.map((ptypes) => (
-                      <MenuItem key={ptypes.id} value={ptypes.id}>
-                        {ptypes.child_type}
-                      </MenuItem>
-                    ))
-                  }
-                </Select>
+              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
+              {/*  <InputLabel htmlFor="category_id" style={{ position: 'unset' }}>Category Id*/}
+              {/*    </InputLabel>*/}
+              {/*  <Input id="category_id" aria-describedby="add-category-id"*/}
+              {/*         onChange={onChangeCategoryId} value={categoryID}/>*/}
+              {/*</Grid>*/}
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <InputLabel htmlFor="paper_type" style={{ position: 'unset' }}>Paper Type</InputLabel>
+                <Input id="paper_type" aria-describedby="add-paper_type"
+                       onChange={onChangePaperType} value={paperType}/>
               </Grid>
               </Grid>
             {/*</FormControl>*/}
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addPaperProduct}>Submit</Button>
-            <Button variant="contained" onClick={closeAddPaperProduct}>Cancel</Button>
+            <Button variant="contained" onClick={addPaperType}>Submit</Button>
+            <Button variant="contained" onClick={closeAddPaperType}>Cancel</Button>
           </Grid>
         </Box>
       </Modal>
       <Head>
         <title>
-          Paper Product | Scholar CRM
+          Paper Type | Scholar CRM
         </title>
       </Head>
       <Box
@@ -335,7 +270,7 @@ const Page = () => {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Paper Product
+                  Paper Type
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -366,7 +301,7 @@ const Page = () => {
               </Stack>
               <div>
                 <Button
-                  onClick={openAddPaperProduct}
+                  onClick={openAddPaperType}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -374,7 +309,7 @@ const Page = () => {
                   )}
                   variant="contained"
                 >
-                  Add Paper Product
+                  Add Paper Type
                 </Button>
               </div>
             </Stack>
