@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
@@ -16,6 +16,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
+import { ToastContainer, toast } from 'react-toastify';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
@@ -195,15 +197,38 @@ const useCustomerIds = (customers) => {
 };
 
 const Page = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addCategoryModal, setAddCategoryModal] = useState(false);
   const [categoryID, setCategoryID] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [isCategoryLoading, setIsCategoryLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+
+  useEffect(() => {
+    
+    fetch(baseUrl + 'get_category', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setCategories(data.category);
+        console.log("category", data.category)
+      })
+      .catch(error => console.error(error));
+  }, []);
+
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -226,18 +251,42 @@ const Page = () => {
     resetForm();
   };
   const resetForm = () => {
-    setCategoryID('');
+    
     setCategoryName('');
     
   };
   const addCategory = () => {
+    setIsCategoryLoading(true);
     const data = {
-      category_id: categoryID,
-      category_name: categoryName,
+      category: categoryName,
       
     };
+    fetch(baseUrl + 'add_new_category', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsCategoryLoading(false);
+        if (data.success == 1){
+          toast.success("Category is Successfully Saved!")
+          setAddCategoryModal(false);
+          // Update Products
+        }else{
+          toast.error("Something Went Wrong!")
+        }
+      })
+      .catch(error => toast.error("Something Went Wrong!"))
+      .finally(() => {
+        setIsCategoryLoading(false);
+      });
+      closeAddCategory(true);
     console.log('add Category data', data);
   };
+  
   const onChangeCategoryId = (e) => {
     setCategoryID(e.target.value);
   };
@@ -248,6 +297,17 @@ const Page = () => {
 
   return (
     <>
+    <Modal
+        open={isDataLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          {<CircularProgress
+            size={100}
+            style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
+          />}
+      </Modal>
+      <ToastContainer />
       {/*Add Category Modal*/}
       <Modal
         open={addCategoryModal}
