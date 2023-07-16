@@ -236,7 +236,6 @@ const Page = () => {
       product_for_name: ProductForName,
       
     };
-    console.log('add Product For data', data);
   };
   const onChangeProductForId = (e) => {
     setProductForID(e.target.value);

@@ -223,7 +223,6 @@ const Page = () => {
       .then(data => {
         setIsDataLoading(false);
         setCategories(data.category);
-        console.log("category", data.category)
       })
       .catch(error => console.error(error));
   }, []);
@@ -284,7 +283,6 @@ const Page = () => {
         setIsCategoryLoading(false);
       });
       closeAddCategory(true);
-    console.log('add Category data', data);
   };
   
   const onChangeCategoryId = (e) => {

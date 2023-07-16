@@ -245,7 +245,6 @@ const Page = () => {
       vendor_type: vendorType,
       
     };
-    console.log('add Vendor data', data);
   };
   const onChangeVendorCode = (e) => {
     setVendorCode(e.target.value);

@@ -354,8 +354,8 @@ export const ProductsTable = (props) => {
                   <MenuItem value="0">
                     <em>Select Category</em>
                   </MenuItem>
-                  <MenuItem value="1">Objective</MenuItem>
-                  <MenuItem value="2">Subjective</MenuItem>
+                  <MenuItem value="2">Objective</MenuItem>
+                  <MenuItem value="1">Subjective</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -416,7 +416,7 @@ export const ProductsTable = (props) => {
                   <TableCell style={{minWidth: 120}}>
                     Short name
                   </TableCell>
-                  <TableCell style={{minWidth: 150}}>
+                  <TableCell style={{minWidth: 180}}>
                     Name
                   </TableCell>
                   <TableCell style={{minWidth: 120}}>
@@ -507,19 +507,19 @@ export const ProductsTable = (props) => {
                         {product.weight}
                       </TableCell>
                       <TableCell>
-                        {product.book_sheet_size}
+                        {product.book_sheet_size_label}
                       </TableCell>
                       <TableCell>
-                        {product.subject}
+                        {product.subject_name}
                       </TableCell>
                       <TableCell>
-                        {product.book_for}
+                        {product.board_name}
                       </TableCell>
                       <TableCell>
-                        {product.category}
+                        {product.category_name}
                       </TableCell>
                       <TableCell>
-                        {product.title_sheet_size}
+                        {product.title_sheet_size_label}
                       </TableCell>
                       <TableCell>
                         <Stack

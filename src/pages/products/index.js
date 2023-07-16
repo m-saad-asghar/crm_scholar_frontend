@@ -4,7 +4,7 @@ import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography, Modal } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, TextField } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
@@ -91,14 +91,19 @@ const Products = () => {
   const customersIds = useCustomerIds(products);
   const [loadCategory, setLoadCategory] = useState([]);
   const [loadSubjects, setLoadSubjects] = useState([]);
+  const [validationerrors, setValidationerrors] = useState({});
   const customersSelection = useSelection(customersIds);
 
   useEffect(() => {
+    const data  = {
+      search_term: ""
+    }
     fetch(baseUrl + 'get_products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      body: JSON.stringify(data)
     })
       .then(response => response.json())
       .then(data => {
@@ -132,7 +137,6 @@ const Products = () => {
     .then(response => response.json())
     .then(data => {
       setLoadSubjects(data.subject);
-      console.log("subject", data.subject)
 
     })
     .catch(error => console.error(error));
@@ -146,7 +150,6 @@ const Products = () => {
     .then(response => response.json())
     .then(data => {
       setLoadCategory(data.category);
-      console.log("category", data.category)
 
     })
     .catch(error => console.error(error));
@@ -160,7 +163,6 @@ const Products = () => {
     .then(response => response.json())
     .then(data => {
       setLoadSheetSizes(data.sheets);
-      console.log("sheet", data.sheets)
 
     })
     .catch(error => console.error(error));
@@ -174,7 +176,6 @@ const Products = () => {
     .then(response => response.json())
     .then(data => {
       setLoadTitleSizes(data.sheets);
-      console.log("sheet", data.sheets)
 
     })
     .catch(error => console.error(error));
@@ -188,7 +189,6 @@ const Products = () => {
     .then(response => response.json())
     .then(data => {
       setLoadBookFor(data.boards);
-      console.log("boards", data.boards)
 
     })
     .catch(error => console.error(error));
@@ -227,33 +227,101 @@ const Products = () => {
     setEdition('0');
     setSubject('0');
   };
+
+  const validate = () => {
+    let validationerrors = {};
+    let isValid = true;
+
+
+    if (productBarCode == null || productBarCode == "" || productBarCode == undefined) {
+      isValid = false;
+      validationerrors["productBarCode"] = "Bar Code is required.";
+    }
+    if (productShortName == null || productShortName == "" || productShortName == undefined) {
+      isValid = false;
+      validationerrors["productShortName"] = "Short Name is required.";
+    }
+    if (productName == null || productName == "" || productName == undefined) {
+      isValid = false;
+      validationerrors["productName"] = "Name is required.";
+    }
+    if (facePrice == null || facePrice == "" || facePrice == undefined) {
+      isValid = false;
+      validationerrors["facePrice"] = "Face Price is required.";
+    }
+    if (pages == null || pages == "" || pages == undefined) {
+      isValid = false;
+      validationerrors["pages"] = "Pages is required.";
+    }
+    if (inner_pages == null || inner_pages == "" || inner_pages == undefined) {
+      isValid = false;
+      validationerrors["inner_pages"] = "Inner Pages is required.";
+    }
+    if (rulePages == null || rulePages == "" || rulePages == undefined) {
+      isValid = false;
+      validationerrors["rulePages"] = "Rule Pages is required.";
+    }
+    if (farmay == null || farmay == "" || farmay == undefined) {
+      isValid = false;
+      validationerrors["farmay"] = "Farmay is required.";
+    }
+    if (sheetSize == null || sheetSize == 0 || sheetSize == undefined) {
+      isValid = false;
+      validationerrors["sheetSize"] = "Sheet Size is required.";
+    }
+    if (titleSheetSize == null || titleSheetSize == 0 || titleSheetSize == undefined) {
+      isValid = false;
+      validationerrors["titleSheetSize"] = "Title Sheet Size is required.";
+    }
+    if (bookWeight == null || bookWeight == "" || bookWeight == undefined) {
+      isValid = false;
+      validationerrors["bookWeight"] = "Book Weight is required.";
+    }
+    if (bookFor == null || bookFor == 0 || bookFor == undefined) {
+      isValid = false;
+      validationerrors["bookFor"] = "Book For is required.";
+    }
+    if (category == null || category == 0 || category == undefined) {
+      isValid = false;
+      validationerrors["category"] = "Category is required.";
+    }
+    if (subject == null || subject == 0 || subject == undefined) {
+      isValid = false;
+      validationerrors["subject"] = "Subject is required.";
+    }
+
+    setValidationerrors(validationerrors);
+
+    return isValid;
+  }
   const addProduct = () => {
-    setIsProductLoading(true);
-    const data = {
-      product_bar_code: productBarCode,
-      product_short_name: productShortName,
-      product_name: productName,
-      face_price: facePrice,
-      grade: grade,
-      pages: pages,
-      inner_pages: inner_pages,
-      rule_pages: rulePages,
-      farmay: farmay,
-      sheet_size: sheetSize,
-      title_sheet_size: titleSheetSize,
-      book_weight: bookWeight,
-      book_for: bookFor,
-      binder_product: binderProduct,
-      warning_level: warningLevel,
-      dead_level: deadLevel,
-      opening_stock: openingStock,
-      manufacturer: manufacturer,
-      category: category,
-      type: type,
-      uom: uom,
-      edition: edition,
-      subject: subject
-    };
+    if (validate()){
+      setIsProductLoading(true);
+      const data = {
+        product_bar_code: productBarCode,
+        product_short_name: productShortName,
+        product_name: productName,
+        face_price: facePrice,
+        grade: grade,
+        pages: pages,
+        inner_pages: inner_pages,
+        rule_pages: rulePages,
+        farmay: farmay,
+        sheet_size: sheetSize,
+        title_sheet_size: titleSheetSize,
+        book_weight: bookWeight,
+        book_for: bookFor,
+        binder_product: binderProduct,
+        warning_level: warningLevel,
+        dead_level: deadLevel,
+        opening_stock: openingStock,
+        manufacturer: manufacturer,
+        category: category,
+        type: type,
+        uom: uom,
+        edition: edition,
+        subject: subject
+      };
 
       fetch(baseUrl + 'add_new_product', {
         method: 'POST',
@@ -277,7 +345,8 @@ const Products = () => {
         .finally(() => {
           setIsProductLoading(false);
         });
-        closeAddProduct(true);
+      closeAddProduct(true);
+    }
   };
   const onChangeProductBarcode = (e) => {
     setProductBarCode(e.target.value);
@@ -379,27 +448,55 @@ const Products = () => {
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_barcode" style={{ position: 'unset' }}>Product
                   Barcode</InputLabel>
-                <Input id="product_barcode" aria-describedby="add-product-barcode"
-                       onChange={onChangeProductBarcode} value={productBarCode}/>
+                <TextField
+                  id="product_barcode"
+                  aria-describedby="add-product-barcode"
+                  error={Boolean(validationerrors.productBarCode)}
+                  onChange={onChangeProductBarcode}
+                  value={productBarCode}
+                  helperText={validationerrors.productBarCode || ""}
+                  variant="standard"
+                />
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_short_name" style={{ position: 'unset' }}>Product Short
                   Name</InputLabel>
-                <Input id="product_short_name" aria-describedby="add-product-shortname"
-                       onChange={onChangeProductShortName} value={productShortName}/>
+                <TextField
+                  id="product_short_name"
+                  aria-describedby="add-product-shortname"
+                  onChange={onChangeProductShortName}
+                  value={productShortName}
+                  error={Boolean(validationerrors.productShortName)}
+                  helperText={validationerrors.productShortName || ""}
+                  variant="standard"
+                />
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_name" style={{ position: 'unset' }}>Product
                   Name</InputLabel>
-                <Input id="product_name" aria-describedby="add-product-name"
-                       onChange={onChangeProductName} value={productName}/>
+                <TextField
+                  id="product_name"
+                  aria-describedby="add-product-name"
+                  onChange={onChangeProductName}
+                  value={productName}
+                  error={Boolean(validationerrors.productName)}
+                  helperText={validationerrors.productName || ""}
+                  variant="standard"
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="face_price" style={{ position: 'unset' }}>Face
                   Price</InputLabel>
-                <Input id="face_price" aria-describedby="add-face-price"
-                       onChange={onChangeFacePrice} value={facePrice}/>
+                <TextField
+                  id="face_price"
+                  aria-describedby="add-face-price"
+                  onChange={onChangeFacePrice}
+                  value={facePrice}
+                  error={Boolean(validationerrors.facePrice)}
+                  helperText={validationerrors.facePrice || ""}
+                  variant="standard"
+                />
               </Grid>
               {/*
               <Grid item xs={12} sm={4} md={4} lg={4}>
@@ -423,42 +520,80 @@ const Products = () => {
   */}
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="pages" style={{ position: 'unset' }}>Pages</InputLabel>
-                <Input id="pages" aria-describedby="add-pages" onChange={onChangePages}
-                       value={pages}/>
+                <TextField
+                  id="pages"
+                  aria-describedby="add-pages"
+                  onChange={onChangePages}
+                  value={pages}
+                  error={Boolean(validationerrors.pages)}
+                  helperText={validationerrors.pages || ""}
+                  variant="standard"
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="inner_pages" style={{ position: 'unset' }}>Inner Pages</InputLabel>
-                <Input id="inner_pages" aria-describedby="add-inner-pages" onChange={onChangeInnerPages}
-                       value={inner_pages}/>
+                <TextField
+                  id="inner_pages"
+                  aria-describedby="add-inner-pages"
+                  onChange={onChangeInnerPages}
+                  value={inner_pages}
+                  error={Boolean(validationerrors.inner_pages)}
+                  helperText={validationerrors.inner_pages || ""}
+                  variant="standard"
+                />
               </Grid>
 
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="rule_pages" style={{ position: 'unset' }}>Rule
                   Pages</InputLabel>
-                <Input id="rule_pages" aria-describedby="add-rule-pages"
-                       onChange={onChangeRulePages} value={rulePages}/>
+                <TextField
+                  id="rule_pages"
+                  aria-describedby="add-rule-pages"
+                  onChange={onChangeRulePages}
+                  value={rulePages}
+                  error={Boolean(validationerrors.rulePages)}
+                  helperText={validationerrors.rulePages || ""}
+                  variant="standard"
+                />
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="farmay" style={{ position: 'unset' }}>Amount of
                   Farmay</InputLabel>
-                <Input id="farmay" aria-describedby="add-farmay" onChange={onChangeFarmay}
-                       value={farmay}/>
+                <TextField
+                  id="farmay"
+                  aria-describedby="add-farmay"
+                  onChange={onChangeFarmay}
+                  value={farmay}
+                  error={Boolean(validationerrors.farmay)}
+                  helperText={validationerrors.farmay || ""}
+                  variant="standard"
+                />
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="book_weight" style={{ position: 'unset' }}>Book
                   Weight</InputLabel>
-                <Input id="book_weight" aria-describedby="add-book-weight"
-                       onChange={onChangeBookWeight} value={bookWeight}/>
+                <TextField
+                  id="book_weight"
+                  aria-describedby="add-book-weight"
+                  onChange={onChangeBookWeight}
+                  value={bookWeight}
+                  error={Boolean(validationerrors.bookWeight)}
+                  helperText={validationerrors.bookWeight || ""}
+                  variant="standard"
+                />
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
+                <TextField
                   labelId="sheet_size"
                   id="sheet_size"
-                  label="Sheet Size"
-                  style={{ minWidth: '95%' }}
+                  select
                   onChange={onChangeSheetSize}
+                  style={{ minWidth: '95%' }}
                   value={sheetSize}
+                  error={Boolean(validationerrors.sheetSize)}
+                  helperText={validationerrors.sheetSize || ""}
+                  variant="standard"
                 >
                   <MenuItem value="0">
                     <em>Select Sheet Size</em>
@@ -467,20 +602,23 @@ const Products = () => {
                     loadSheetSizes.map((sheets) => (
                       <MenuItem key={sheets.id} value={sheets.id}
                       >
-                        {sheets.sheet_size}
+                        {sheets.sheet}
                       </MenuItem>
                     ) )
                   }
-                </Select>
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
+                <TextField
                   labelId="subject"
                   id="subject"
-                  label="subject"
-                  style={{ minWidth: '95%' }}
+                  select
                   onChange={onChangeSubject}
+                  style={{ minWidth: '95%' }}
                   value={subject}
+                  error={Boolean(validationerrors.subject)}
+                  helperText={validationerrors.subject || ""}
+                  variant="standard"
                 >
                   <MenuItem value="0">
                     <em>Select Subject</em>
@@ -492,16 +630,19 @@ const Products = () => {
                       </MenuItem>
                     ))
                   }
-                </Select>
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <Select
+                <TextField
                   labelId="book_for"
                   id="book_for"
-                  label="Book For"
-                  style={{ minWidth: '95%' }}
+                  select
                   onChange={onChangeBookFor}
+                  style={{ minWidth: '95%' }}
                   value={bookFor}
+                  error={Boolean(validationerrors.bookFor)}
+                  helperText={validationerrors.bookFor || ""}
+                  variant="standard"
                 >
                   <MenuItem value="0">
                     <em>Select Book For</em>
@@ -513,7 +654,7 @@ const Products = () => {
                       </MenuItem>
                     ))
                   }
-                </Select>
+                </TextField>
               </Grid>
               {/*
               <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -573,25 +714,28 @@ const Products = () => {
               </Grid>
   */}
               <Grid item xs={12} sm={6} md={4} lg={6}>
-                <Select
+                <TextField
                   labelId="category"
                   id="category"
-                  label="Category"
-                  style={{ minWidth: '95%' }}
+                  select
                   onChange={onChangeCategory}
                   value={category}
+                  style={{ minWidth: '95%' }}
+                  error={Boolean(validationerrors.category)}
+                  helperText={validationerrors.category || ""}
+                  variant="standard"
                 >
                   <MenuItem value="0">
                     <em>Select Category</em>
                   </MenuItem>
-                 {
-                  loadCategory.map((items) => (
-                    <MenuItem key={items.id} value={items.id}>
-                      {items.category}
-                    </MenuItem>
-                  ))
-                 }
-                </Select>
+                  {
+                    loadCategory.map((items) => (
+                      <MenuItem key={items.id} value={items.id}>
+                        {items.category}
+                      </MenuItem>
+                    ))
+                  }
+                </TextField>
               </Grid>
               {/*
               <Grid item xs={12} sm={4} md={4} lg={4}>
@@ -645,13 +789,16 @@ const Products = () => {
               </Grid>
 */}
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <Select
+                <TextField
                   labelId="title_sheet_size"
                   id="title_sheet_size"
-                  label="Title Sheet Size"
-                  style={{ minWidth: '95%' }}
+                  select
                   onChange={onChangeTitleSheetSize}
                   value={titleSheetSize}
+                  style={{ minWidth: '95%' }}
+                  error={Boolean(validationerrors.subject)}
+                  helperText={validationerrors.subject || ""}
+                  variant="standard"
                 >
                   <MenuItem value="0">
                     <em>Select Title Sheet Size</em>
@@ -659,11 +806,11 @@ const Products = () => {
                   {
                     loadTitleSizes.map((titles) => (
                       <MenuItem key={titles.id} value={titles.id}>
-                        {titles.sheet_size}
+                        {titles.sheet}
                       </MenuItem>
                     ) )
                   }
-                </Select>
+                </TextField>
               </Grid>
             </Grid>
             {/*</FormControl>*/}
@@ -744,7 +891,7 @@ const Products = () => {
                 </Button>
               </div>
             </Stack>
-            <ProductsSearch/>
+            <ProductsSearch sendProducts={getLatestProducts}/>
             <ProductsTable
               count={products.length}
               items={customers}

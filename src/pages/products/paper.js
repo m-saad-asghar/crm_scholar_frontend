@@ -248,7 +248,6 @@ const Page = () => {
       paper_product: paperProduct,
       
     };
-    console.log('add Paper Product data', data);
   };
   const onChangePaperId = (e) => {
     setPaperID(e.target.value);

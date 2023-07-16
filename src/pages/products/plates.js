@@ -236,7 +236,6 @@ const Page = () => {
       plates_name: platesName,
       
     };
-    console.log('add Plates data', data);
   };
   const onChangePlatesId = (e) => {
     setPlatesID(e.target.value);

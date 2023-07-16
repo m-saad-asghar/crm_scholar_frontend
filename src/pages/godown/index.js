@@ -244,7 +244,6 @@ const Page = () => {
       
       
     };
-    console.log('add Godown data', data);
   };
   const onChangeGodownID = (e) => {
     setGodownID(e.target.value);

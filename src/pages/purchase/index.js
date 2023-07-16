@@ -294,7 +294,6 @@ const Page = () => {
       
       
     };
-    console.log('add purchase data', data);
   };
   const onClickAddButton = () => {
     const newItem = {
@@ -327,7 +326,6 @@ const Page = () => {
 
   }
   const onClickProductName = ( pid) =>{
-    console.log(pid);
     const selectedProduct = productData.find(
       (product) => product.id === pid 
     );
