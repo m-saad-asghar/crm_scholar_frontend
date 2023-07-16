@@ -35,7 +35,7 @@ const style = {
 };
 
 const now = new Date();
-const useCustomers = (page, rowsPerPage, products) => {
+const useProducts = (page, rowsPerPage, products) => {
   return useMemo(
     () => {
       return applyPagination(products, page, rowsPerPage);
@@ -44,7 +44,7 @@ const useCustomers = (page, rowsPerPage, products) => {
   );
 };
 
-const useCustomerIds = (products) => {
+const useProductIds = (products) => {
   return useMemo(
     () => {
       return products.map((product) => product.id);
@@ -87,12 +87,12 @@ const Products = () => {
   const [isProductLoading, setIsProductLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [products, setProducts] = useState([]);
-  const customers = useCustomers(page, rowsPerPage, products);
-  const customersIds = useCustomerIds(products);
+  const product_data = useProducts(page, rowsPerPage, products);
+  const productsIds = useProductIds(products);
   const [loadCategory, setLoadCategory] = useState([]);
   const [loadSubjects, setLoadSubjects] = useState([]);
   const [validationerrors, setValidationerrors] = useState({});
-  const customersSelection = useSelection(customersIds);
+  const productsSelection = useSelection(productsIds);
 
   useEffect(() => {
     const data  = {
@@ -894,16 +894,16 @@ const Products = () => {
             <ProductsSearch sendProducts={getLatestProducts}/>
             <ProductsTable
               count={products.length}
-              items={customers}
-              onDeselectAll={customersSelection.handleDeselectAll}
-              onDeselectOne={customersSelection.handleDeselectOne}
+              items={product_data}
+              onDeselectAll={productsSelection.handleDeselectAll}
+              onDeselectOne={productsSelection.handleDeselectOne}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={customersSelection.handleSelectAll}
-              onSelectOne={customersSelection.handleSelectOne}
+              onSelectAll={productsSelection.handleSelectAll}
+              onSelectOne={productsSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={customersSelection.selected}
+              selected={productsSelection.selected}
               sendProducts={getLatestProducts}
             />
           </Stack>
