@@ -298,7 +298,7 @@ const Page = () => {
                   {
                     loadPaperTypes.map((ptypes) => (
                       <MenuItem key={ptypes.id} value={ptypes.id}>
-                        {ptypes.child_type}
+                        {ptypes.name}
                       </MenuItem>
                     ))
                   }

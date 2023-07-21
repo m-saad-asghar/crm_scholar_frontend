@@ -90,8 +90,8 @@ export const items = [
   },
   
   {
-    title: 'Overview',
-    path: '/',
+    title: 'Batch',
+    path: '/process',
     icon: (
       <SvgIcon fontSize="small">
         <ChartBarIcon />
@@ -117,6 +117,15 @@ export const items = [
     )
   },
   {
+    title: 'PO For Press',
+    path: '/purchase/popress',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    )
+  },
+  {
     title: 'Godown',
     path: '/godown',
     icon: (
@@ -126,15 +135,7 @@ export const items = [
     )
   },
   
-  {
-    title: 'Companies',
-    path: '/companies',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ShoppingBagIcon />
-      </SvgIcon>
-    )
-  },
+  
   {
     title: 'Account',
     path: '/account',
