@@ -22,7 +22,23 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
-
+const tableHeaders = [
+  "Barcode",
+  "Short Name",
+  "Name",
+  "Face Price",
+  "Pages",
+  "Inner Pages",
+  "Rule Pages",
+  "Farmay",
+  "Book Weight",
+  "Sheet Size",
+  "Subject",
+  "Book For",
+  "Category",
+  "Title Sheet Size",
+  "Actions"
+];
 const style = {
   position: 'absolute',
   top: '50%',
@@ -57,7 +73,7 @@ const Products = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addProductModal, setAddProductModal] = useState(false);
+  const [ProductModal, setProductModal] = useState(false);
   const [productBarCode, setProductBarCode] = useState('');
   const [productShortName, setProductShortName] = useState('');
   const [productName, setProductName] = useState('');
@@ -92,25 +108,16 @@ const Products = () => {
   const [loadCategory, setLoadCategory] = useState([]);
   const [loadSubjects, setLoadSubjects] = useState([]);
   const [validationerrors, setValidationerrors] = useState({});
+  const [currentId, setCurrentId] = useState('');
   const productsSelection = useSelection(productsIds);
 
   useEffect(() => {
-    const data  = {
-      search_term: ""
-    }
-    fetch(baseUrl + 'get_products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(data => {
-        setIsDataLoading(false);
-        setProducts(data.products);
-      })
-      .catch(error => console.error(error));
+    getProducts();
+    getSubjects();
+    getCategories();
+    getSheetSizes();
+    getTitleSizes();
+    getBoards();
   }, []);
 
   const handlePageChange = useCallback(
@@ -127,80 +134,137 @@ const Products = () => {
     []
   );
 
-  const openAddProduct = () => {
+  const getProducts = () => {
+    const data  = {
+      search_term: ""
+    }
+    fetch(baseUrl + 'get_products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsDataLoading(false);
+        setProducts(data.products);
+      })
+      .catch(error => console.error(error));
+  };
+  const getSubjects = () => {
     fetch(baseUrl + 'get_subjects',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      setLoadSubjects(data.subject);
+      .then(response => response.json())
+      .then(data => {
+        setLoadSubjects(data.subject);
 
-    })
-    .catch(error => console.error(error));
-
+      })
+      .catch(error => console.error(error));
+  };
+  const getCategories = () => {
     fetch(baseUrl + 'get_category',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      setLoadCategory(data.category);
+      .then(response => response.json())
+      .then(data => {
+        setLoadCategory(data.category);
 
-    })
-    .catch(error => console.error(error));
-
+      })
+      .catch(error => console.error(error));
+  };
+  const getSheetSizes = () => {
     fetch(baseUrl + 'get_sheet_sizes',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      setLoadSheetSizes(data.sheets);
+      .then(response => response.json())
+      .then(data => {
+        setLoadSheetSizes(data.sheets);
 
-    })
-    .catch(error => console.error(error));
-
+      })
+      .catch(error => console.error(error));
+  };
+  const getTitleSizes = () => {
     fetch(baseUrl + 'get_sheet_sizes',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      setLoadTitleSizes(data.sheets);
+      .then(response => response.json())
+      .then(data => {
+        setLoadTitleSizes(data.sheets);
 
-    })
-    .catch(error => console.error(error));
-
+      })
+      .catch(error => console.error(error));
+  };
+  const getBoards = () => {
     fetch(baseUrl + 'get_book_for_board',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
     })
-    .then(response => response.json())
-    .then(data => {
-      setLoadBookFor(data.boards);
+      .then(response => response.json())
+      .then(data => {
+        setLoadBookFor(data.boards);
 
-    })
-    .catch(error => console.error(error));
-
-    setAddProductModal(true);
+      })
+      .catch(error => console.error(error));
   };
-  const closeAddProduct = () => {
-    setAddProductModal(false);
+  const openProduct = () => {
+    setProductModal(true);
+  };
+  const closeProduct = () => {
+    setProductModal(false);
     resetForm();
   };
   const getLatestProducts = (data) => {
     setProducts(data);
+  };
+  const getUpdateData = (data) => {
+    setCurrentId((data && data.id) ? data.id : '')
+    setProductBarCode((data && data.product_code != null && data.product_code != undefined) ? data.product_code : '')
+    setProductShortName((data && data.product_sname != null && data.product_sname != null) ? data.product_sname : '')
+    setProductName((data && data.product_name != null && data.product_name != undefined) ? data.product_name : '')
+    setFacePrice((data && data.face_price != null && data.face_price != undefined) ? data.face_price : '')
+    setPages((data && data.pages != null && data.pages != undefined) ? data.pages : '')
+    setInnerPages((data && data.inner_pages != null && data.inner_pages != undefined) ? data.inner_pages : '')
+    setRulePages((data && data.rule_pages != null && data.rule_pages != undefined) ? data.rule_pages : '')
+    setFarmay((data && data.farmay != null && data.farmay != undefined) ? data.farmay : '')
+    setSheetSize((data && data.book_sheet_size != null && data.book_sheet_size != undefined) ? data.book_sheet_size : 0)
+    setTitleSheetSize((data && data.title_sheet_size != null && data.title_sheet_size != undefined) ? data.title_sheet_size : 0)
+    setBookWeight((data && data.weight != null && data.weight != undefined) ? data.weight : '')
+    setBookFor((data && data.book_for != null && data.book_for != undefined) ? data.book_for : 0)
+    setCategory((data && data.category != null && data.category != undefined) ? data.category : 0)
+    setSubject((data && data.subject != null && data.subject != undefined) ? data.subject : 0)
+    setProductModal(true);
+  };
+  const changeStatus = (data) => {
+    fetch(baseUrl + 'change_status_product/' + data.id, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success == 0){
+          toast.error("Something Went Wrong!")
+        }
+      })
+      .catch(error => toast.error("Something Went Wrong!"))
   };
   const resetForm = () => {
     setProductBarCode('');
@@ -226,6 +290,8 @@ const Products = () => {
     setUom('0');
     setEdition('0');
     setSubject('0');
+    setValidationerrors({});
+    setCurrentId('');
   };
 
   const validate = () => {
@@ -233,35 +299,35 @@ const Products = () => {
     let isValid = true;
 
 
-    if (productBarCode == null || productBarCode == "" || productBarCode == undefined) {
+    if (productBarCode === null || productBarCode === "" || productBarCode === undefined) {
       isValid = false;
       validationerrors["productBarCode"] = "Bar Code is required.";
     }
-    if (productShortName == null || productShortName == "" || productShortName == undefined) {
+    if (productShortName === null || productShortName === "" || productShortName === undefined) {
       isValid = false;
       validationerrors["productShortName"] = "Short Name is required.";
     }
-    if (productName == null || productName == "" || productName == undefined) {
+    if (productName === null || productName === "" || productName === undefined) {
       isValid = false;
       validationerrors["productName"] = "Name is required.";
     }
-    if (facePrice == null || facePrice == "" || facePrice == undefined) {
+    if (facePrice === null || facePrice === "" || facePrice === undefined) {
       isValid = false;
       validationerrors["facePrice"] = "Face Price is required.";
     }
-    if (pages == null || pages == "" || pages == undefined) {
+    if (pages === null || pages === "" || pages === undefined) {
       isValid = false;
       validationerrors["pages"] = "Pages is required.";
     }
-    if (inner_pages == null || inner_pages == "" || inner_pages == undefined) {
+    if (inner_pages === null || inner_pages === "" || inner_pages === undefined) {
       isValid = false;
       validationerrors["inner_pages"] = "Inner Pages is required.";
     }
-    if (rulePages == null || rulePages == "" || rulePages == undefined) {
+    if (rulePages === null || rulePages === "" || rulePages === undefined) {
       isValid = false;
       validationerrors["rulePages"] = "Rule Pages is required.";
     }
-    if (farmay == null || farmay == "" || farmay == undefined) {
+    if (farmay === null || farmay === "" || farmay === undefined) {
       isValid = false;
       validationerrors["farmay"] = "Farmay is required.";
     }
@@ -273,7 +339,7 @@ const Products = () => {
       isValid = false;
       validationerrors["titleSheetSize"] = "Title Sheet Size is required.";
     }
-    if (bookWeight == null || bookWeight == "" || bookWeight == undefined) {
+    if (bookWeight === null || bookWeight === "" || bookWeight === undefined) {
       isValid = false;
       validationerrors["bookWeight"] = "Book Weight is required.";
     }
@@ -294,7 +360,7 @@ const Products = () => {
 
     return isValid;
   }
-  const addProduct = () => {
+  const Product = () => {
     if (validate()){
       setIsProductLoading(true);
       const data = {
@@ -322,31 +388,63 @@ const Products = () => {
         edition: edition,
         subject: subject
       };
-
-      fetch(baseUrl + 'add_new_product', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-        .then(response => response.json())
-        .then(data => {
-          setIsProductLoading(false);
-          if (data.success == 1){
-            toast.success("Product is Successfully Saved!")
-            setProducts(data.products)
-            setAddProductModal(false);
-          }else{
-            toast.error("Something Went Wrong!")
-          }
-        })
-        .catch(error => toast.error("Something Went Wrong!"))
-        .finally(() => {
-          setIsProductLoading(false);
-        });
-      closeAddProduct(true);
+      if (currentId == ''){
+        addNewProduct(data);
+      }else{
+        updateProduct(data);
+      }
     }
+  };
+  const addNewProduct = (data) => {
+    fetch(baseUrl + 'add_new_product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsProductLoading(false);
+        if (data.success == 1){
+          toast.success("Product is Successfully Saved!")
+          setProducts(data.products)
+          setProductModal(false);
+          resetForm();
+        }else{
+          toast.error("Something Went Wrong!")
+        }
+      })
+      .catch(error => toast.error("Something Went Wrong!"))
+      .finally(() => {
+        setIsProductLoading(false);
+      });
+    closeProduct(true);
+  };
+  const updateProduct = (data) => {
+    fetch(baseUrl + 'update_product/' + currentId, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsProductLoading(false);
+        if (data.success == 1){
+          toast.success("Product is Successfully Updated!")
+          setProducts(data.products)
+          setProductModal(false);
+          resetForm();
+        }else{
+          toast.error("Something Went Wrong!")
+        }
+      })
+      .catch(error => toast.error("Something Went Wrong!"))
+      .finally(() => {
+        setIsProductLoading(false);
+      });
   };
   const onChangeProductBarcode = (e) => {
     setProductBarCode(e.target.value);
@@ -431,16 +529,16 @@ const Products = () => {
           />}
       </Modal>
       <ToastContainer />
-      {/*Add Product Modal*/}
+      {/*Product Modal*/}
       <Modal
-        open={addProductModal}
-        onClose={closeAddProduct}
+        open={ProductModal}
+        onClose={closeProduct}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Product
+            {currentId == '' ? "+ Add Product" : "Update Product"}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
@@ -450,7 +548,7 @@ const Products = () => {
                   Barcode</InputLabel>
                 <TextField
                   id="product_barcode"
-                  aria-describedby="add-product-barcode"
+                  aria-describedby="product-barcode"
                   error={Boolean(validationerrors.productBarCode)}
                   onChange={onChangeProductBarcode}
                   value={productBarCode}
@@ -463,7 +561,7 @@ const Products = () => {
                   Name</InputLabel>
                 <TextField
                   id="product_short_name"
-                  aria-describedby="add-product-shortname"
+                  aria-describedby="product-shortname"
                   onChange={onChangeProductShortName}
                   value={productShortName}
                   error={Boolean(validationerrors.productShortName)}
@@ -476,7 +574,7 @@ const Products = () => {
                   Name</InputLabel>
                 <TextField
                   id="product_name"
-                  aria-describedby="add-product-name"
+                  aria-describedby="product-name"
                   onChange={onChangeProductName}
                   value={productName}
                   error={Boolean(validationerrors.productName)}
@@ -490,7 +588,7 @@ const Products = () => {
                   Price</InputLabel>
                 <TextField
                   id="face_price"
-                  aria-describedby="add-face-price"
+                  aria-describedby="face-price"
                   onChange={onChangeFacePrice}
                   value={facePrice}
                   error={Boolean(validationerrors.facePrice)}
@@ -522,7 +620,7 @@ const Products = () => {
                 <InputLabel htmlFor="pages" style={{ position: 'unset' }}>Pages</InputLabel>
                 <TextField
                   id="pages"
-                  aria-describedby="add-pages"
+                  aria-describedby="pages"
                   onChange={onChangePages}
                   value={pages}
                   error={Boolean(validationerrors.pages)}
@@ -535,7 +633,7 @@ const Products = () => {
                 <InputLabel htmlFor="inner_pages" style={{ position: 'unset' }}>Inner Pages</InputLabel>
                 <TextField
                   id="inner_pages"
-                  aria-describedby="add-inner-pages"
+                  aria-describedby="inner-pages"
                   onChange={onChangeInnerPages}
                   value={inner_pages}
                   error={Boolean(validationerrors.inner_pages)}
@@ -549,7 +647,7 @@ const Products = () => {
                   Pages</InputLabel>
                 <TextField
                   id="rule_pages"
-                  aria-describedby="add-rule-pages"
+                  aria-describedby="rule-pages"
                   onChange={onChangeRulePages}
                   value={rulePages}
                   error={Boolean(validationerrors.rulePages)}
@@ -562,7 +660,7 @@ const Products = () => {
                   Farmay</InputLabel>
                 <TextField
                   id="farmay"
-                  aria-describedby="add-farmay"
+                  aria-describedby="farmay"
                   onChange={onChangeFarmay}
                   value={farmay}
                   error={Boolean(validationerrors.farmay)}
@@ -575,7 +673,7 @@ const Products = () => {
                   Weight</InputLabel>
                 <TextField
                   id="book_weight"
-                  aria-describedby="add-book-weight"
+                  aria-describedby="book-weight"
                   onChange={onChangeBookWeight}
                   value={bookWeight}
                   error={Boolean(validationerrors.bookWeight)}
@@ -796,8 +894,8 @@ const Products = () => {
                   onChange={onChangeTitleSheetSize}
                   value={titleSheetSize}
                   style={{ minWidth: '95%' }}
-                  error={Boolean(validationerrors.subject)}
-                  helperText={validationerrors.subject || ""}
+                  error={Boolean(validationerrors.titleSheetSize)}
+                  helperText={validationerrors.titleSheetSize || ""}
                   variant="standard"
                 >
                   <MenuItem value="0">
@@ -817,8 +915,8 @@ const Products = () => {
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" disabled={isProductLoading}  onClick={closeAddProduct}>Cancel</Button>
-            <Button variant="contained" disabled={isProductLoading} onClick={addProduct}> {isProductLoading ? (
+            <Button variant="contained" disabled={isProductLoading}  onClick={closeProduct}>Cancel</Button>
+            <Button variant="contained" disabled={isProductLoading} onClick={Product}> {isProductLoading ? (
               <CircularProgress
                 size={20}
                 style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -10, marginLeft: -10, color: '#ffffff' }}
@@ -879,7 +977,7 @@ const Products = () => {
               </Stack>
               <div>
                 <Button
-                  onClick={openAddProduct}
+                  onClick={openProduct}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -893,6 +991,7 @@ const Products = () => {
             </Stack>
             <ProductsSearch sendProducts={getLatestProducts}/>
             <ProductsTable
+              tableHeaders={tableHeaders}
               count={products.length}
               items={product_data}
               onDeselectAll={productsSelection.handleDeselectAll}
@@ -905,6 +1004,8 @@ const Products = () => {
               rowsPerPage={rowsPerPage}
               selected={productsSelection.selected}
               sendProducts={getLatestProducts}
+              updateProduct={getUpdateData}
+              updateStatus={changeStatus}
             />
           </Stack>
         </Container>
