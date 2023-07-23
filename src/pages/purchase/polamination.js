@@ -21,7 +21,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { textAlign } from '@mui/system';
+import { borderColor, textAlign } from '@mui/system';
 import { ToastContainer, toast } from 'react-toastify';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -71,10 +71,9 @@ const data = [
 ];
 
 const processData = [
-  {id: 1, process: 'Book Printing'},
-  {id: 2, process: 'Title Printing'},
-  {id: 3, process: 'Inner Printing'},
-  {id: 4, process: 'Rule Printing'},
+  {id: 5, process: 'Lamination'},
+  {id: 6, process: 'Spot UV'},
+  
 ];
 
 
@@ -133,9 +132,9 @@ const Page = () => {
   const [godownID, setGodownID] = useState('0');
   const [loadGodowns, setLoadGodowns] = useState([]);
   
- 
+ const [pickupLocation, setPickupLocation] = useState('');
+ const [pickupLocationID, setPickupLocationID] = useState('');
   
-  const [productQty, setProductQty] = useState('');
   const [productRate, setProductRate] = useState('');
   const [productAmount, setProductAmount] = useState('');
   const [totalAmount, setTotalAmount] = useState('0');
@@ -145,15 +144,13 @@ const Page = () => {
   const [batchNos, setBatchNos] = useState('0');
 
   const [printOrder, setPrintOrder] = useState('');
-  const [paperQty, setPaperQty] = useState('');
-  const [paperProduct, setPaperProduct] = useState('');
-  const [paperProductID, setPaperProductID] = useState('');
-
-  const [billingQty, setBillingQty] = useState('');
-  const [platesQty, setPlatesQty] = useState('');
-  
+ 
   const [processName, setProcessName] = useState('0');
   const [processNameID, setProcessNameID] = useState('0');
+
+  const [laminationType, setLaminationType] = useState('');
+  const [laminationTypeID, setLaminationTypeID] = useState('');
+  const [loadLaminationType, setLoadLaminationType] = useState([]);
   
   const [isBatchData, setIsBatchData] = useState(false);
 
@@ -181,7 +178,7 @@ const Page = () => {
 
   const openAddPurchase = () => {
 
-    fetch(baseUrl + 'get_press_vendors',{
+    fetch(baseUrl + 'get_lamination_vendors',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -231,7 +228,7 @@ const Page = () => {
     
     setGodownID('0');
     setGodown('0');
-    setProductQty('');
+    
     setProductRate('');
     setProductAmount('');
     
@@ -257,7 +254,7 @@ const Page = () => {
       inventories: dbData,
     };
 console.log(data);
-    fetch(baseUrl + 'add_new_po_press', {
+    fetch(baseUrl + 'add_new_po_lamination', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -291,13 +288,12 @@ console.log(data);
       process_name: processName,
       batch_no: batchNos,
       product_name: productName,
-      paper_product: paperProduct,
-      paper_qty: paperQty,
+      
       print_order: printOrder,
-      plates_qty: platesQty,
+      lamination_type: laminationType,
       product_rate: productRate,
       product_amount: productAmount,
-      godown_name: godown,
+      pickup_location: pickupLocation,
       
     };
 
@@ -306,13 +302,12 @@ console.log(data);
       process_id: processNameID,
       batch_no: batchNos,
       product_id: productNameID,
-      paper_product_id: paperProductID,
-      paper_qty: paperQty,
+      
       print_order: printOrder,
-      plates_qty: platesQty,
+      lamination_type_id: laminationTypeID,
       product_rate: productRate,
       product_amount: productAmount,
-      godown_id: godownID,
+      pickup_location_id: pickupLocationID,
     };
 
     setTableData((prevTableData) => [...prevTableData, newItem]);
@@ -322,13 +317,11 @@ console.log(data);
     setBatchNos('0');
     setProductName('');
     setPrintOrder('');
-    setPaperProduct('');
-    setPaperQty('');
-    setBillingQty('');
+    
     setProductRate('');
     setProductAmount('');
-    setPlatesQty('');
-    setGodown('0');
+    
+    setPickupLocation('');
     
 
   };
@@ -407,11 +400,31 @@ console.log(data);
     })
     .catch(error => console.error(error));
 
+    if(id == 5){
+      const lType = [
+        {id: 1, name: 'Shine'},
+        {id: 2, name: 'Mat'},
+      ];
+      setLoadLaminationType(lType);
+    }
+    else if (id == 6){
+      const lType = [
+        {id: 1, name: 'Spot UV'},
+        
+      ];
+      setLoadLaminationType(lType);
+    }
+    else{
+      setLoadLaminationType([]);
+
+    }
+    
+setLaminationType('0');
     setBatchNos('0');
     setProductName('');
-    setPaperProduct('');
+   
     setPrintOrder('');
-    setPaperQty('');
+    
     
    
 
@@ -425,7 +438,7 @@ console.log(data);
   }
   const getBatchData = (batchno, process) => {
 if(batchno != 0 && process != 0){
-  fetch(baseUrl + 'get_batch_data_for_press/' + batchno + '/' + process,{
+  fetch(baseUrl + 'get_batch_data_for_lamination/' + batchno + '/' + process + '/' + (process === 5 ? 2: 5),{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -439,10 +452,11 @@ if(batchno != 0 && process != 0){
 
     setProductName(data.batchData[0]['productName']);
     setProductNameID(data.batchData[0]['productID']);
-setPaperProduct(data.batchData[0]['paperProduct']);
-setPaperProductID(data.batchData[0]['paperProductID']);
+    setPickupLocation(data.batchData[0]['Received from']);
+    setPickupLocationID(data.batchData[0]['Received from ID']);
+
 setPrintOrder(data.batchData[0]['order']);
-setPaperQty(data.batchData[0]['paperQty']);
+
     
     console.log('Batch Data::: ' + loadBatchData);
    }
@@ -452,10 +466,10 @@ setPaperQty(data.batchData[0]['paperQty']);
       
       setProductName('');
       setProductNameID('0');
-setPaperProduct('');
-setPaperProductID('0');
+      setPickupLocation('');
+
 setPrintOrder('');
-setPaperQty('');
+
       setLoadBachData([]);
       setBatchNos('0');
       
@@ -469,10 +483,10 @@ else{
   setIsBatchData(false);
   setProductName('');
   setProductNameID('0');
-setPaperProduct('');
-setPaperProductID('0');
+  setPickupLocation('');
+
 setPrintOrder('');
-setPaperQty('');
+
   setLoadBachData([]);
   
 
@@ -503,6 +517,15 @@ setPaperQty('');
   }
   const onClickGodown = (id) => {
 setGodownID(id);
+  }
+  const onChangeLaminationType = (e) => {
+    setLaminationType(e.target.value);
+  }
+  const onClickLaminationType = (id) => {
+    setLaminationTypeID(id);
+  }
+  const onChangePickupLocation = (e) => {
+   // setPickupLocation(e.target.value);
   }
 
   return (
@@ -601,11 +624,12 @@ setGodownID(id);
                   
                 </Select>
               </Grid>
+
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <InputLabel htmlFor="product_name" style={{ position: 'unset' }}>Product Name
+                <InputLabel htmlFor="product_name" style={{ position: 'unset'}}>Product Name
                   </InputLabel>
                 <TextField id="product_name" aria-describedby="add-product_name"
-                       onChange={onChangeProductName} value={productName}/>
+                       onChange={onChangeProductName} value={productName} />
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
                 <InputLabel htmlFor="print_order" style={{ position: 'unset' }}>Print Order
@@ -614,52 +638,37 @@ setGodownID(id);
                        onChange={onChangePrintOrder} value={printOrder}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
-                <InputLabel htmlFor="Billing_qty" style={{ position: 'unset' }}>Billing Qty
+                <InputLabel htmlFor="pickup_location" style={{ position: 'unset' }}>Pickup Location
                   </InputLabel>
-                <TextField id="billing_qty" aria-describedby="add-billing_qty"
-                       onChange={onChangeBillingQty} value={billingQty}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_product" style={{ position: 'unset' }}>Paper Product
-                  </InputLabel>
-                <TextField id="paper_product" aria-describedby="add-paper_product"
-                       onChange={onChangePaperProduct} value={paperProduct}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_qty" style={{ position: 'unset' }}>Paper Qty
-                  </InputLabel>
-                <TextField id="paper_qty" aria-describedby="add-paper_qty"
-                       onChange={onChangePaperQty} value={paperQty}/>
+                <TextField id="pickup_location" aria-describedby="add-pickup_location"
+                       onChange={onChangePickupLocation} value={pickupLocation}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
               <Select
-                  labelId="godown"
-                  id="godown"
-                  label="Godown"
+                  labelId="lamination_type"
+                  id="lamination_type"
+                  label="Lamination Type"
                   
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeGodown}
-                  value={godown}
+                  onChange={onChangeLaminationType}
+                  value={laminationType}
                 >
                   <MenuItem value="0" onClick={() => onClickGodown(0)}>
-                    <em>Select Godown</em>
+                    <em>Select Lamination Type</em>
                   </MenuItem>
                   {
-                    loadGodowns.map((godown) => (
-                      <MenuItem key = {godown.id} value={godown.name}
-                      onClick={() => onClickGodown(godown.id)}>{godown.name}</MenuItem>
+                    loadLaminationType.map((ltype) => (
+                      <MenuItem key = {ltype.id} value={ltype.name}
+                      onClick={() => onClickLaminationType(ltype.id)}>{ltype.name}</MenuItem>
                     ))
                   }
                   
                 </Select>
               </Grid>
+             
+              
 
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="plates_qty" style={{ position: 'unset' }}>Plates Qty
-                  </InputLabel>
-                <TextField id="plates_qty" aria-describedby="add-paper_qty"
-                       onChange={onChangePlatesQty} value={platesQty}/>
-              </Grid>
+              
               
                            
               
@@ -692,13 +701,11 @@ setGodownID(id);
     
     <th>Process</th>
     <th>Product Name</th>
-    <th>Paper</th>
-    <th>Paper Qty</th>
     <th>Print Order</th>
-    <th>Plates</th>
+    <th>Lamination Type</th>
     <th>Rate</th>
     <th>Amount</th>
-    <th>Godown</th>
+    <th>Pickup Location</th>
     
   </tr>
 </thead>
@@ -709,13 +716,12 @@ setGodownID(id);
   <td>{rowData.batch_no}</td>
   <td>{rowData.process_name}</td>
   <td>{rowData.product_name}</td>
-  <td>{rowData.paper_product}</td>
-  <td>{rowData.paper_qty}</td>
+  
   <td>{rowData.print_order}</td>
-  <td>{rowData.plates_qty}</td>
+  <td>{rowData.lamination_type}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
-  <td>{rowData.godown_name}</td>
+  <td>{rowData.pickup_location}</td>
   
   
 </tr>
