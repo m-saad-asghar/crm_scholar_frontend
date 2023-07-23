@@ -17,9 +17,11 @@ import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
+import { useRouter } from 'next/router';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
+  const router = useRouter();
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
@@ -107,8 +109,7 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
-              const active = item.path ? (pathname === item.path) : false;
-
+              const active = item.path ? (router.pathname.startsWith(item.path)) : false;
               return (
                 <SideNavItem
                   active={active}
@@ -118,6 +119,7 @@ export const SideNav = (props) => {
                   key={item.title}
                   path={item.path}
                   title={item.title}
+                  children={item.children}
                 />
               );
             })}
