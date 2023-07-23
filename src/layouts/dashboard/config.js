@@ -24,69 +24,40 @@ export const items = [
         <ProductIcon />
       </SvgIcon>
     ),
-  },
-  {
-    title: 'Product - Category',
-    path: '/products/category',
-    icon: (
-      <SvgIcon fontSize="small">
-        <CategoryIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - Subject',
-    path: '/products/subject',
-    icon: (
-      <SvgIcon fontSize="small">
-        <SubjectIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - Paper',
-    path: '/products/paper',
-    icon: (
-      <SvgIcon fontSize="small">
-        <BlindsClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - Paper Type',
-    path: '/products/papertype',
-    icon: (
-      <SvgIcon fontSize="small">
-        <BlindsClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - Plates',
-    path: '/products/plates',
-    icon: (
-      <SvgIcon fontSize="small">
-        <BlindsClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - For Board',
-    path: '/products/productfor',
-    icon: (
-      <SvgIcon fontSize="small">
-        <WrapTextIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Product - Sheet Size',
-    path: '/products/sheetsize',
-    icon: (
-      <SvgIcon fontSize="small">
-        <WrapTextIcon />
-      </SvgIcon>
-    )
+    children: [
+      {
+        title: 'Products',
+        path: '/products',
+      },
+      {
+        title: 'Product - Category',
+        path: '/products/category',
+      },
+      {
+        title: 'Product - Subject',
+        path: '/products/subject',
+      },
+      {
+        title: 'Product - Paper',
+        path: '/products/paper',
+      },
+      {
+        title: 'Product - Paper Type',
+        path: '/products/papertype',
+      },
+      {
+        title: 'Product - Plates',
+        path: '/products/plates',
+      },
+      {
+        title: 'Product - For Board',
+        path: '/products/productfor',
+      },
+      {
+        title: 'Product - Sheet Size',
+        path: '/products/sheetsize',
+      },
+    ],
   },
   
   {
