@@ -71,8 +71,8 @@ const data = [
 ];
 
 const processData = [
-  {id: 5, process: 'Lamination'},
-  {id: 6, process: 'Spot UV'},
+  {id: 7, process: 'Binding'},
+ 
   
 ];
 
@@ -178,7 +178,7 @@ const Page = () => {
 
   const openAddPurchase = () => {
 
-    fetch(baseUrl + 'get_lamination_vendors',{
+    fetch(baseUrl + 'get_binder_vendors',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -192,19 +192,7 @@ const Page = () => {
     })
     .catch(error => console.error(error));
 
-    fetch(baseUrl + 'get_godowns',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadGodowns(data.godowns);
-      
-
-    })
-    .catch(error => console.error(error));
+    
 
     
     
@@ -254,7 +242,7 @@ const Page = () => {
       inventories: dbData,
     };
 console.log(data);
-    fetch(baseUrl + 'add_new_po_lamination', {
+    fetch(baseUrl + 'add_new_po_binding', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -290,7 +278,7 @@ console.log(data);
       product_name: productName,
       
       print_order: printOrder,
-      lamination_type: laminationType,
+      
       product_rate: productRate,
       product_amount: productAmount,
       pickup_location: pickupLocation,
@@ -304,7 +292,7 @@ console.log(data);
       product_id: productNameID,
       
       print_order: printOrder,
-      lamination_type_id: laminationTypeID,
+      
       product_rate: productRate,
       product_amount: productAmount,
       pickup_location_id: pickupLocationID,
@@ -400,26 +388,7 @@ console.log(data);
     })
     .catch(error => console.error(error));
 
-    if(id == 5){
-      const lType = [
-        {id: 1, name: 'Shine'},
-        {id: 2, name: 'Mat'},
-      ];
-      setLoadLaminationType(lType);
-    }
-    else if (id == 6){
-      const lType = [
-        {id: 1, name: 'Spot UV'},
-        
-      ];
-      setLoadLaminationType(lType);
-    }
-    else{
-      setLoadLaminationType([]);
-
-    }
-    
-setLaminationType('0');
+    setLaminationType('0');
     setBatchNos('0');
     setProductName('');
    
@@ -438,7 +407,7 @@ setLaminationType('0');
   }
   const getBatchData = (batchno, process) => {
 if(batchno != 0 && process != 0){
-  fetch(baseUrl + 'get_batch_data_for_lamination/' + batchno + '/' + process + '/' + (process === 5 ? 2: 5),{
+  fetch(baseUrl + 'get_batch_data_for_binding/' + batchno + '/' + process,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -550,7 +519,7 @@ setGodownID(id);
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Purchase Order For Lamination
+            + Add Purchase Order For Binder
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
@@ -643,34 +612,7 @@ setGodownID(id);
                 <TextField id="pickup_location" aria-describedby="add-pickup_location"
                        onChange={onChangePickupLocation} value={pickupLocation}/>
               </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-              <Select
-                  labelId="lamination_type"
-                  id="lamination_type"
-                  label="Lamination Type"
-                  
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeLaminationType}
-                  value={laminationType}
-                >
-                  <MenuItem value="0" onClick={() => onClickGodown(0)}>
-                    <em>Select Lamination Type</em>
-                  </MenuItem>
-                  {
-                    loadLaminationType.map((ltype) => (
-                      <MenuItem key = {ltype.id} value={ltype.name}
-                      onClick={() => onClickLaminationType(ltype.id)}>{ltype.name}</MenuItem>
-                    ))
-                  }
-                  
-                </Select>
-              </Grid>
-             
               
-
-              
-              
-                           
               
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_rate" style={{ position: 'unset' }}>Rate
@@ -702,7 +644,6 @@ setGodownID(id);
     <th>Process</th>
     <th>Product Name</th>
     <th>Print Order</th>
-    <th>Lamination Type</th>
     <th>Rate</th>
     <th>Amount</th>
     <th>Pickup Location</th>
@@ -718,7 +659,7 @@ setGodownID(id);
   <td>{rowData.product_name}</td>
   
   <td>{rowData.print_order}</td>
-  <td>{rowData.lamination_type}</td>
+  
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
   <td>{rowData.pickup_location}</td>
@@ -761,7 +702,7 @@ setGodownID(id);
       </Modal>
       <Head>
         <title>
-          Purchase Order For Lamination | Scholar CRM
+          Purchase Order For Binder | Scholar CRM
         </title>
       </Head>
       <Box
@@ -780,7 +721,7 @@ setGodownID(id);
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Purchase Order For Lamination
+                  Purchase Order For Binder
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}

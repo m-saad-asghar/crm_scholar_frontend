@@ -67,7 +67,15 @@ export const items = [
       <SvgIcon fontSize="small">
         <ChartBarIcon />
       </SvgIcon>
-    )
+    ),
+    children: [
+      {
+      title: 'Batch',
+    path: '/process',
+    },
+    
+
+    ],
   },
   {
     title: 'Vendor',
@@ -85,26 +93,27 @@ export const items = [
       <SvgIcon fontSize="small">
         <UsersIcon />
       </SvgIcon>
-    )
+    ),
+    children: [
+      {
+        title: 'Purchase - Paper and Plate',
+        path: '/purchase',
+      },
+      {
+        title: 'PO For Press',
+        path: '/purchase/popress',
+      },
+      {
+        title: 'PO For Lamination',
+        path: '/purchase/polamination',
+      },
+      {
+        title: 'PO For Binder',
+        path: '/purchase/pobinder',
+      },
+    ],
   },
-  {
-    title: 'PO For Press',
-    path: '/purchase/popress',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'PO For Lamination',
-    path: '/purchase/polamination',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
-  },
+  
   {
     title: 'Godown',
     path: '/godown',
