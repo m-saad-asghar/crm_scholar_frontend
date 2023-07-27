@@ -4,7 +4,7 @@ import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, TextField } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, TextField, TableRow , TableCell, Checkbox} from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
@@ -22,6 +22,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
+import EditIcon from '@mui/icons-material/Edit';
+import Switch from '@mui/material/Switch';
 const tableHeaders = [
   "Barcode",
   "Short Name",
@@ -110,6 +112,8 @@ const Products = () => {
   const [validationerrors, setValidationerrors] = useState({});
   const [currentId, setCurrentId] = useState('');
   const productsSelection = useSelection(productsIds);
+  const selectedSome = (productsSelection.selected.length > 0) && (productsSelection.selected.length < product_data.length);
+const selectedAll = (product_data.length > 0) && (productsSelection.selected.length === product_data.length);
 
   useEffect(() => {
     getProducts();
@@ -133,6 +137,122 @@ const Products = () => {
     },
     []
   );
+
+  const tableHeader = () => {
+    return <>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={(selectedAll)}
+                      indeterminate={selectedSome}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          productsSelection.handleSelectAll?.();
+                        } else {
+                          productsSelection.handleDeselectAll?.();
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  
+                  {tableHeaders && tableHeaders.map((header, index) => (
+                    <TableCell key={index} style={{minWidth: 150}}>
+                      {header}
+                    </TableCell>
+                  ))}
+    </>
+  }
+
+  const tableBody = () => {
+    return <>
+    {product_data && product_data.map((product) => {
+                  const isSelected = productsSelection.selected.includes(product.id);
+                  return (
+                    <TableRow
+                      hover
+                      key={product.id}
+                      selected={isSelected}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={isSelected}
+                          onChange={(event) => {
+                            if (event.target.checked) {
+                              productsSelection.handleSelectOne?.(product.id);
+                            } else {
+                              productsSelection.handleDeselectOne?.(product.id);
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {product.product_code}
+                      </TableCell>
+                      <TableCell>
+                        {product.product_sname}
+                      </TableCell>
+                      <TableCell>
+                        {product.product_name}
+                      </TableCell>
+                      <TableCell>
+                        {product.face_price}
+                      </TableCell>
+                      <TableCell>
+                        {product.pages}
+                      </TableCell>
+                      <TableCell>
+                        {product.inner_pages}
+                      </TableCell>
+                      <TableCell>
+                        {product.rule_pages}
+                      </TableCell>
+                      <TableCell>
+                        {product.farmay}
+                      </TableCell>
+                      <TableCell>
+                        {product.weight}
+                      </TableCell>
+                      <TableCell>
+                        {product.book_sheet_size_label}
+                      </TableCell>
+                      <TableCell>
+                        {product.subject_name}
+                      </TableCell>
+                      <TableCell>
+                        {product.board_name}
+                      </TableCell>
+                      <TableCell>
+                        {product.category_name}
+                      </TableCell>
+                      <TableCell>
+                        {product.title_sheet_size_label}
+                      </TableCell>
+                      <TableCell>
+                        <Stack
+                          alignItems="center"
+                          direction="row"
+                          spacing={2}
+                        >
+                          <Button><EditIcon style={{ fontSize: '20px' }} onClick={handleUpdateProduct.bind(this, product)} /></Button>
+                          <Switch defaultChecked={product.active == 1 ? true : false} onChange={onChangeEnable.bind(this, product.id)}/>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+    </>
+  }
+
+  const handleUpdateProduct = (data) => {
+    getUpdateData(data);
+  };
+
+  const onChangeEnable = (id, event) => {
+    const data = {
+      status: event.target.checked,
+      id: id
+    }
+    changeStatus(data);
+  };
 
   const getProducts = () => {
     const data  = {
@@ -991,21 +1111,22 @@ const Products = () => {
             </Stack>
             <ProductsSearch sendProducts={getLatestProducts}/>
             <ProductsTable
-              tableHeaders={tableHeaders}
+              tableHeader={tableHeader}
+              tableBody={tableBody}
               count={products.length}
-              items={product_data}
-              onDeselectAll={productsSelection.handleDeselectAll}
-              onDeselectOne={productsSelection.handleDeselectOne}
+              // items={product_data}
+              // onDeselectAll={productsSelection.handleDeselectAll}
+              // onDeselectOne={productsSelection.handleDeselectOne}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={productsSelection.handleSelectAll}
-              onSelectOne={productsSelection.handleSelectOne}
+              // onSelectAll={productsSelection.handleSelectAll}
+              // onSelectOne={productsSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={productsSelection.selected}
+              // selected={productsSelection.selected}
               sendProducts={getLatestProducts}
               updateProduct={getUpdateData}
-              updateStatus={changeStatus}
+              // updateStatus={changeStatus}
             />
           </Stack>
         </Container>

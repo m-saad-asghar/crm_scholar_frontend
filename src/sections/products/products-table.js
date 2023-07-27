@@ -18,33 +18,33 @@ import {
 import { Scrollbar } from 'src/components/scrollbar';
 
 export const ProductsTable = (props) => {
-  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
-  const handleUpdateProduct = (data) => {
-    props.updateProduct(data);
-  };
+  // const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  // const handleUpdateProduct = (data) => {
+  //   props.updateProduct(data);
+  // };
   const {
     count = 0,
-    items = [],
-    onDeselectAll,
-    onDeselectOne,
+    // items = [],
+    // onDeselectAll,
+    // onDeselectOne,
     onPageChange = () => {},
     onRowsPerPageChange,
-    onSelectAll,
-    onSelectOne,
+    // onSelectAll,
+    // onSelectOne,
     page = 0,
     rowsPerPage = 0,
-    selected = []
+    // selected = []
   } = props;
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
-  const onChangeEnable = (id, event) => {
-    const data = {
-      status: event.target.checked,
-      id: id
-    }
-    props.updateStatus(data);
-  };
+  // const selectedSome = (selected.length > 0) && (selected.length < items.length);
+  // const selectedAll = (items.length > 0) && (selected.length === items.length);
+  // const onChangeEnable = (id, event) => {
+  //   const data = {
+  //     status: event.target.checked,
+  //     id: id
+  //   }
+  //   props.updateStatus(data);
+  // };
 
   return (
     <>
@@ -54,7 +54,7 @@ export const ProductsTable = (props) => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
+                  {/* <TableCell padding="checkbox">
                     <Checkbox
                       checked={selectedAll}
                       indeterminate={selectedSome}
@@ -66,16 +66,13 @@ export const ProductsTable = (props) => {
                         }
                       }}
                     />
-                  </TableCell>
-                  {props && props.tableHeaders && props.tableHeaders.map((header, index) => (
-                    <TableCell key={index} style={{minWidth: 150}}>
-                      {header}
-                    </TableCell>
-                  ))}
+                  </TableCell> */}
+                  {props.tableHeader()}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items && items.map((product) => {
+                {props.tableBody()}
+                {/* {items && items.map((product) => {
                   const isSelected = selected.includes(product.id);
                   return (
                     <TableRow
@@ -149,7 +146,7 @@ export const ProductsTable = (props) => {
                       </TableCell>
                     </TableRow>
                   );
-                })}
+                })} */}
               </TableBody>
             </Table>
           </Box>
@@ -170,15 +167,15 @@ export const ProductsTable = (props) => {
 
 ProductsTable.propTypes = {
   count: PropTypes.number,
-  items: PropTypes.array,
-  tableHeaders: PropTypes.array,
-  onDeselectAll: PropTypes.func,
-  onDeselectOne: PropTypes.func,
+  // items: PropTypes.array,
+  // tableHeaders: PropTypes.array,
+  // onDeselectAll: PropTypes.func,
+  // onDeselectOne: PropTypes.func,
   onPageChange: PropTypes.func,
   onRowsPerPageChange: PropTypes.func,
-  onSelectAll: PropTypes.func,
-  onSelectOne: PropTypes.func,
+  // onSelectAll: PropTypes.func,
+  // onSelectOne: PropTypes.func,
   page: PropTypes.number,
   rowsPerPage: PropTypes.number,
-  selected: PropTypes.array
+  // selected: PropTypes.array
 };
