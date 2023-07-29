@@ -97,6 +97,15 @@ export const items = [
     )
   },
   {
+    title: 'PO For Lamination',
+    path: '/purchase/polamination',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    )
+  },
+  {
     title: 'Godown',
     path: '/godown',
     icon: (
