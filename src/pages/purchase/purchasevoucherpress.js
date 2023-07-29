@@ -21,8 +21,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { borderColor, textAlign } from '@mui/system';
+import { textAlign } from '@mui/system';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const style = {
@@ -70,11 +71,7 @@ const data = [
   
 ];
 
-const processData = [
-  {id: 7, process: 'Binding'},
- 
-  
-];
+
 
 
 
@@ -132,9 +129,9 @@ const Page = () => {
   const [godownID, setGodownID] = useState('0');
   const [loadGodowns, setLoadGodowns] = useState([]);
   
- const [hasReceived, sethasReceived] = useState('');
  
   
+  const [productQty, setProductQty] = useState('');
   const [productRate, setProductRate] = useState('');
   const [productAmount, setProductAmount] = useState('');
   const [totalAmount, setTotalAmount] = useState('0');
@@ -144,14 +141,17 @@ const Page = () => {
   const [batchNos, setBatchNos] = useState('0');
 
   const [printOrder, setPrintOrder] = useState('');
-  const [receivedQty, setReceivedQty] = useState('');
- 
+  const [paperQty, setPaperQty] = useState('');
+  const [paperProduct, setPaperProduct] = useState('');
+  const [paperProductID, setPaperProductID] = useState('');
+
+  const [billingQty, setBillingQty] = useState('');
+  const [printQty, setPrintQty] = useState('');
+  const [platesQty, setPlatesQty] = useState('');
+  
   const [processName, setProcessName] = useState('0');
   const [processNameID, setProcessNameID] = useState('0');
-
-  const [laminationType, setLaminationType] = useState('');
-  const [laminationTypeID, setLaminationTypeID] = useState('');
-  const [loadLaminationType, setLoadLaminationType] = useState([]);
+  const [loadProcesses, setLoadProcesses] = useState([]);
   
   const [isBatchData, setIsBatchData] = useState(false);
 
@@ -177,43 +177,43 @@ const Page = () => {
     []
   );
 
+  useEffect(() => {
+    addTotalAmount();
+      
+     },[tableData]);
+      
+      
+      const addTotalAmount = () => {
+        let totalAmount = 0;
+        tableData.forEach((data) => {
+          totalAmount += parseFloat(data.product_amount);
+        });
+        setTotalAmount(totalAmount);
+      };
+
+      const getVendors = () => {
+        fetch(baseUrl + 'get_press_vendors',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          setLoadVendors(data.vendors);
+         
+    
+        })
+        .catch(error => console.error(error));
+      }
+
+
   const openAddPurchase = () => {
 
-    fetch(baseUrl + 'get_binder_vendors',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadVendors(data.vendors);
-     
-
-    })
-    .catch(error => console.error(error));
-
-    
-
-    fetch(baseUrl + 'get_godowns',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadGodowns(data.godowns);
-      console.log("godowns", data.godowns)
-
-    })
-    .catch(error => console.error(error));
-
-    
+    getVendors();    
     
     setAddPurchaseModal(true);
-
-    
+   
     
   };
   const closeAddPurchase = () => {
@@ -224,14 +224,11 @@ const Page = () => {
   const resetForm = () => {
     
     setVendorName('0');
-    
-    setProductName('0');
-    
-    
-    
-    setGodownID('0');
-    setGodown('0');
-    
+    setProcessName('0');
+    setBatchNos('0');
+    setProductName('');
+    setBillingQty('');
+    setProductQty('');
     setProductRate('');
     setProductAmount('');
     
@@ -241,6 +238,7 @@ const Page = () => {
     
   };
   const addPurchase = () => {
+    setIsDataLoading(true);
     const Voucher = {
       
       vendor_code: vendorCode,
@@ -249,15 +247,12 @@ const Page = () => {
       
     };
     
-    
-    
-
     const data = {
       Voucher: Voucher,
       inventories: dbData,
     };
 console.log(data);
-    fetch(baseUrl + 'add_new_book_received', {
+    fetch(baseUrl + 'add_new_voucher_press', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -265,9 +260,10 @@ console.log(data);
       body: JSON.stringify(data)
     })
     .then(response => response.json())
-    .then(dt => {
+    .then(data => {
+      setIsDataLoading(false);
       if (data.success == 1){
-        toast.success("Book Received is Successfully Saved!");
+        toast.success("Purchase Voucher is Successfully Saved!");
         setAddPurchaseModal(false);
         // Update Products
       }else{
@@ -282,49 +278,51 @@ console.log(data);
     
     .finally(() => {
       //setIsPaperSizeLoading(false);
+      setIsDataLoading(false);
     });
       closeAddPurchase(true);
   };
   const onClickAddButton = () => {
     const newItem = {
       
-      
+      process_name: processName,
       batch_no: batchNos,
       product_name: productName,
       
-      qty: receivedQty,
-      
+      print_qty: printQty,
+      plates_qty: platesQty,
       product_rate: productRate,
       product_amount: productAmount,
-      godown: godown,
+      
       
     };
 
     const newItemDB = {
       
-      
+      process_id: processNameID,
       batch_no: batchNos,
       product_id: productNameID,
       
-      qty: receivedQty,
-            
+      print_qty: printQty,
+      plates_qty: platesQty,
       product_rate: productRate,
       product_amount: productAmount,
-      godown_id: godownID,
       
     };
 
     setTableData((prevTableData) => [...prevTableData, newItem]);
     setDBData((prevDBData) => [...prevDBData, newItemDB]);
 
-    
+    setProcessName('0');
     setBatchNos('0');
     setProductName('');
+    setPrintOrder('');
     
-    
+    setBillingQty('');
+    setPrintQty('');
     setProductRate('');
     setProductAmount('');
-    
+    setPlatesQty('');
     
     
 
@@ -337,21 +335,11 @@ console.log(data);
     console.log(dbData);
   }, [dbData]);
   */
- useEffect(() => {
-  
-  let totalAmount = 0;
-  tableData.forEach((data) => {
-    totalAmount += parseFloat(data.product_amount);
-  });
-  setTotalAmount(totalAmount);
-  console.log(totalAmount);
- }, [tableData]);
+ 
   
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
   };
-
-  
   
   
 
@@ -367,7 +355,48 @@ console.log(data);
   const onClickVendorName = (vid) => {
     setVendorCode(vid);
 
-    fetch(baseUrl + 'get_batches_for_product_received/' + vid,{
+    fetch(baseUrl + 'get_processes_of_vendor_for_pv/' + vid,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+     
+      if(data.success == 1)
+      setLoadProcesses(data.processes);
+      else
+      setLoadProcesses([]);
+      
+     
+
+    })
+    .catch(error => console.error(error));
+  }
+  
+ 
+ 
+  
+  const onChangeProductRate = (e) => {
+    setProductRate(e.target.value);
+  };
+  const onChangeProductAmount = (e) => {
+    setProductAmount(e.target.value);
+  };
+  
+  
+
+  const onChangeProcessName = (e) => {
+    setProcessName(e.target.value);
+
+   
+
+  }
+  const onClickProcessName = (id) => {
+        setProcessNameID(id);
+   console.log('Process Id: ' + id);
+    fetch(baseUrl + 'get_batches_for_pv_against_vendor/' + id + '/' + vendorCode,{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -384,26 +413,16 @@ console.log(data);
     })
     .catch(error => console.error(error));
 
-  }
-  
- 
- 
-  
-  const onChangeProductRate = (e) => {
-    setProductRate(e.target.value);
-  };
-  const onChangeProductAmount = (e) => {
-    setProductAmount(e.target.value);
-  };
-  
-  
-
-  const onChangeReceivedQty = (e) => {
-    setReceivedQty(e.target.value);
+    setBatchNos('0');
+    setProductName('');
+    setPaperProduct('');
+    setPrintOrder('');
+    setPrintQty('');
+    setPaperQty('');
+    
    
 
   }
-  
   const onChangeBatchNos = (e) => {
     setBatchNos(e.target.value);
 
@@ -412,8 +431,8 @@ console.log(data);
     
   }
   const getBatchData = (batchno, process) => {
-if(batchno != 0){
-  fetch(baseUrl + 'get_batch_data_for_book_received/' + batchno,{
+if(batchno != 0 && process != 0){
+  fetch(baseUrl + 'get_batch_data_for_press_pv/' + batchno + '/' + process,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -427,11 +446,11 @@ if(batchno != 0){
 
     setProductName(data.batchData[0]['productName']);
     setProductNameID(data.batchData[0]['productID']);
-    
 
-setPrintOrder(data.batchData[0]['order']);
-sethasReceived(data.batchData[0]['hasReceived']);
+setPrintOrder(data.batchData[0]['qty']);
 setProductRate(data.batchData[0]['rate']);
+setProductAmount(data.batchData[0]['amount']);
+setPlatesQty(data.batchData[0]['plates']);
 
     
     console.log('Batch Data::: ' + loadBatchData);
@@ -441,11 +460,13 @@ setProductRate(data.batchData[0]['rate']);
       setIsBatchData(false);
       
       setProductName('');
-      setProductNameID('0');
-      
+      setProductNameID('');
 
 setPrintOrder('');
-
+setPrintQty('');
+setProductRate('');
+setProductAmount('');
+setPlatesQty('');
       setLoadBachData([]);
       setBatchNos('0');
       
@@ -459,9 +480,11 @@ else{
   setIsBatchData(false);
   setProductName('');
   setProductNameID('0');
-  
-
+  setProductRate('');
+  setProductAmount('');
+  setPlatesQty('');
 setPrintOrder('');
+setPrintQty('');
 
   setLoadBachData([]);
   
@@ -476,20 +499,26 @@ setPrintOrder('');
   const onChangePrintOrder = (e) => {
     setPrintOrder(e.target.value);
   }
-  
-  
-  
-  
+  const onChangePaperQty = (e) => {
+    setPaperQty(e.target.value);
+  }
+  const onChangePaperProduct = (e) => {
+    setPaperProduct(e.target.value);
+  }
+  const onChangeBillingQty = (e) => {
+    setBillingQty(e.target.value);
+  }
+  const onChangePrintQty = (e) => {
+    setPrintQty(e.target.value);
+  }
+  const onChangePlatesQty = (e) => {
+    setPlatesQty(e.target.value);
+  }
   const onChangeGodown = (e) => {
     setGodown(e.target.value);
   }
   const onClickGodown = (id) => {
 setGodownID(id);
-  }
-  
-  
-  const onChangeHasReceived = (e) => {
-   // setPickupLocation(e.target.value);
   }
 
   return (
@@ -514,7 +543,7 @@ setGodownID(id);
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Product Received
+            + Add Purchase Voucher For Press
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
@@ -544,7 +573,28 @@ setGodownID(id);
                   
                 </Select>
               </Grid>
-              
+              <Grid item xs={12} sm={6} md={6} lg={6}>
+              <Select
+                  labelId="process"
+                  id="process"
+                  label="Process"
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeProcessName}
+                  value={processName}
+                >
+                  <MenuItem value="0" onClick={() => onClickProcessName(0) }>
+                    <em>Select Process</em>
+                  </MenuItem>
+                  {
+                    loadProcesses.map((process) => (
+                      <MenuItem key = {process.id} value={process.process}
+                      onClick={() => onClickProcessName(process.id) }>{process.process}</MenuItem>
+                    ))
+                  }
+                  
+                  
+                </Select>
+              </Grid>
               <Grid item xs={12} sm={6} md={6} lg={6}>
               <Select
                   labelId="batch"
@@ -567,12 +617,11 @@ setGodownID(id);
                   
                 </Select>
               </Grid>
-
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <InputLabel htmlFor="product_name" style={{ position: 'unset'}}>Product Name
+                <InputLabel htmlFor="product_name" style={{ position: 'unset' }}>Product Name
                   </InputLabel>
                 <TextField id="product_name" aria-describedby="add-product_name"
-                       onChange={onChangeProductName} value={productName} />
+                       onChange={onChangeProductName} value={productName}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
                 <InputLabel htmlFor="print_order" style={{ position: 'unset' }}>Print Order
@@ -581,17 +630,26 @@ setGodownID(id);
                        onChange={onChangePrintOrder} value={printOrder}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
-                <InputLabel htmlFor="has_received" style={{ position: 'unset' }}>Has Received
+                <InputLabel htmlFor="Billing_qty" style={{ position: 'unset' }}>Billing Qty
                   </InputLabel>
-                <TextField id="has_received" aria-describedby="add-has_received"
-                       onChange={onChangeHasReceived} value={hasReceived}/>
+                <TextField id="billing_qty" aria-describedby="add-billing_qty"
+                       onChange={onChangeBillingQty} value={billingQty}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
-                <InputLabel htmlFor="received_qty" style={{ position: 'unset' }}>Received Qty
+                <InputLabel htmlFor="print_qty" style={{ position: 'unset' }}>Print Qty
                   </InputLabel>
-                <TextField id="received_qty" aria-describedby="add-has_received"
-                       onChange={onChangeReceivedQty} value={receivedQty}/>
+                <TextField id="print_qty" aria-describedby="add-print_qty"
+                       onChange={onChangePrintQty} value={printQty}/>
               </Grid>
+
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="plates_qty" style={{ position: 'unset' }}>Plates Qty
+                  </InputLabel>
+                <TextField id="plates_qty" aria-describedby="add-paper_qty"
+                       onChange={onChangePlatesQty} value={platesQty}/>
+              </Grid>
+              
+                           
               
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_rate" style={{ position: 'unset' }}>Rate
@@ -604,29 +662,6 @@ setGodownID(id);
                   </InputLabel>
                 <TextField id="product_amount" aria-describedby="add-product_amount"
                        onChange={onChangeProductAmount} value={productAmount}/>
-              </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
-                <Select
-                  labelId="product_godown"
-                  id="product_godown"
-                  label="Product Godown"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeGodown}
-                  value={godown}
-                >
-                  <MenuItem value="0">
-                    <em>Select Godown</em>
-                  </MenuItem>
-                  {
-                   loadGodowns.map((godown) => (
-                    <MenuItem data-key={godown.id} value={godown.name} 
-                    onClick={() => onClickGodown(godown.id)}>
-                      {godown.name}
-                    </MenuItem>
-                  ))
-                  }
-                  
-                </Select>
               </Grid>
              
               <Grid item xs={12} sm={2} md={2} lg={2}>
@@ -642,12 +677,15 @@ setGodownID(id);
   <tr>
     
     <th>Batch No</th>
-        
+    
+    <th>Process</th>
     <th>Product Name</th>
-    <th>Qty</th>
+    
+    <th>Print Qty</th>
+    <th>Plates</th>
     <th>Rate</th>
     <th>Amount</th>
-    <th>Godown</th>
+    
     
   </tr>
 </thead>
@@ -656,14 +694,14 @@ setGodownID(id);
   <tr key={index}>
   
   <td>{rowData.batch_no}</td>
-  
+  <td>{rowData.process_name}</td>
   <td>{rowData.product_name}</td>
   
-  <td>{rowData.qty}</td>
-  
+  <td>{rowData.print_qty}</td>
+  <td>{rowData.plates_qty}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
-  <td>{rowData.godown}</td>
+  
   
   
 </tr>
@@ -703,7 +741,7 @@ setGodownID(id);
       </Modal>
       <Head>
         <title>
-          Product Received from Binder | Scholar CRM
+          Purchase Voucher For Press | Scholar CRM
         </title>
       </Head>
       <Box
@@ -722,7 +760,7 @@ setGodownID(id);
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Product Received from Binder
+                  Purchase Voucher For Press
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -761,7 +799,7 @@ setGodownID(id);
                   )}
                   variant="contained"
                 >
-                  Add Received Product
+                  Add Purchase Voucher
                 </Button>
               </div>
             </Stack>

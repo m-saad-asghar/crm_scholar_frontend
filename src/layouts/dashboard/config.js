@@ -73,6 +73,10 @@ export const items = [
       title: 'Batch',
     path: '/process',
     },
+    {
+      title: 'Received Books',
+    path: '/process/receivedfrombinder',
+    },
     
 
     ],
@@ -87,7 +91,7 @@ export const items = [
     )
   },
   {
-    title: 'Purchase',
+    title: 'Purchase Voucher',
     path: '/purchase',
     icon: (
       <SvgIcon fontSize="small">
@@ -96,23 +100,49 @@ export const items = [
     ),
     children: [
       {
-        title: 'Purchase - Paper and Plate',
+        title: 'Paper and Plate',
         path: '/purchase',
       },
       {
-        title: 'PO For Press',
-        path: '/purchase/popress',
+        title: 'Press',
+        path: '/purchase/purchasevoucherpress',
       },
       {
-        title: 'PO For Lamination',
-        path: '/purchase/polamination',
+        title: 'Lamination',
+        path: '/purchase/purchasevoucherlamination',
       },
       {
-        title: 'PO For Binder',
-        path: '/purchase/pobinder',
+        title: 'Binder',
+        path: '/purchase/purchasevoucherbinder',
+      },
+      
+    ],
+  },
+  {
+    title: 'Purchase Order',
+    path: '/purchaseorder',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    ),
+    children: [
+      
+      {
+        title: 'Press',
+        path: '/purchaseorder/popress',
+      },
+      {
+        title: 'Lamination',
+        path: '/purchaseorder/polamination',
+      },
+      {
+        title: 'Binder',
+        path: '/purchaseorder/pobinder',
       },
     ],
   },
+  
   
   {
     title: 'Godown',

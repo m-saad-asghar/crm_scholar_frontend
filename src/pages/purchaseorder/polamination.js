@@ -23,6 +23,7 @@ import Paper from '@mui/material/Paper';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { borderColor, textAlign } from '@mui/system';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const style = {
@@ -119,7 +120,7 @@ const Page = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addPurchaseModal, setAddPurchaseModal] = useState(false);
+  const [addPurchaseOrderModal, setaddPurchaseOrderModal] = useState(false);
   
   const [vendorName, setVendorName] = useState('0');
   const [vendorCode, setVendorCode] = useState('');
@@ -176,46 +177,70 @@ const Page = () => {
     []
   );
 
-  const openAddPurchase = () => {
-
-    fetch(baseUrl + 'get_lamination_vendors',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadVendors(data.vendors);
-     
-
-    })
-    .catch(error => console.error(error));
-
-    fetch(baseUrl + 'get_godowns',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoadGodowns(data.godowns);
+  useEffect(() => {
+    addTotalAmount();
       
+      
+     },[tableData]);
+      
+      
+  
+      const addTotalAmount = () => {
+        let totalAmount = 0;
+        tableData.forEach((data) => {
+          totalAmount += parseFloat(data.product_amount);
+        });
+        setTotalAmount(totalAmount);
+      }
+const getVendors = () => {
+  fetch(baseUrl + 'get_lamination_vendors',{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    setLoadVendors(data.vendors);
+   
 
-    })
-    .catch(error => console.error(error));
+  })
+  .catch(error => console.error(error));
 
+};
+
+const getGodowns = () => {
+  fetch(baseUrl + 'get_godowns',{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    setLoadGodowns(data.godowns);
+    
+
+  })
+  .catch(error => console.error(error));
+
+}
+
+  const openAddPO = () => {
+
+    getVendors();
+    getGodowns();
+   
     
     
-    setAddPurchaseModal(true);
+    setaddPurchaseOrderModal(true);
 
     
     
   };
-  const closeAddPurchase = () => {
+  const closeAddPO = () => {
     resetForm();
-    setAddPurchaseModal(false);
+    setaddPurchaseOrderModal(false);
     
   };
   const resetForm = () => {
@@ -237,23 +262,20 @@ const Page = () => {
     setDBData([]);
     
   };
-  const addPurchase = () => {
+  const addPurchaseOrder = () => {
+    setIsDataLoading(true);
     const Voucher = {
       
       vendor_code: vendorCode,
       total_amount: totalAmount,
-      
-      
+    
     };
-    
-    
-    
-
+  
     const data = {
       Voucher: Voucher,
       inventories: dbData,
     };
-console.log(data);
+
     fetch(baseUrl + 'add_new_po_lamination', {
       method: 'POST',
       headers: {
@@ -262,10 +284,11 @@ console.log(data);
       body: JSON.stringify(data)
     })
     .then(response => response.json())
-    .then(dt => {
+    .then(data => {
+      setIsDataLoading(false);
       if (data.success == 1){
         toast.success("Purchase Order is Successfully Saved!");
-        setAddPurchaseModal(false);
+        setaddPurchaseOrderModal(false);
         // Update Products
       }else{
         toast.error("Something Went Wrong!");
@@ -279,8 +302,9 @@ console.log(data);
     
     .finally(() => {
       //setIsPaperSizeLoading(false);
+      setIsDataLoading(false);
     });
-      closeAddPurchase(true);
+      closeAddPO(true);
   };
   const onClickAddButton = () => {
     const newItem = {
@@ -326,23 +350,6 @@ console.log(data);
 
   };
 
-
-  /*
-      It is very important if I want to see immigiate updates  
-  useEffect(() => {
-    console.log(dbData);
-  }, [dbData]);
-  */
- useEffect(() => {
-  
-  let totalAmount = 0;
-  tableData.forEach((data) => {
-    totalAmount += parseFloat(data.product_amount);
-  });
-  setTotalAmount(totalAmount);
-  console.log(totalAmount);
- }, [tableData]);
-  
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
   };
@@ -543,8 +550,8 @@ setGodownID(id);
       <ToastContainer />
       {/*Add Purchase Voucher Modal*/}
       <Modal
-        open={addPurchaseModal}
-        onClose={closeAddPurchase}
+        open={addPurchaseOrderModal}
+        onClose={closeAddPO}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -753,8 +760,8 @@ setGodownID(id);
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={closeAddPurchase}>Cancel</Button>
-            <Button variant="contained" onClick={addPurchase}>Submit</Button>
+            <Button variant="contained" onClick={closeAddPO}>Cancel</Button>
+            <Button variant="contained" onClick={addPurchaseOrder}>Submit</Button>
             
           </Grid>
         </Box>
@@ -811,7 +818,7 @@ setGodownID(id);
               </Stack>
               <div>
                 <Button
-                  onClick={openAddPurchase}
+                  onClick={openAddPO}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>

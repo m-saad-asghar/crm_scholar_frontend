@@ -21,8 +21,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Paper from '@mui/material/Paper';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { borderColor, textAlign } from '@mui/system';
+import { textAlign } from '@mui/system';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const style = {
@@ -71,9 +72,10 @@ const data = [
 ];
 
 const processData = [
-  {id: 7, process: 'Binding'},
- 
-  
+  {id: 1, process: 'Book Printing'},
+  {id: 2, process: 'Title Printing'},
+  {id: 3, process: 'Inner Printing'},
+  {id: 4, process: 'Rule Printing'},
 ];
 
 
@@ -119,7 +121,7 @@ const Page = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addPurchaseModal, setAddPurchaseModal] = useState(false);
+  const [AddPurchaseOrderModal, setAddPurchaseOrderModal] = useState(false);
   
   const [vendorName, setVendorName] = useState('0');
   const [vendorCode, setVendorCode] = useState('');
@@ -132,9 +134,9 @@ const Page = () => {
   const [godownID, setGodownID] = useState('0');
   const [loadGodowns, setLoadGodowns] = useState([]);
   
- const [pickupLocation, setPickupLocation] = useState('');
- const [pickupLocationID, setPickupLocationID] = useState('');
+ 
   
+  const [productQty, setProductQty] = useState('');
   const [productRate, setProductRate] = useState('');
   const [productAmount, setProductAmount] = useState('');
   const [totalAmount, setTotalAmount] = useState('0');
@@ -144,13 +146,15 @@ const Page = () => {
   const [batchNos, setBatchNos] = useState('0');
 
   const [printOrder, setPrintOrder] = useState('');
- 
+  const [paperQty, setPaperQty] = useState('');
+  const [paperProduct, setPaperProduct] = useState('');
+  const [paperProductID, setPaperProductID] = useState('');
+
+  const [billingQty, setBillingQty] = useState('');
+  const [platesQty, setPlatesQty] = useState('');
+  
   const [processName, setProcessName] = useState('0');
   const [processNameID, setProcessNameID] = useState('0');
-
-  const [laminationType, setLaminationType] = useState('');
-  const [laminationTypeID, setLaminationTypeID] = useState('');
-  const [loadLaminationType, setLoadLaminationType] = useState([]);
   
   const [isBatchData, setIsBatchData] = useState(false);
 
@@ -175,10 +179,24 @@ const Page = () => {
     },
     []
   );
-
-  const openAddPurchase = () => {
-
-    fetch(baseUrl + 'get_binder_vendors',{
+  useEffect(() => {
+    addTotalAmount();
+      
+      
+     },[tableData]);
+      
+      
+  
+      const addTotalAmount = () => {
+        let totalAmount = 0;
+        tableData.forEach((data) => {
+          totalAmount += parseFloat(data.product_amount);
+        });
+        setTotalAmount(totalAmount);
+      }
+      
+  const getVendors = () => {
+    fetch(baseUrl + 'get_press_vendors',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -191,19 +209,39 @@ const Page = () => {
 
     })
     .catch(error => console.error(error));
+  };
 
-    
+  const getGodowns = () => {
+    fetch(baseUrl + 'get_godowns',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLoadGodowns(data.godowns);
+      
 
+    })
+    .catch(error => console.error(error));
+
+  };
+
+  const openAddPO = () => {
+
+    getVendors();
+    getGodowns();
     
     
-    setAddPurchaseModal(true);
+    setAddPurchaseOrderModal(true);
 
     
     
   };
-  const closeAddPurchase = () => {
+  const closeAddPO = () => {
     resetForm();
-    setAddPurchaseModal(false);
+    setAddPurchaseOrderModal(false);
     
   };
   const resetForm = () => {
@@ -216,7 +254,7 @@ const Page = () => {
     
     setGodownID('0');
     setGodown('0');
-    
+    setProductQty('');
     setProductRate('');
     setProductAmount('');
     
@@ -225,7 +263,8 @@ const Page = () => {
     setDBData([]);
     
   };
-  const addPurchase = () => {
+  const addPurchaseOrder = () => {
+    setIsDataLoading(true);
     const Voucher = {
       
       vendor_code: vendorCode,
@@ -235,14 +274,12 @@ const Page = () => {
     };
     
     
-    
-
     const data = {
       Voucher: Voucher,
       inventories: dbData,
     };
 console.log(data);
-    fetch(baseUrl + 'add_new_po_binding', {
+    fetch(baseUrl + 'add_new_po_press', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -251,9 +288,10 @@ console.log(data);
     })
     .then(response => response.json())
     .then(dt => {
-      if (data.success == 1){
+      setIsDataLoading(false);
+      if (dt.success == 1){
         toast.success("Purchase Order is Successfully Saved!");
-        setAddPurchaseModal(false);
+        setAddPurchaseOrderModal(false);
         // Update Products
       }else{
         toast.error("Something Went Wrong!");
@@ -267,8 +305,9 @@ console.log(data);
     
     .finally(() => {
       //setIsPaperSizeLoading(false);
+      setIsDataLoading(false);
     });
-      closeAddPurchase(true);
+      closeAddPO(true);
   };
   const onClickAddButton = () => {
     const newItem = {
@@ -276,12 +315,13 @@ console.log(data);
       process_name: processName,
       batch_no: batchNos,
       product_name: productName,
-      
+      paper_product: paperProduct,
+      paper_qty: paperQty,
       print_order: printOrder,
-      
+      plates_qty: platesQty,
       product_rate: productRate,
       product_amount: productAmount,
-      pickup_location: pickupLocation,
+      godown_name: godown,
       
     };
 
@@ -290,12 +330,13 @@ console.log(data);
       process_id: processNameID,
       batch_no: batchNos,
       product_id: productNameID,
-      
+      paper_product_id: paperProductID,
+      paper_qty: paperQty,
       print_order: printOrder,
-      
+      plates_qty: platesQty,
       product_rate: productRate,
       product_amount: productAmount,
-      pickup_location_id: pickupLocationID,
+      godown_id: godownID,
     };
 
     setTableData((prevTableData) => [...prevTableData, newItem]);
@@ -305,11 +346,13 @@ console.log(data);
     setBatchNos('0');
     setProductName('');
     setPrintOrder('');
-    
+    setPaperProduct('');
+    setPaperQty('');
+    setBillingQty('');
     setProductRate('');
     setProductAmount('');
-    
-    setPickupLocation('');
+    setPlatesQty('');
+    setGodown('0');
     
 
   };
@@ -321,15 +364,7 @@ console.log(data);
     console.log(dbData);
   }, [dbData]);
   */
- useEffect(() => {
-  
-  let totalAmount = 0;
-  tableData.forEach((data) => {
-    totalAmount += parseFloat(data.product_amount);
-  });
-  setTotalAmount(totalAmount);
-  console.log(totalAmount);
- }, [tableData]);
+ 
   
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
@@ -388,12 +423,11 @@ console.log(data);
     })
     .catch(error => console.error(error));
 
-    setLaminationType('0');
     setBatchNos('0');
     setProductName('');
-   
+    setPaperProduct('');
     setPrintOrder('');
-    
+    setPaperQty('');
     
    
 
@@ -407,7 +441,7 @@ console.log(data);
   }
   const getBatchData = (batchno, process) => {
 if(batchno != 0 && process != 0){
-  fetch(baseUrl + 'get_batch_data_for_binding/' + batchno + '/' + process,{
+  fetch(baseUrl + 'get_batch_data_for_press/' + batchno + '/' + process,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -421,11 +455,10 @@ if(batchno != 0 && process != 0){
 
     setProductName(data.batchData[0]['productName']);
     setProductNameID(data.batchData[0]['productID']);
-    setPickupLocation(data.batchData[0]['Received from']);
-    setPickupLocationID(data.batchData[0]['Received from ID']);
-
+setPaperProduct(data.batchData[0]['paperProduct']);
+setPaperProductID(data.batchData[0]['paperProductID']);
 setPrintOrder(data.batchData[0]['order']);
-
+setPaperQty(data.batchData[0]['paperQty']);
     
     console.log('Batch Data::: ' + loadBatchData);
    }
@@ -435,10 +468,10 @@ setPrintOrder(data.batchData[0]['order']);
       
       setProductName('');
       setProductNameID('0');
-      setPickupLocation('');
-
+setPaperProduct('');
+setPaperProductID('0');
 setPrintOrder('');
-
+setPaperQty('');
       setLoadBachData([]);
       setBatchNos('0');
       
@@ -452,10 +485,10 @@ else{
   setIsBatchData(false);
   setProductName('');
   setProductNameID('0');
-  setPickupLocation('');
-
+setPaperProduct('');
+setPaperProductID('0');
 setPrintOrder('');
-
+setPaperQty('');
   setLoadBachData([]);
   
 
@@ -487,15 +520,6 @@ setPrintOrder('');
   const onClickGodown = (id) => {
 setGodownID(id);
   }
-  const onChangeLaminationType = (e) => {
-    setLaminationType(e.target.value);
-  }
-  const onClickLaminationType = (id) => {
-    setLaminationTypeID(id);
-  }
-  const onChangePickupLocation = (e) => {
-   // setPickupLocation(e.target.value);
-  }
 
   return (
     <>
@@ -512,14 +536,14 @@ setGodownID(id);
       <ToastContainer />
       {/*Add Purchase Voucher Modal*/}
       <Modal
-        open={addPurchaseModal}
-        onClose={closeAddPurchase}
+        open={AddPurchaseOrderModal}
+        onClose={closeAddPO}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Purchase Order For Binder
+            + Add Purchase Order For Press
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
@@ -593,12 +617,11 @@ setGodownID(id);
                   
                 </Select>
               </Grid>
-
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <InputLabel htmlFor="product_name" style={{ position: 'unset'}}>Product Name
+                <InputLabel htmlFor="product_name" style={{ position: 'unset' }}>Product Name
                   </InputLabel>
                 <TextField id="product_name" aria-describedby="add-product_name"
-                       onChange={onChangeProductName} value={productName} />
+                       onChange={onChangeProductName} value={productName}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
                 <InputLabel htmlFor="print_order" style={{ position: 'unset' }}>Print Order
@@ -607,12 +630,54 @@ setGodownID(id);
                        onChange={onChangePrintOrder} value={printOrder}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
-                <InputLabel htmlFor="pickup_location" style={{ position: 'unset' }}>Pickup Location
+                <InputLabel htmlFor="Billing_qty" style={{ position: 'unset' }}>Billing Qty
                   </InputLabel>
-                <TextField id="pickup_location" aria-describedby="add-pickup_location"
-                       onChange={onChangePickupLocation} value={pickupLocation}/>
+                <TextField id="billing_qty" aria-describedby="add-billing_qty"
+                       onChange={onChangeBillingQty} value={billingQty}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="paper_product" style={{ position: 'unset' }}>Paper Product
+                  </InputLabel>
+                <TextField id="paper_product" aria-describedby="add-paper_product"
+                       onChange={onChangePaperProduct} value={paperProduct}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="paper_qty" style={{ position: 'unset' }}>Paper Qty
+                  </InputLabel>
+                <TextField id="paper_qty" aria-describedby="add-paper_qty"
+                       onChange={onChangePaperQty} value={paperQty}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Select
+                  labelId="godown"
+                  id="godown"
+                  label="Godown"
+                  
+                  style={{ minWidth: '95%' }}
+                  onChange={onChangeGodown}
+                  value={godown}
+                >
+                  <MenuItem value="0" onClick={() => onClickGodown(0)}>
+                    <em>Select Godown</em>
+                  </MenuItem>
+                  {
+                    loadGodowns.map((godown) => (
+                      <MenuItem key = {godown.id} value={godown.name}
+                      onClick={() => onClickGodown(godown.id)}>{godown.name}</MenuItem>
+                    ))
+                  }
+                  
+                </Select>
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="plates_qty" style={{ position: 'unset' }}>Plates Qty
+                  </InputLabel>
+                <TextField id="plates_qty" aria-describedby="add-paper_qty"
+                       onChange={onChangePlatesQty} value={platesQty}/>
               </Grid>
               
+                           
               
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_rate" style={{ position: 'unset' }}>Rate
@@ -643,10 +708,13 @@ setGodownID(id);
     
     <th>Process</th>
     <th>Product Name</th>
+    <th>Paper</th>
+    <th>Paper Qty</th>
     <th>Print Order</th>
+    <th>Plates</th>
     <th>Rate</th>
     <th>Amount</th>
-    <th>Pickup Location</th>
+    <th>Godown</th>
     
   </tr>
 </thead>
@@ -657,12 +725,13 @@ setGodownID(id);
   <td>{rowData.batch_no}</td>
   <td>{rowData.process_name}</td>
   <td>{rowData.product_name}</td>
-  
+  <td>{rowData.paper_product}</td>
+  <td>{rowData.paper_qty}</td>
   <td>{rowData.print_order}</td>
-  
+  <td>{rowData.plates_qty}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
-  <td>{rowData.pickup_location}</td>
+  <td>{rowData.godown_name}</td>
   
   
 </tr>
@@ -694,15 +763,15 @@ setGodownID(id);
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={closeAddPurchase}>Cancel</Button>
-            <Button variant="contained" onClick={addPurchase}>Submit</Button>
+            <Button variant="contained" onClick={closeAddPO}>Cancel</Button>
+            <Button variant="contained" onClick={addPurchaseOrder}>Submit</Button>
             
           </Grid>
         </Box>
       </Modal>
       <Head>
         <title>
-          Purchase Order For Binder | Scholar CRM
+          Purchase Order For Press | Scholar CRM
         </title>
       </Head>
       <Box
@@ -721,7 +790,7 @@ setGodownID(id);
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Purchase Order For Binder
+                  Purchase Order For Press
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -752,7 +821,7 @@ setGodownID(id);
               </Stack>
               <div>
                 <Button
-                  onClick={openAddPurchase}
+                  onClick={openAddPO}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
