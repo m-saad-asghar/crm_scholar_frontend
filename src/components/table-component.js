@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 
-export const ProductsTable = (props) => {
+export const TableComponent = (props) => {
   const {
     count = 0,
     onPageChange = () => {},
@@ -50,7 +50,7 @@ export const ProductsTable = (props) => {
   );
 };
 
-ProductsTable.propTypes = {
+TableComponent.propTypes = {
   count: PropTypes.number,
   onPageChange: PropTypes.func,
   onRowsPerPageChange: PropTypes.func,
