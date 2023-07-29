@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, Table } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, Table, TextField } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CustomersTable } from 'src/sections/customer/customers-table';
@@ -23,6 +23,7 @@ import Paper from '@mui/material/Paper';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { textAlign } from '@mui/system';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const style = {
@@ -70,22 +71,13 @@ const data = [
   
 ];
 
-const productData = [
-  {
-    id: '24',
-    code: '1234',
-    name: 'Physics',
-    rate: 100,
+const processData = [
+  {id: 1, process: 'Book Printing'},
+  {id: 2, process: 'Title Printing'},
+  {id: 3, process: 'Inner Printing'},
+  {id: 4, process: 'Rule Printing'},
+];
 
-  },
-  {
-    id: '25',
-    code: '1235',
-    name: 'Physics',
-    rate: 110,
-    
-  }
-]
 
 
 
@@ -129,29 +121,44 @@ const Page = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addPurchaseModal, setAddPurchaseModal] = useState(false);
+  const [AddPurchaseOrderModal, setAddPurchaseOrderModal] = useState(false);
   
   const [vendorName, setVendorName] = useState('0');
   const [vendorCode, setVendorCode] = useState('');
   const [loadVendors, setLoadVendors] = useState([]);
-  const [productType, setProductType] = useState('0');
-  const [productName, setProductName] = useState('0');
-  const [productID, setProductID] = useState('0');
-  const [loadProducts, setLoadProducts] = useState([]);
   
-  const [productGodown, setProductGodown] = useState('0');
-  const [productGodownID, setProductGodownID] = useState('');
+  const [productName, setProductName] = useState('');
+  const [productNameID, setProductNameID] = useState('0');
+  
+  const [godown, setGodown] = useState('0');
+  const [godownID, setGodownID] = useState('0');
   const [loadGodowns, setLoadGodowns] = useState([]);
+  
+ 
+  
   const [productQty, setProductQty] = useState('');
   const [productRate, setProductRate] = useState('');
   const [productAmount, setProductAmount] = useState('');
   const [totalAmount, setTotalAmount] = useState('0');
-  const [productForPlates, setProductForPlates] = useState('0');
-  const [productForPlatesID, setProductForPlatesID] = useState('0');
-  const [loadProductsForPlates, setLoadProductsForPlates] = useState([]);
-
-  const [productForPlatesLabel, setProductForPlatesLabel] = useState('Select');
   
+
+  const [loadBatchNos, setLoadBatchNos] = useState([]);
+  const [batchNos, setBatchNos] = useState('0');
+
+  const [printOrder, setPrintOrder] = useState('');
+  const [paperQty, setPaperQty] = useState('');
+  const [paperProduct, setPaperProduct] = useState('');
+  const [paperProductID, setPaperProductID] = useState('');
+
+  const [billingQty, setBillingQty] = useState('');
+  const [platesQty, setPlatesQty] = useState('');
+  
+  const [processName, setProcessName] = useState('0');
+  const [processNameID, setProcessNameID] = useState('0');
+  
+  const [isBatchData, setIsBatchData] = useState(false);
+
+  const [loadBatchData, setLoadBachData] = useState([]);
   
   const [isDataLoading, setIsDataLoading] = useState(false);
   const customers = useCustomers(page, rowsPerPage);
@@ -172,11 +179,24 @@ const Page = () => {
     },
     []
   );
-
-  const openAddPurchase = () => {
-
-
-    fetch(baseUrl + 'get_p_p_vendors',{
+  useEffect(() => {
+    addTotalAmount();
+      
+      
+     },[tableData]);
+      
+      
+  
+      const addTotalAmount = () => {
+        let totalAmount = 0;
+        tableData.forEach((data) => {
+          totalAmount += parseFloat(data.product_amount);
+        });
+        setTotalAmount(totalAmount);
+      }
+      
+  const getVendors = () => {
+    fetch(baseUrl + 'get_press_vendors',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -189,7 +209,9 @@ const Page = () => {
 
     })
     .catch(error => console.error(error));
+  };
 
+  const getGodowns = () => {
     fetch(baseUrl + 'get_godowns',{
       method: 'POST',
       headers: {
@@ -199,42 +221,50 @@ const Page = () => {
     .then(response => response.json())
     .then(data => {
       setLoadGodowns(data.godowns);
-      console.log("godowns", data.godowns)
+      
 
     })
     .catch(error => console.error(error));
 
-    setAddPurchaseModal(true);
+  };
+
+  const openAddPO = () => {
+
+    getVendors();
+    getGodowns();
+    
+    
+    setAddPurchaseOrderModal(true);
 
     
     
   };
-  const closeAddPurchase = () => {
+  const closeAddPO = () => {
     resetForm();
-    setAddPurchaseModal(false);
+    setAddPurchaseOrderModal(false);
     
   };
   const resetForm = () => {
     
     setVendorName('0');
-    setProductType('0');
-    setProductName('0');
-    setLoadProducts([]);
-    setLoadProductsForPlates([]);
     
-    setProductGodownID('0');
-    setProductGodown('0');
+    setProductName('0');
+    
+    
+    
+    setGodownID('0');
+    setGodown('0');
     setProductQty('');
     setProductRate('');
     setProductAmount('');
-    setProductForPlates('0');
-    setProductForPlatesID('0');
+    
 
     setTableData([]);
     setDBData([]);
     
   };
-  const addPurchase = () => {
+  const addPurchaseOrder = () => {
+    setIsDataLoading(true);
     const Voucher = {
       
       vendor_code: vendorCode,
@@ -244,14 +274,12 @@ const Page = () => {
     };
     
     
-    
-
     const data = {
       Voucher: Voucher,
       inventories: dbData,
     };
 console.log(data);
-    fetch(baseUrl + 'add_new_voucher', {
+    fetch(baseUrl + 'add_new_po_press', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -260,9 +288,10 @@ console.log(data);
     })
     .then(response => response.json())
     .then(dt => {
-      if (data.success == 1){
-        toast.success("Purchase Voucher is Successfully Saved!");
-        setAddPurchaseModal(false);
+      setIsDataLoading(false);
+      if (dt.success == 1){
+        toast.success("Purchase Order is Successfully Saved!");
+        setAddPurchaseOrderModal(false);
         // Update Products
       }else{
         toast.error("Something Went Wrong!");
@@ -276,41 +305,55 @@ console.log(data);
     
     .finally(() => {
       //setIsPaperSizeLoading(false);
+      setIsDataLoading(false);
     });
-      closeAddPurchase(true);
+      closeAddPO(true);
   };
   const onClickAddButton = () => {
     const newItem = {
       
+      process_name: processName,
+      batch_no: batchNos,
       product_name: productName,
-      product_godown: productGodown,
-      product_qty: productQty,
+      paper_product: paperProduct,
+      paper_qty: paperQty,
+      print_order: printOrder,
+      plates_qty: platesQty,
       product_rate: productRate,
       product_amount: productAmount,
-      product_for: productForPlates === '0' ? '' : productForPlates,
+      godown_name: godown,
+      
     };
-console.log('productForPlatesID: ' + productForPlatesID);
+
     const newItemDB = {
       
-      product_id: productID,
-      godown_id: productGodownID,
-      product_qty: productQty,
+      process_id: processNameID,
+      batch_no: batchNos,
+      product_id: productNameID,
+      paper_product_id: paperProductID,
+      paper_qty: paperQty,
+      print_order: printOrder,
+      plates_qty: platesQty,
       product_rate: productRate,
       product_amount: productAmount,
-      product_for: productForPlatesID === '0' ? 0 : productForPlatesID,
+      godown_id: godownID,
     };
 
     setTableData((prevTableData) => [...prevTableData, newItem]);
     setDBData((prevDBData) => [...prevDBData, newItemDB]);
 
-    setProductName('0');
-    setProductQty('');
+    setProcessName('0');
+    setBatchNos('0');
+    setProductName('');
+    setPrintOrder('');
+    setPaperProduct('');
+    setPaperQty('');
+    setBillingQty('');
     setProductRate('');
     setProductAmount('');
-    setProductGodown('0');
-    setProductGodownID('0');
-    setProductForPlates('0');
-    setProductForPlatesID('0');
+    setPlatesQty('');
+    setGodown('0');
+    
 
   };
 
@@ -321,165 +364,161 @@ console.log('productForPlatesID: ' + productForPlatesID);
     console.log(dbData);
   }, [dbData]);
   */
- useEffect(() => {
-  
-  let totalAmount = 0;
-  tableData.forEach((data) => {
-    totalAmount += parseFloat(data.product_amount);
-  });
-  setTotalAmount(totalAmount);
-  console.log(totalAmount);
- }, [tableData]);
+ 
   
   const onChangeVendorName = (e) => {
     setVendorName(e.target.value);
   };
   
-  const onChangeProductType = (e) => {            // Paper: 2, Plate: 3
-    
-    setProductType(e.target.value);
-    console.log('Product Type: ' + e.target.value);
-   
-    if(e.target.value === '2'){                   // Select Paper
-
-      setProductForPlatesLabel('Select Paper Type')
-
-
-      // Fetch Paper Types like Paper, Art Paer, Bleach Card, etc
-      fetch(baseUrl + 'get_paper_types',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-       
-        // Load Paper Types like Paper Types like Paper, Art Paer, Bleach Card, etc
-        setLoadProductsForPlates(data.paper_types);
-        setProductForPlates('0');
-
-      })
-      .catch(error => console.error(error));
-    }
-
-    else if(e.target.value === '3'){
-      setProductForPlatesLabel('Select Product For Plates')
-
-      fetch(baseUrl + 'get_p_f_plates',{    // Get Active Product ID and Product Name
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        setLoadProductsForPlates(data.products);
-        
   
-      })
-      .catch(error => console.error(error));
-
-      fetch(baseUrl + 'get_plate_with_id',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        setLoadProducts(data.plates);
-        
-  
-      })
-      .catch(error => console.error(error));
-
-      
-    }
-    else{
-      setLoadProducts([]);
-      setLoadProductsForPlates([]);
-      setProductForPlatesLabel('Select');
-    }
-
-    setProductName('0');
-    setProductForPlates('0');
-  };
 
   const onChangeProductName = (e) => {
     
-    setProductName(e.target.value);
+   // setProductName(e.target.value);
 
     
 
   };
-  const onClickProduct = (pid) => {
-    setProductID(pid);
-  }
+ 
   
   const onClickVendorName = (vid) => {
     setVendorCode(vid);
   }
   
-  const onChangeProductGodown = (e) => {
-    setProductGodown(e.target.value);
-    console.log('Godown Name: ' + e.target.value);
-    
-  };
-  const onClickGodown = (gid) => {
-    setProductGodownID(gid);
-    console.log('Godown ID: ' + gid);
-  };
-  function onChangeProductQty(e) {
-    setProductQty(e.target.value);
-  }
+ 
+ 
+  
   const onChangeProductRate = (e) => {
     setProductRate(e.target.value);
   };
   const onChangeProductAmount = (e) => {
     setProductAmount(e.target.value);
   };
-  const onChangeProductForPlates = (e) => {
-    setProductForPlates(e.target.value);
+  
+  
 
-    
+  const onChangeProcessName = (e) => {
+    setProcessName(e.target.value);
+
+   
 
   }
-  const onClickProductForPlates = (pid) => {
-    setProductForPlatesID(pid);
+  const onClickProcessName = (id) => {
+        setProcessNameID(id);
+   console.log('Process Id: ' + id);
+    fetch(baseUrl + 'get_batches_against_processes/' + id,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+     
+      setLoadBatchNos(data.batches)
+      console.log(data.batches);
+     // console.log('query: ' + data.query);
+     
 
-    console.log('Product Type: ' + pid);
-    if(productType === '2'){
+    })
+    .catch(error => console.error(error));
+
+    setBatchNos('0');
+    setProductName('');
+    setPaperProduct('');
+    setPrintOrder('');
+    setPaperQty('');
+    
+   
+
+  }
+  const onChangeBatchNos = (e) => {
+    setBatchNos(e.target.value);
+
+    getBatchData(e.target.value, processNameID);
+
+    
+  }
+  const getBatchData = (batchno, process) => {
+if(batchno != 0 && process != 0){
+  fetch(baseUrl + 'get_batch_data_for_press/' + batchno + '/' + process,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+   if(data.success === 1){
+  //  setIsBatchData(true);
+    setLoadBachData(data.batchData);
+
+    setProductName(data.batchData[0]['productName']);
+    setProductNameID(data.batchData[0]['productID']);
+setPaperProduct(data.batchData[0]['paperProduct']);
+setPaperProductID(data.batchData[0]['paperProductID']);
+setPrintOrder(data.batchData[0]['order']);
+setPaperQty(data.batchData[0]['paperQty']);
+    
+    console.log('Batch Data::: ' + loadBatchData);
+   }
+    
+    else if(data.success === 0){
+      setIsBatchData(false);
       
-      if(pid === 0){
-        setLoadProducts([]);
-      }
-      else{
-// load Paper Products in Products
-fetch(baseUrl + 'get_paper_with_id/' + pid ,{
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-})
-.then(response => response.json())
-.then(data => {
-  setLoadProducts(data.papers);
-  console.log("papers", data.papers)
- // setLoadProductsForPlates([]);
-
-})
-.catch(error => console.error(error));
-
-      }
-
-
-
-      
-      
-
+      setProductName('');
+      setProductNameID('0');
+setPaperProduct('');
+setPaperProductID('0');
+setPrintOrder('');
+setPaperQty('');
+      setLoadBachData([]);
+      setBatchNos('0');
       
     }
+    
+    
+  })
+  .catch(error => console.error(error));
+}
+else{
+  setIsBatchData(false);
+  setProductName('');
+  setProductNameID('0');
+setPaperProduct('');
+setPaperProductID('0');
+setPrintOrder('');
+setPaperQty('');
+  setLoadBachData([]);
+  
+
+}
+
+  }
+  const onClickBatchNos = (value) => {
+  
+    
+  }
+  const onChangePrintOrder = (e) => {
+    setPrintOrder(e.target.value);
+  }
+  const onChangePaperQty = (e) => {
+    setPaperQty(e.target.value);
+  }
+  const onChangePaperProduct = (e) => {
+    setPaperProduct(e.target.value);
+  }
+  const onChangeBillingQty = (e) => {
+    setBillingQty(e.target.value);
+  }
+  const onChangePlatesQty = (e) => {
+    setPlatesQty(e.target.value);
+  }
+  const onChangeGodown = (e) => {
+    setGodown(e.target.value);
+  }
+  const onClickGodown = (id) => {
+setGodownID(id);
   }
 
   return (
@@ -497,14 +536,14 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
       <ToastContainer />
       {/*Add Purchase Voucher Modal*/}
       <Modal
-        open={addPurchaseModal}
-        onClose={closeAddPurchase}
+        open={AddPurchaseOrderModal}
+        onClose={closeAddPO}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Purchase
+            + Add Purchase Order For Press
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
@@ -534,117 +573,122 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
                   
                 </Select>
               </Grid>
-              
-
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <Select
-                  labelId="product_type"
-                  id="product_type"
-                  label="Product Type"
+              <Select
+                  labelId="process"
+                  id="process"
+                  label="Process"
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeProductType}
-                  value={productType}
+                  onChange={onChangeProcessName}
+                  value={processName}
                 >
-                  <MenuItem value="0">
-                    <em>Select Product Type</em>
+                  <MenuItem value="0" onClick={() => onClickProcessName(0) }>
+                    <em>Select Process</em>
                   </MenuItem>
-                  <MenuItem value="2">Paper</MenuItem>
-                  <MenuItem value="3">Plate</MenuItem>
+                  {
+                    processData.map((process) => (
+                      <MenuItem key = {process.id} value={process.process}
+                      onClick={() => onClickProcessName(process.id) }>{process.process}</MenuItem>
+                    ))
+                  }
+                  
                   
                 </Select>
               </Grid>
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <Select
-                  labelId="product_for_plates"
-                  id="product_for_plates"
-                  label="Product for Plates"
+              <Select
+                  labelId="batch"
+                  id="batch"
+                  label="Batch"
                   
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeProductForPlates}
-                  value={productForPlates}
+                  onChange={onChangeBatchNos}
+                  value={batchNos}
                 >
-                  <MenuItem value="0"
-                  onClick={() => onClickProductForPlates(0)}>
-                    <em>{productForPlatesLabel}</em>
+                  <MenuItem value="0" onClick={() => onClickBatchNos(0)}>
+                    <em>Select Batch</em>
                   </MenuItem>
                   {
-                   loadProductsForPlates.map((product) => (
-                    <MenuItem data-key={product.id} value={product.name} 
-                    onClick={() => onClickProductForPlates(product.id)}>
-                      {product.name}
-                    </MenuItem>
-                  ))
+                    loadBatchNos.map((batch) => (
+                      <MenuItem key = {batch.batch_no} value={batch.batch_no}
+                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_no}</MenuItem>
+                    ))
                   }
                   
                 </Select>
               </Grid>
-              
               <Grid item xs={12} sm={6} md={6} lg={6}>
-                <Select
-                  labelId="product_name"
-                  id="product_name"
-                  label="Product Name"
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeProductName}
-                  
-                  value={productName}
-                >
-                  <MenuItem value="0">
-                    <em>Select Product Name</em>
-                  </MenuItem>
-                  {
-                   loadProducts.map((product) => (
-                    <MenuItem data-key={product.id} value={productType === '2' ? product.paper : product.plate} 
-                    onClick={() => onClickProduct(product.id)}>
-                      {productType === '2' ? product.paper : product.plate}
-                    </MenuItem>
-                  ))
-                  }
-
-
-  
-                </Select>
+                <InputLabel htmlFor="product_name" style={{ position: 'unset' }}>Product Name
+                  </InputLabel>
+                <TextField id="product_name" aria-describedby="add-product_name"
+                       onChange={onChangeProductName} value={productName}/>
               </Grid>
-              <Grid item xs={12} sm={6} md={6} lg={6}>
-                <Select
-                  labelId="product_godown"
-                  id="product_godown"
-                  label="Product Godown"
+              <Grid item xs={12} sm={3} md={3} lg={3}>
+                <InputLabel htmlFor="print_order" style={{ position: 'unset' }}>Print Order
+                  </InputLabel>
+                <TextField id="print_order" aria-describedby="add-print_order"
+                       onChange={onChangePrintOrder} value={printOrder}/>
+              </Grid>
+              <Grid item xs={12} sm={3} md={3} lg={3}>
+                <InputLabel htmlFor="Billing_qty" style={{ position: 'unset' }}>Billing Qty
+                  </InputLabel>
+                <TextField id="billing_qty" aria-describedby="add-billing_qty"
+                       onChange={onChangeBillingQty} value={billingQty}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="paper_product" style={{ position: 'unset' }}>Paper Product
+                  </InputLabel>
+                <TextField id="paper_product" aria-describedby="add-paper_product"
+                       onChange={onChangePaperProduct} value={paperProduct}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+                <InputLabel htmlFor="paper_qty" style={{ position: 'unset' }}>Paper Qty
+                  </InputLabel>
+                <TextField id="paper_qty" aria-describedby="add-paper_qty"
+                       onChange={onChangePaperQty} value={paperQty}/>
+              </Grid>
+              <Grid item xs={12} sm={4} md={4} lg={4}>
+              <Select
+                  labelId="godown"
+                  id="godown"
+                  label="Godown"
+                  
                   style={{ minWidth: '95%' }}
-                  onChange={onChangeProductGodown}
-                  value={productGodown}
+                  onChange={onChangeGodown}
+                  value={godown}
                 >
-                  <MenuItem value="0">
+                  <MenuItem value="0" onClick={() => onClickGodown(0)}>
                     <em>Select Godown</em>
                   </MenuItem>
                   {
-                   loadGodowns.map((godown) => (
-                    <MenuItem data-key={godown.id} value={godown.name} 
-                    onClick={() => onClickGodown(godown.id)}>
-                      {godown.name}
-                    </MenuItem>
-                  ))
+                    loadGodowns.map((godown) => (
+                      <MenuItem key = {godown.id} value={godown.name}
+                      onClick={() => onClickGodown(godown.id)}>{godown.name}</MenuItem>
+                    ))
                   }
                   
                 </Select>
               </Grid>
-              
+
               <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="product_qty" style={{ position: 'unset' }}>Qty
+                <InputLabel htmlFor="plates_qty" style={{ position: 'unset' }}>Plates Qty
                   </InputLabel>
-                <Input id="product_qty" aria-describedby="add-product_qty"
-                       onChange={onChangeProductQty} value={productQty}/>
+                <TextField id="plates_qty" aria-describedby="add-paper_qty"
+                       onChange={onChangePlatesQty} value={platesQty}/>
               </Grid>
+              
+                           
+              
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_rate" style={{ position: 'unset' }}>Rate
                   </InputLabel>
-                <Input id="product_rate" aria-describedby="add-product_rate"
+                <TextField id="product_rate" aria-describedby="add-product_rate"
                        onChange={onChangeProductRate} value={productRate}/>
               </Grid>
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_amount" style={{ position: 'unset' }}>Amount
                   </InputLabel>
-                <Input id="product_amount" aria-describedby="add-product_amount"
+                <TextField id="product_amount" aria-describedby="add-product_amount"
                        onChange={onChangeProductAmount} value={productAmount}/>
               </Grid>
              
@@ -653,30 +697,42 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
               </Grid>
               
               <Grid item xs={12} sm={12} md={12} lg={12}>
-              <Table className="table table-striped">
+                <div style={{ overflowX: 'auto' }}>
+
+                
+        <Table className="table table-striped" style={{ width: '100%' }}>
 <thead>
   <tr>
     
-    <th>Product Name</th>
+    <th>Batch No</th>
     
-    <th>Qty</th>
+    <th>Process</th>
+    <th>Product Name</th>
+    <th>Paper</th>
+    <th>Paper Qty</th>
+    <th>Print Order</th>
+    <th>Plates</th>
     <th>Rate</th>
     <th>Amount</th>
     <th>Godown</th>
-    <th>For Product</th>
+    
   </tr>
 </thead>
 <tbody>
 {tableData.map((rowData, index) => (
   <tr key={index}>
   
+  <td>{rowData.batch_no}</td>
+  <td>{rowData.process_name}</td>
   <td>{rowData.product_name}</td>
-  
-  <td>{rowData.product_qty}</td>
+  <td>{rowData.paper_product}</td>
+  <td>{rowData.paper_qty}</td>
+  <td>{rowData.print_order}</td>
+  <td>{rowData.plates_qty}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
-  <td>{rowData.product_godown}</td>
-  <td>{rowData.product_for}</td>
+  <td>{rowData.godown_name}</td>
+  
   
 </tr>
 ))}
@@ -684,6 +740,7 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
 
 
             </Table>
+            </div>
               </Grid>
               
               <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -706,14 +763,15 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addPurchase}>Submit</Button>
-            <Button variant="contained" onClick={closeAddPurchase}>Cancel</Button>
+            <Button variant="contained" onClick={closeAddPO}>Cancel</Button>
+            <Button variant="contained" onClick={addPurchaseOrder}>Submit</Button>
+            
           </Grid>
         </Box>
       </Modal>
       <Head>
         <title>
-          Purchases | Scholar CRM
+          Purchase Order For Press | Scholar CRM
         </title>
       </Head>
       <Box
@@ -732,7 +790,7 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Purchases
+                  Purchase Order For Press
                 </Typography>
                 {/*<Stack*/}
                 {/*  alignItems="center"*/}
@@ -763,7 +821,7 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
               </Stack>
               <div>
                 <Button
-                  onClick={openAddPurchase}
+                  onClick={openAddPO}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -771,7 +829,7 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
                   )}
                   variant="contained"
                 >
-                  Add Purchase
+                  Add Purchase Order
                 </Button>
               </div>
             </Stack>

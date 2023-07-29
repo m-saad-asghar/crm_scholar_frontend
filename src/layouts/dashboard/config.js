@@ -67,7 +67,19 @@ export const items = [
       <SvgIcon fontSize="small">
         <ChartBarIcon />
       </SvgIcon>
-    )
+    ),
+    children: [
+      {
+      title: 'Batch',
+    path: '/process',
+    },
+    {
+      title: 'Received Books',
+    path: '/process/receivedfrombinder',
+    },
+    
+
+    ],
   },
   {
     title: 'Vendor',
@@ -79,32 +91,59 @@ export const items = [
     )
   },
   {
-    title: 'Purchase',
+    title: 'Purchase Voucher',
     path: '/purchase',
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />
       </SvgIcon>
-    )
+    ),
+    children: [
+      {
+        title: 'Paper and Plate',
+        path: '/purchase',
+      },
+      {
+        title: 'Press',
+        path: '/purchase/purchasevoucherpress',
+      },
+      {
+        title: 'Lamination',
+        path: '/purchase/purchasevoucherlamination',
+      },
+      {
+        title: 'Binder',
+        path: '/purchase/purchasevoucherbinder',
+      },
+      
+    ],
   },
   {
-    title: 'PO For Press',
-    path: '/purchase/popress',
+    title: 'Purchase Order',
+    path: '/purchaseorder',
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />
       </SvgIcon>
-    )
+    ),
+    children: [
+      
+      {
+        title: 'Press',
+        path: '/purchaseorder/popress',
+      },
+      {
+        title: 'Lamination',
+        path: '/purchaseorder/polamination',
+      },
+      {
+        title: 'Binder',
+        path: '/purchaseorder/pobinder',
+      },
+    ],
   },
-  {
-    title: 'PO For Lamination',
-    path: '/purchase/polamination',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
-  },
+  
+  
   {
     title: 'Godown',
     path: '/godown',
