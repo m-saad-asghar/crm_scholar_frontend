@@ -4,7 +4,7 @@
   import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, TableRow , TableCell, Checkbox} from '@mui/material';
   import { useSelection } from 'src/hooks/use-selection';
   import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-  import { ProductsTable } from 'src/sections/products/products-table';
+  import { TableComponent } from 'src/components/table-component';
   import { ProductsSearch } from 'src/sections/products/products-search';
   import { applyPagination } from 'src/utils/apply-pagination';
   import { ToastContainer, toast } from 'react-toastify';
@@ -14,6 +14,7 @@
   import Switch from '@mui/material/Switch';
   import { ProductPopup } from 'src/components/product/product_model';
   const tableHeaders = [
+    "Actions",
     "Barcode",
     "Short Name",
     "Name",
@@ -27,8 +28,7 @@
     "Subject",
     "Book For",
     "Category",
-    "Title Sheet Size",
-    "Actions"
+    "Title Sheet Size"
   ];
   const style = {
     position: 'absolute',
@@ -139,6 +139,16 @@
                           />
                         </TableCell>
                         <TableCell>
+                          <Stack
+                            alignItems="center"
+                            direction="row"
+                            spacing={2}
+                          >
+                            <Button><EditIcon style={{ fontSize: '20px' }} onClick={handleUpdateProduct.bind(this, product)} /></Button>
+                            <Switch defaultChecked={product.active == 1 ? true : false} onChange={onChangeEnable.bind(this, product.id)}/>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
                           {product.product_code}
                         </TableCell>
                         <TableCell>
@@ -179,16 +189,6 @@
                         </TableCell>
                         <TableCell>
                           {product.title_sheet_size_label}
-                        </TableCell>
-                        <TableCell>
-                          <Stack
-                            alignItems="center"
-                            direction="row"
-                            spacing={2}
-                          >
-                            <Button><EditIcon style={{ fontSize: '20px' }} onClick={handleUpdateProduct.bind(this, product)} /></Button>
-                            <Switch defaultChecked={product.active == 1 ? true : false} onChange={onChangeEnable.bind(this, product.id)}/>
-                          </Stack>
                         </TableCell>
                       </TableRow>
                     );
@@ -320,7 +320,7 @@
                 </div>
               </Stack>
               <ProductsSearch sendProducts={getLatestProducts}/>
-              <ProductsTable
+              <TableComponent
                 tableHeader={tableHeader}
                 tableBody={tableBody}
                 count={products.length}
