@@ -13,6 +13,7 @@
   import EditIcon from '@mui/icons-material/Edit';
   import Switch from '@mui/material/Switch';
   import { ProductPopup } from 'src/components/product/product_model';
+  import { useSelector } from 'react-redux';
   const tableHeaders = [
     "Actions",
     "Barcode",
@@ -61,6 +62,7 @@
   };
 
   const Products = () => {
+    const auth_token = useSelector((state) => state.token);
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -73,7 +75,6 @@
     const productsSelection = useSelection(productsIds);
     const selectedSome = (productsSelection.selected.length > 0) && (productsSelection.selected.length < product_data.length);
   const selectedAll = (product_data.length > 0) && (productsSelection.selected.length === product_data.length);
-
     useEffect(() => {
       getProducts();
     }, []);
@@ -219,7 +220,8 @@
       fetch(baseUrl + 'get_products', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
         body: JSON.stringify(data)
       })
