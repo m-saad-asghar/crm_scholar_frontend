@@ -34,7 +34,9 @@ const style = {
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
-  p: 4
+  p: 4,
+  overflowY: 'auto',
+  overflowX: 'auto',
 };
 
 const now = new Date();
@@ -389,7 +391,7 @@ console.log(data);
     .then(data => {
      
       setLoadBatchNos(data.batches)
-      console.log(data.batches);
+      
      // console.log('query: ' + data.query);
      
 
@@ -409,7 +411,7 @@ console.log(data);
   const onChangeBatchNos = (e) => {
     setBatchNos(e.target.value);
 
-    getBatchData(e.target.value, processNameID);
+    
 
     
   }
@@ -472,7 +474,7 @@ setPrintOrder('');
   }
   const onClickBatchNos = (value) => {
   
-    
+    getBatchData(value, processNameID);
   }
   const onChangePrintOrder = (e) => {
     setPrintOrder(e.target.value);
@@ -594,8 +596,8 @@ setGodownID(id);
                   </MenuItem>
                   {
                     loadBatchNos.map((batch) => (
-                      <MenuItem key = {batch.batch_no} value={batch.batch_no}
-                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_no}</MenuItem>
+                      <MenuItem key = {batch.batch_no} value={batch.batch_pro}
+                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_pro}</MenuItem>
                     ))
                   }
                   

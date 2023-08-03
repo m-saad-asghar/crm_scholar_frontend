@@ -33,7 +33,9 @@ const style = {
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
-  p: 4
+  p: 4,
+  overflowY: 'auto',
+  overflowX: 'auto',
 };
 
 const now = new Date();
@@ -176,9 +178,47 @@ const Page = () => {
     },
     []
   );
-
-  const openAddPurchase = () => {
-
+    const submitData = () => {
+      const Voucher = {
+      
+        vendor_code: vendorCode,
+        total_amount: totalAmount,
+       
+      };
+      
+      const data = {
+        Voucher: Voucher,
+        inventories: dbData,
+      };
+  console.log(data);
+      fetch(baseUrl + 'add_new_book_received', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(dt => {
+        if (data.success == 1){
+          toast.success("Book Received is Successfully Saved!");
+          setAddPurchaseModal(false);
+          // Update Products
+        }else{
+          toast.error("Something Went Wrong!");
+        }
+      })
+      .catch(error => {
+        console.error("Error: ", error);
+        toast.error("Something Went Wrong!");
+      })
+  
+      
+      .finally(() => {
+        //setIsPaperSizeLoading(false);
+      });
+    }
+  const getBinderVendors = () => {
     fetch(baseUrl + 'get_binder_vendors',{
       method: 'POST',
       headers: {
@@ -193,8 +233,8 @@ const Page = () => {
     })
     .catch(error => console.error(error));
 
-    
-
+  }
+  const getGodowns = () => {
     fetch(baseUrl + 'get_godowns',{
       method: 'POST',
       headers: {
@@ -204,17 +244,20 @@ const Page = () => {
     .then(response => response.json())
     .then(data => {
       setLoadGodowns(data.godowns);
-      console.log("godowns", data.godowns)
+      
 
     })
     .catch(error => console.error(error));
 
-    
-    
+  }
+
+  const openAddPurchase = () => {
+
+    getBinderVendors();
+    getGodowns();
+
     setAddPurchaseModal(true);
 
-    
-    
   };
   const closeAddPurchase = () => {
     resetForm();
@@ -240,54 +283,14 @@ const Page = () => {
     setDBData([]);
     
   };
+
+  
   const addPurchase = () => {
-    const Voucher = {
-      
-      vendor_code: vendorCode,
-      total_amount: totalAmount,
-      
-      
-    };
-    
-    
-    
-
-    const data = {
-      Voucher: Voucher,
-      inventories: dbData,
-    };
-console.log(data);
-    fetch(baseUrl + 'add_new_book_received', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(dt => {
-      if (data.success == 1){
-        toast.success("Book Received is Successfully Saved!");
-        setAddPurchaseModal(false);
-        // Update Products
-      }else{
-        toast.error("Something Went Wrong!");
-      }
-    })
-    .catch(error => {
-      console.error("Error: ", error);
-      toast.error("Something Went Wrong!");
-    })
-
-    
-    .finally(() => {
-      //setIsPaperSizeLoading(false);
-    });
+    submitData();
       closeAddPurchase(true);
   };
   const onClickAddButton = () => {
     const newItem = {
-      
       
       batch_no: batchNos,
       product_name: productName,
@@ -301,7 +304,6 @@ console.log(data);
     };
 
     const newItemDB = {
-      
       
       batch_no: batchNos,
       product_id: productNameID,
@@ -325,9 +327,6 @@ console.log(data);
     setProductRate('');
     setProductAmount('');
     
-    
-    
-
   };
 
 
@@ -407,10 +406,11 @@ console.log(data);
   const onChangeBatchNos = (e) => {
     setBatchNos(e.target.value);
 
-    getBatchData(e.target.value, processNameID);
+    
 
     
   }
+  
   const getBatchData = (batchno, process) => {
 if(batchno != 0){
   fetch(baseUrl + 'get_batch_data_for_book_received/' + batchno,{
@@ -470,7 +470,7 @@ setPrintOrder('');
 
   }
   const onClickBatchNos = (value) => {
-  
+    getBatchData(value, processNameID);
     
   }
   const onChangePrintOrder = (e) => {
@@ -560,8 +560,8 @@ setGodownID(id);
                   </MenuItem>
                   {
                     loadBatchNos.map((batch) => (
-                      <MenuItem key = {batch.batch_no} value={batch.batch_no}
-                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_no}</MenuItem>
+                      <MenuItem key = {batch.batch_no} value={batch.batch_pro}
+                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_pro}</MenuItem>
                     ))
                   }
                   

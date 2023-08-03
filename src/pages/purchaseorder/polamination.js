@@ -34,7 +34,9 @@ const style = {
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
-  p: 4
+  p: 4,
+  overflowY: 'auto',
+  overflowX: 'auto',
 };
 
 const now = new Date();
@@ -387,9 +389,7 @@ const getGodowns = () => {
    
 
   }
-  const onClickProcessName = (id) => {
-        setProcessNameID(id);
-   console.log('Process Id: ' + id);
+  const getBatches = (id) => {
     fetch(baseUrl + 'get_batches_against_processes/' + id,{
       method: 'POST',
       headers: {
@@ -407,6 +407,11 @@ const getGodowns = () => {
     })
     .catch(error => console.error(error));
 
+  }
+  const onClickProcessName = (id) => {
+        setProcessNameID(id);
+   getBatches(id);
+    
     if(id == 5){
       const lType = [
         {id: 1, name: 'Shine'},
@@ -624,8 +629,8 @@ setGodownID(id);
                   </MenuItem>
                   {
                     loadBatchNos.map((batch) => (
-                      <MenuItem key = {batch.batch_no} value={batch.batch_no}
-                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_no}</MenuItem>
+                      <MenuItem key = {batch.batch_no} value={batch.batch_pro}
+                      onClick={() => onClickBatchNos(batch.batch_no)}>{batch.batch_pro}</MenuItem>
                     ))
                   }
                   

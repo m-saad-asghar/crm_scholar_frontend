@@ -38,7 +38,8 @@ const style = {
   p: 4,
   maxHeight: '800px',
   maxWidth: '800px',
-  overflow: 'auto',
+  overflowY: 'auto',
+  overflowX: 'auto',
 };
 
 const now = new Date();
@@ -389,11 +390,11 @@ let ream = 0;
         setReamForTitle(0);
     }
 
-    ream = (bookFarmay/2) * (printOrder/1000);
+    ream = (bookFarmay) * (printOrder/500);
     ream = ream * (1 + wastage/100);
     setReamForPages(ream);
 
-     ream = ((innerPages/2)/sheetPortion) * (printOrder/1000);
+     ream = (printOrder/sheetPortion)/500 * innerPages/2;
      ream = ream * (1 + wastage/100);
     setReamForInnerPages(ream);
 
