@@ -30,7 +30,6 @@ export const AuthGuard = (props) => {
 
       // if(isAuthenticated && Object.keys(auth_token).length != 0){
         if(Object.keys(auth_token).length != 0){
-          console.log("if", router)
         setChecked(true);
       }else{
         router
