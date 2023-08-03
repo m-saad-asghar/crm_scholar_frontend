@@ -9,6 +9,9 @@ import { useNProgress } from 'src/hooks/use-nprogress';
 import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
+import React from 'react';
+import { Provider } from 'react-redux';
+import store from '../sections/redux/store';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -24,7 +27,8 @@ const App = (props) => {
   const theme = createTheme();
 
   return (
-    <CacheProvider value={emotionCache}>
+   <Provider store={store}>
+     <CacheProvider value={emotionCache}>
       <Head>
         <title>
           Devias Kit
@@ -49,6 +53,7 @@ const App = (props) => {
         </AuthProvider>
       </LocalizationProvider>
     </CacheProvider>
+   </Provider>
   );
 };
 

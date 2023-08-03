@@ -4,6 +4,8 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { addData } from 'src/sections/redux/action';
+import { useDispatch } from 'react-redux';
 import {
   Alert,
   Box,
@@ -18,15 +20,19 @@ import {
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const [method, setMethod] = useState('email');
+  const dispatch = useDispatch();
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: '',
+      password: '',
       submit: null
     },
     validationSchema: Yup.object({
@@ -41,14 +47,49 @@ const Page = () => {
         .required('Password is required')
     }),
     onSubmit: async (values, helpers) => {
-      try {
-        await auth.signIn(values.email, values.password);
-        router.push('/');
-      } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
+
+      const data = {
+        "email": values.email,
+        "password": values.password
       }
+
+      fetch(baseUrl + 'auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if(data.success == "unauthorize"){
+            toast.error("Email or password is invalid!")
+          }
+          if(data.success == "error"){
+            toast.error("Email and password is required")
+          }
+          if(data.success == 1){
+            const jwt_data = {
+              jwt_auth: data.jwt_token
+            }
+            dispatch(addData(jwt_data));
+            router.push('/');
+          }
+        })
+        .catch(error => {
+          helpers.setStatus({ success: false });
+        helpers.setErrors({ submit: error.message });
+        helpers.setSubmitting(false);
+        });
+
+      // try {
+        // await auth.signIn(values.email, values.password);
+        // router.push('/');
+      // } catch (err) {
+      //   helpers.setStatus({ success: false });
+      //   helpers.setErrors({ submit: err.message });
+      //   helpers.setSubmitting(false);
+      // }
     }
   });
 
@@ -69,6 +110,7 @@ const Page = () => {
 
   return (
     <>
+    <ToastContainer />
       <Head>
         <title>
           Login | Devias Kit
@@ -99,7 +141,7 @@ const Page = () => {
               <Typography variant="h4">
                 Login
               </Typography>
-              <Typography
+              {/* <Typography
                 color="text.secondary"
                 variant="body2"
               >
@@ -113,9 +155,9 @@ const Page = () => {
                 >
                   Register
                 </Link>
-              </Typography>
+              </Typography> */}
             </Stack>
-            <Tabs
+            {/* <Tabs
               onChange={handleMethodChange}
               sx={{ mb: 3 }}
               value={method}
@@ -128,7 +170,7 @@ const Page = () => {
                 label="Phone Number"
                 value="phoneNumber"
               />
-            </Tabs>
+            </Tabs> */}
             {method === 'email' && (
               <form
                 noValidate
@@ -158,9 +200,9 @@ const Page = () => {
                     value={formik.values.password}
                   />
                 </Stack>
-                <FormHelperText sx={{ mt: 1 }}>
+                {/* <FormHelperText sx={{ mt: 1 }}>
                   Optionally you can skip.
-                </FormHelperText>
+                </FormHelperText> */}
                 {formik.errors.submit && (
                   <Typography
                     color="error"
@@ -174,12 +216,12 @@ const Page = () => {
                   fullWidth
                   size="large"
                   sx={{ mt: 3 }}
-                  type="submit"
                   variant="contained"
+                  type="submit"
                 >
                   Continue
                 </Button>
-                <Button
+                {/* <Button
                   fullWidth
                   size="large"
                   sx={{ mt: 3 }}
@@ -195,7 +237,7 @@ const Page = () => {
                   <div>
                     You can use <b>demo@devias.io</b> and password <b>Password123!</b>
                   </div>
-                </Alert>
+                </Alert> */}
               </form>
             )}
             {method === 'phoneNumber' && (
