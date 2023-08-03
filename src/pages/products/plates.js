@@ -1,27 +1,25 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import Head from 'next/head';
-import { subDays, subHours } from 'date-fns';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography, Modal } from '@mui/material';
-import { useSelection } from 'src/hooks/use-selection';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { CustomersTable } from 'src/sections/customer/customers-table';
-import { ProductsSearch } from 'src/sections/products/products-search';
-import { applyPagination } from 'src/utils/apply-pagination';
-import FilledInput from '@mui/material/FilledInput';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
-import Grid from '@mui/material/Grid';
-import CircularProgress from '@mui/material/CircularProgress';
-import { ToastContainer, toast } from 'react-toastify';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Paper from '@mui/material/Paper';
+  import Head from 'next/head';
+  import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+  import { Box, Button, Container, Stack, SvgIcon, Typography, Modal, TableRow , TableCell, Checkbox} from '@mui/material';
+  import { useSelection } from 'src/hooks/use-selection';
+  import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+  import { TableComponent } from 'src/components/table-component';
+  import { ProductsSearch } from 'src/sections/products/products-search';
+  import { applyPagination } from 'src/utils/apply-pagination';
+  import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
+  import CircularProgress from '@mui/material/CircularProgress';
+  import EditIcon from '@mui/icons-material/Edit';
+  import Switch from '@mui/material/Switch';
+  import { PlatePopup } from 'src/components/product/plate_modal';
+import { minWidth } from '@mui/system';
 
+const tableHeaders = [
+  "Actions",
+  "Plate",
+  
+];
 const style = {
   position: 'absolute',
   top: '50%',
@@ -30,61 +28,60 @@ const style = {
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
-  p: 4
+  p: 4,
+  maxHeight: '800px',
+  maxWidth: '800px',
+  overflowY: 'auto',
+  overflowX: 'auto',
 };
 
 const now = new Date();
 
-const data = [
-  {
-    id: '5e887ac47eed253091be10cb',
-    address: {
-      city: 'Cleveland',
-      country: 'USA',
-      state: 'Ohio',
-      street: '2849 Fulton Street'
-    },
-    avatar: '/assets/avatars/avatar-carson-darrin.png',
-    createdAt: subDays(subHours(now, 7), 1).getTime(),
-    email: 'carson.darrin@devias.io',
-    name: 'Carson Darrin',
-    phone: '304-428-3097'
-  },
 
-];
-
-const useCustomers = (page, rowsPerPage) => {
+const usePlates = (page, rowsPerPage, plates) => {
   return useMemo(
     () => {
-      return applyPagination(data, page, rowsPerPage);
+      return applyPagination(plates, page, rowsPerPage);
     },
-    [page, rowsPerPage]
+    [page, rowsPerPage, plates]
+  );
+};
+const usePlatesIds = (plates) => {
+  return useMemo(
+    () => {
+      return plates.map((plate) => plate.id);
+    },
+    [plates]
   );
 };
 
-const useCustomerIds = (customers) => {
-  return useMemo(
-    () => {
-      return customers.map((customer) => customer.id);
-    },
-    [customers]
-  );
-};
 
-const Page = () => {
+const Plate = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [addPlatesModal, setAddPlatesModal] = useState(false);
+  const [PlateModal, setPlateModal] = useState(false);
   
-  const [plate, setPlate] = useState('');
   const [plates, setPlates] = useState([]);
-  const [isPaperPlatesLoading, setIsPlatesLoading] = useState(false);
+  const plate_data = usePlates(page, rowsPerPage, plates);
+  const platesIds = usePlatesIds(plates);
+  
+  
+  const platesSelection = useSelection(platesIds);
+  const selectedSome = (platesSelection.selected.length > 0) && (platesSelection.selected.length < plate_data.length);
+  const selectedAll = (plate_data.length > 0) && (platesSelection.selected.length === plate_data.length);
+  const [currentData, setCurrentData] = useState('');
+  const [isPlateLoading, setIsPlateLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  
+  
 
-  const customers = useCustomers(page, rowsPerPage);
-  const customersIds = useCustomerIds(customers);
-  const customersSelection = useSelection(customersIds);
+  useEffect(() => {
+    getPlates();
+    
+  }, []);
+
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -99,8 +96,7 @@ const Page = () => {
     []
   );
 
-  useEffect(() => {
-
+  const getPlates = () => {
     fetch(baseUrl + 'get_plates', {
       method: 'POST',
       headers: {
@@ -111,33 +107,91 @@ const Page = () => {
       .then(data => {
         setIsDataLoading(false);
         setPlates(data.plates);
-        console.log("plates", data.plates)
       })
       .catch(error => console.error(error));
-  }, []);
+  }
 
-  const openAddPlates = () => {
-    setAddPlatesModal(true);
+  const tableHeader = () => {
+    return <>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={(selectedAll)}
+                      indeterminate={selectedSome}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          platesSelection.handleSelectAll?.();
+                        } else {
+                          platesSelection.handleDeselectAll?.();
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  
+                  {tableHeaders && tableHeaders.map((header, index) => (
+                    <TableCell key={index} style={{minWidth: 50}}>
+                      {header}
+                    </TableCell>
+                  ))}
+    </>
+  }
+  const tableBody = () => {
+    return <>
+    {plate_data && plate_data.map((plate) => {
+                  const isSelected = platesSelection.selected.includes(plate.id);
+                  return (
+                    <TableRow
+                      hover
+                      key={plate.id}
+                      selected={isSelected}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={isSelected}
+                          onChange={(event) => {
+                            if (event.target.checked) {
+                              platesSelection.handleSelectOne?.(plate.id);
+                            } else {
+                              platesSelection.handleDeselectOne?.(plate.id);
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Stack
+                          alignItems="center"
+                          direction="row"
+                          spacing={2}
+                        >
+                          <Button><EditIcon style={{ fontSize: '20px' }} onClick={handleUpdatePlate.bind(this, plate)} /></Button>
+                          <Switch defaultChecked={plate.active == 1 ? true : false} onChange={onChangeEnable.bind(this, plate.id)}/>
+                        </Stack>
+                      </TableCell>
+                      <TableCell style={{minWidth: 50}}>
+                        {plate.plate}
+                      </TableCell>
+                     
+                    </TableRow>
+                  );
+                })}
+    </>
+  }
+  const handleUpdatePlate = (data) => {
+    getUpdateData(data);
   };
-  const closeAddPlates = () => {
-    setAddPlatesModal(false);
-    resetForm();
-  };
-  const resetForm = () => {
-
-    setPlate('');
-    
-  };
-  const addPlates = () => {
-    setIsPlatesLoading(true);
+  const onChangeEnable = (id, event) => {
     const data = {
-
-      plate: plate,
-      
-    };
-
-    fetch(baseUrl + 'add_new_plate', {
-      method: 'POST',
+      status: event.target.checked,
+      id: id
+    }
+    changeStatus(data);
+  };
+  const getUpdateData = (data) => {
+    setCurrentData(data);
+    setPlateModal(true);
+  };
+  const changeStatus = (data) => {
+    fetch(baseUrl + 'change_status_plate/' + data.id, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -145,34 +199,40 @@ const Page = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setIsPlatesLoading(false);
-        if (data.success == 1){
-          toast.success("Plate is Successfully Saved!")
-          setAddPlatesModal(false);
-          // Update Products
-        }else{
+        if (data.success == 0){
           toast.error("Something Went Wrong!")
         }
       })
-      .catch(error => {
-        console.error("Error: ", error);
-        toast.error("Something Went Wrong!");
-      })
-      .finally(() => {
-        setIsPlatesLoading(false);
-      });
-      closeAddPlates(true);
-    console.log('add Plates data', data);
-  };
-
-  const onChangePlate = (e) => {
-    setPlate(e.target.value);
+      .catch(error => toast.error("Something Went Wrong!"))
   };
   
-
+  const openPlate = () => {
+    setPlateModal(true);
+  };
+  const closePlate = () => {
+    setPlateModal(false);
+    resetForm();
+  };
+  const resetForm = () => {
+    
+    
+    setCurrentData('')
+    
+  };
+  const closePlateModal = () => {
+    setPlateModal(false);
+  }
+   
+  const onChangePlateName = (e) => {
+    setPlateName(e.target.value);
+  };
+  
+  const getLatestPlates = (data) => {
+    setPlates(data);
+  };
   return (
     <>
-    <Modal
+      <Modal
         open={isDataLoading}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -183,44 +243,16 @@ const Page = () => {
           />}
       </Modal>
       <ToastContainer />
-      {/*Add Plates Modal*/}
-      <Modal
-        open={addPlatesModal}
-        onClose={closeAddPlates}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Plates
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 4 }}>
-            {/*<FormControl>*/}
-            <Grid container spacing={2}>
-              {/*<Grid item xs={12} sm={4} md={4} lg={4}>*/}
-              {/*  <InputLabel htmlFor="plates_id" style={{ position: 'unset' }}>Plates Id*/}
-              {/*    </InputLabel>*/}
-              {/*  <Input id="plates_id" aria-describedby="add-plates-id"*/}
-              {/*         onChange={onChangePlatesId} value={platesID}/>*/}
-              {/*</Grid>*/}
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                <InputLabel htmlFor="plate" style={{ position: 'unset' }}>Plate</InputLabel>
-                <Input id="plate" aria-describedby="add-plates-name"
-                       onChange={onChangePlate} value={plate}/>
-              </Grid>
-              </Grid>
-            {/*</FormControl>*/}
-          </Typography>
-          <Grid item xs={12} sm={4} md={4} lg={4}
-                style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={addPlates}>Submit</Button>
-            <Button variant="contained" onClick={closeAddPlates}>Cancel</Button>
-          </Grid>
-        </Box>
-      </Modal>
+      <PlatePopup 
+      PlateModal={PlateModal}
+      closePlate={closePlate}
+      currentData={currentData}
+      setPlates={setPlates}
+      closePlateModal={closePlateModal}
+      />
       <Head>
         <title>
-          Plates | Scholar CRM
+          Plate | Scholar CRM
         </title>
       </Head>
       <Box
@@ -241,36 +273,10 @@ const Page = () => {
                 <Typography variant="h4">
                   Plates
                 </Typography>
-                {/*<Stack*/}
-                {/*  alignItems="center"*/}
-                {/*  direction="row"*/}
-                {/*  spacing={1}*/}
-                {/*>*/}
-                {/*  <Button*/}
-                {/*    color="inherit"*/}
-                {/*    startIcon={(*/}
-                {/*      <SvgIcon fontSize="small">*/}
-                {/*        <ArrowUpOnSquareIcon />*/}
-                {/*      </SvgIcon>*/}
-                {/*    )}*/}
-                {/*  >*/}
-                {/*    Import*/}
-                {/*  </Button>*/}
-                {/*  <Button*/}
-                {/*    color="inherit"*/}
-                {/*    startIcon={(*/}
-                {/*      <SvgIcon fontSize="small">*/}
-                {/*        <ArrowDownOnSquareIcon />*/}
-                {/*      </SvgIcon>*/}
-                {/*    )}*/}
-                {/*  >*/}
-                {/*    Export*/}
-                {/*  </Button>*/}
-                {/*</Stack>*/}
               </Stack>
               <div>
                 <Button
-                  onClick={openAddPlates}
+                  onClick={openPlate}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon/>
@@ -278,23 +284,20 @@ const Page = () => {
                   )}
                   variant="contained"
                 >
-                  Add Plates
+                  Add Plate
                 </Button>
               </div>
             </Stack>
-            <ProductsSearch/>
-            <CustomersTable
-              count={data.length}
-              items={customers}
-              onDeselectAll={customersSelection.handleDeselectAll}
-              onDeselectOne={customersSelection.handleDeselectOne}
+            <ProductsSearch sendProducts={getLatestPlates}/>
+            <TableComponent
+              tableHeader={tableHeader}
+              tableBody={tableBody}
+              count={plates.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={customersSelection.handleSelectAll}
-              onSelectOne={customersSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={customersSelection.selected}
+              sendPlates={getLatestPlates}
             />
           </Stack>
         </Container>
@@ -303,10 +306,10 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => (
+Plate.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
 
-export default Page;
+export default Plate;

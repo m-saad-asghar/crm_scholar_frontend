@@ -142,8 +142,7 @@ export const items = [
       },
     ],
   },
-  
-  
+    
   {
     title: 'Godown',
     path: '/godown',
@@ -162,7 +161,18 @@ export const items = [
       <SvgIcon fontSize="small">
         <UserIcon />
       </SvgIcon>
-    )
+    ),
+    children: [
+      
+      {
+        title: 'Cash Payment',
+        path: '/account/cashpayment',
+      },
+      {
+        title: 'Bank Payment',
+        path: '/account/bankpayment',
+      },
+    ]
   },
   {
     title: 'Settings',
