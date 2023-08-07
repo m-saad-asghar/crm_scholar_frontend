@@ -254,6 +254,24 @@ const Page = () => {
               </div>
             )}
           </div>
+       
+        <Typography
+        style={{marginTop: 20}}
+                color="text.secondary"
+                variant="body2"
+              >
+                Forgot Password?
+                &nbsp;
+                <Link
+                  component={NextLink}
+                  href="/auth/reset_password"
+                  underline="hover"
+                  variant="subtitle2"
+                >
+                  Click here to reset password
+                </Link>
+              </Typography>
+
         </Box>
       </Box>
     </>
