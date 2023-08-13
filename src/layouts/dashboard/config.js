@@ -14,6 +14,13 @@ import BlindsClosedIcon from '@mui/icons-material/BlindsClosed';
 import PressIcon from '@mui/icons-material/Compress';
 import PaperIcon from '@mui/icons-material/Note';
 import { SvgIcon } from '@mui/material';
+import DataArrayIcon from '@mui/icons-material/DataArray';
+import ArticleIcon from '@mui/icons-material/Article';
+import PersonIcon from '@mui/icons-material/Person';
+import ShopIcon from '@mui/icons-material/Shop';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+
 
 export const items = [
   {
@@ -65,7 +72,7 @@ export const items = [
     path: '/process',
     icon: (
       <SvgIcon fontSize="small">
-        <ChartBarIcon />
+        <DataArrayIcon />
       </SvgIcon>
     ),
     children: [
@@ -86,7 +93,7 @@ export const items = [
     path: '/vendor',
     icon: (
       <SvgIcon fontSize="small">
-        <UsersIcon />
+        <PersonIcon />
       </SvgIcon>
     )
   },
@@ -95,7 +102,7 @@ export const items = [
     path: '/purchase',
     icon: (
       <SvgIcon fontSize="small">
-        <UsersIcon />
+        <ArticleIcon />
       </SvgIcon>
     ),
     children: [
@@ -123,7 +130,7 @@ export const items = [
     path: '/purchaseorder',
     icon: (
       <SvgIcon fontSize="small">
-        <UsersIcon />
+        <ShopIcon />
       </SvgIcon>
     ),
     children: [
@@ -148,7 +155,7 @@ export const items = [
     path: '/godown',
     icon: (
       <SvgIcon fontSize="small">
-        <UsersIcon />
+        <StorefrontIcon />
       </SvgIcon>
     )
   },
@@ -159,7 +166,7 @@ export const items = [
     path: '/account',
     icon: (
       <SvgIcon fontSize="small">
-        <UserIcon />
+        <MonetizationOnIcon />
       </SvgIcon>
     ),
     children: [
@@ -174,40 +181,40 @@ export const items = [
       },
     ]
   },
-  {
-    title: 'Settings',
-    path: '/settings',
-    icon: (
-      <SvgIcon fontSize="small">
-        <CogIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Login',
-    path: '/auth/login',
-    icon: (
-      <SvgIcon fontSize="small">
-        <LockClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Register',
-    path: '/auth/register',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserPlusIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Error',
-    path: '/404',
-    icon: (
-      <SvgIcon fontSize="small">
-        <XCircleIcon />
-      </SvgIcon>
-    )
-  }
+  // {
+  //   title: 'Settings',
+  //   path: '/settings',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <CogIcon />
+  //     </SvgIcon>
+  //   )
+  // },
+  // {
+  //   title: 'Login',
+  //   path: '/auth/login',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <LockClosedIcon />
+  //     </SvgIcon>
+  //   )
+  // },
+  // {
+  //   title: 'Register',
+  //   path: '/auth/register',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <UserPlusIcon />
+  //     </SvgIcon>
+  //   )
+  // },
+  // {
+  //   title: 'Error',
+  //   path: '/404',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <XCircleIcon />
+  //     </SvgIcon>
+  //   )
+  // }
 ];

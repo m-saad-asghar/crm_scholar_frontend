@@ -18,9 +18,11 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
+  const user = useSelector((state) => state.user);
   const router = useRouter();
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
@@ -47,7 +49,7 @@ export const SideNav = (props) => {
         <Box sx={{ p: 3 }}>
           <Box
             component={NextLink}
-            href="/"
+            href="/products"
             sx={{
               display: 'inline-flex',
               height: 32,
@@ -73,13 +75,13 @@ export const SideNav = (props) => {
                 color="inherit"
                 variant="subtitle1"
               >
-                Scholar
+                {user.name}
               </Typography>
               <Typography
                 color="neutral.400"
                 variant="body2"
               >
-                CMS
+                Admin
               </Typography>
             </div>
             <SvgIcon

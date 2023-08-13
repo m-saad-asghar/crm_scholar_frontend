@@ -73,7 +73,7 @@ const Page = () => {
               jwt_auth: data.jwt_token
             }
             dispatch(addData(jwt_data));
-            router.push('/');
+            router.push('/products');
           }
         })
         .catch(error => {
