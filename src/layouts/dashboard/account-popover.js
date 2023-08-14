@@ -22,7 +22,8 @@ export const AccountPopover = (props) => {
     })
       .then(response => response.json())
       .then(data => {
-        dispatch(logout());
+        localStorage.removeItem("jwt_token");
+        localStorage.removeItem("user_data");
       })
       .catch(error => {
         

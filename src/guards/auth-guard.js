@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import { useAuthContext } from 'src/contexts/auth-context';
-import { useSelector } from 'react-redux';
 
 export const AuthGuard = (props) => {
   const { children } = props;
@@ -14,7 +13,7 @@ export const AuthGuard = (props) => {
   // Only do authentication check on component mount.
   // This flow allows you to manually redirect the user after sign-out, otherwise this will be
   // triggered and will automatically redirect to sign-in page.
-  const auth_token = useSelector((state) => state);
+  const jwt_token = localStorage.getItem('jwt_token');
   useEffect(
     () => {
       if (!router.isReady) {
@@ -29,9 +28,11 @@ export const AuthGuard = (props) => {
       ignore.current = true;
 
       // if(isAuthenticated && Object.keys(auth_token).length != 0){
-        if(Object.keys(auth_token).length != 0){
+        if(jwt_token && jwt_token != null && jwt_token != ""){
+          console.log("if", jwt_token)
         setChecked(true);
       }else{
+        console.log("else", jwt_token)
         router
           .replace({
             pathname: '/auth/login',

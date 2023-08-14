@@ -18,11 +18,10 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
-  const user = useSelector((state) => state.user);
+  const user = JSON.parse(localStorage.getItem("user_data"));
   const router = useRouter();
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));

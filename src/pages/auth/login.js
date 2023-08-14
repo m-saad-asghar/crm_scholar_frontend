@@ -69,10 +69,11 @@ const Page = () => {
             toast.error("Email and password is required")
           }
           if(data.success == 1){
-            const jwt_data = {
-              jwt_auth: data.jwt_token
-            }
-            dispatch(addData(jwt_data));
+            const token_data = data.jwt_token;
+            const token = token_data.original.access_token;
+            const user = token_data.original.user;
+            localStorage.setItem('jwt_token', token);
+            localStorage.setItem('user_data', JSON.stringify(user));
             router.push('/products');
           }
         })

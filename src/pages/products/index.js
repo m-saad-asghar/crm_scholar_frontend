@@ -13,7 +13,6 @@
   import EditIcon from '@mui/icons-material/Edit';
   import Switch from '@mui/material/Switch';
   import { ProductPopup } from 'src/components/product/product_model';
-  import { useSelector } from 'react-redux';
   const tableHeaders = [
     "Actions",
     "Barcode",
@@ -62,7 +61,7 @@
   };
 
   const Products = () => {
-    const auth_token = useSelector((state) => state.token);
+    const jwt_token = localStorage.getItem("jwt_token")
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -221,7 +220,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
         body: JSON.stringify(data)
       })
