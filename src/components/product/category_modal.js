@@ -7,7 +7,9 @@ import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import { textAlign } from '@mui/system';
+import { useSelector } from 'react-redux';
 export const CategoryPopup = (props) => {
+  const auth_token = useSelector((state) => state.token);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [categoryName, setCategoryName] = useState('');
   
@@ -86,7 +88,8 @@ export const CategoryPopup = (props) => {
     fetch(baseUrl + 'add_new_category', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })
@@ -113,7 +116,8 @@ export const CategoryPopup = (props) => {
     fetch(baseUrl + 'update_category/' + currentId, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })

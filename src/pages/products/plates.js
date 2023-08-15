@@ -13,6 +13,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
   import EditIcon from '@mui/icons-material/Edit';
   import Switch from '@mui/material/Switch';
   import { PlatePopup } from 'src/components/product/plate_modal';
+  import { useSelector } from 'react-redux';
 import { minWidth } from '@mui/system';
 
 const tableHeaders = [
@@ -57,6 +58,7 @@ const usePlatesIds = (plates) => {
 
 
 const Plate = () => {
+  const auth_token = useSelector((state) => state.token);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -100,7 +102,8 @@ const Plate = () => {
     fetch(baseUrl + 'get_plates', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
     })
       .then(response => response.json())
@@ -193,7 +196,8 @@ const Plate = () => {
     fetch(baseUrl + 'change_status_plate/' + data.id, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })

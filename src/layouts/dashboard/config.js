@@ -30,31 +30,31 @@ export const items = [
         path: '/products',
       },
       {
-        title: 'Product - Category',
+        title: 'Category',
         path: '/products/category',
       },
       {
-        title: 'Product - Subject',
+        title: 'Subject',
         path: '/products/subject',
       },
       {
-        title: 'Product - Paper',
+        title: 'Paper',
         path: '/products/paper',
       },
       {
-        title: 'Product - Paper Type',
+        title: 'Paper Type',
         path: '/products/papertype',
       },
       {
-        title: 'Product - Plates',
+        title: 'Plates',
         path: '/products/plates',
       },
       {
-        title: 'Product - For Board',
+        title: 'For Board',
         path: '/products/productfor',
       },
       {
-        title: 'Product - Sheet Size',
+        title: 'Sheet Size',
         path: '/products/sheetsize',
       },
     ],

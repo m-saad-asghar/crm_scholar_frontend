@@ -6,7 +6,9 @@
   import InputLabel from '@mui/material/InputLabel';
   import Grid from '@mui/material/Grid';
   import MenuItem from '@mui/material/MenuItem';
+  import { useSelector } from 'react-redux';
   export const ProductPopup = (props) => {
+    const auth_token = useSelector((state) => state.token);
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const [productBarCode, setProductBarCode] = useState('');
     const [productShortName, setProductShortName] = useState('');
@@ -84,7 +86,8 @@
       fetch(baseUrl + 'get_subjects',{
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
       })
         .then(response => response.json())
@@ -98,7 +101,8 @@
       fetch(baseUrl + 'get_category',{
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
       })
         .then(response => response.json())
@@ -112,7 +116,8 @@
       fetch(baseUrl + 'get_sheet_sizes',{
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
       })
         .then(response => response.json())
@@ -126,7 +131,8 @@
       fetch(baseUrl + 'get_sheet_sizes',{
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
       })
         .then(response => response.json())
@@ -140,7 +146,8 @@
       fetch(baseUrl + 'get_book_for_board',{
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
       })
         .then(response => response.json())
@@ -305,7 +312,8 @@
       fetch(baseUrl + 'add_new_product', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
         body: JSON.stringify(data)
       })
@@ -331,7 +339,8 @@
       fetch(baseUrl + 'update_product/' + currentId, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
         body: JSON.stringify(data)
       })
