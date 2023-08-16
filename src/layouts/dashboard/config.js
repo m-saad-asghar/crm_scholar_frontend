@@ -20,6 +20,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ShopIcon from '@mui/icons-material/Shop';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 
 export const items = [
@@ -180,6 +181,15 @@ export const items = [
         path: '/account/bankpayment',
       },
     ]
+  },
+  {
+    title: 'Profile Setting',
+    path: '/profile_setting',
+    icon: (
+      <SvgIcon fontSize="small">
+        <SettingsIcon />
+      </SvgIcon>
+    )
   },
   // {
   //   title: 'Settings',

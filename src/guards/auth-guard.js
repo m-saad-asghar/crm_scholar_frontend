@@ -29,10 +29,8 @@ export const AuthGuard = (props) => {
 
       // if(isAuthenticated && Object.keys(auth_token).length != 0){
         if(jwt_token && jwt_token != null && jwt_token != ""){
-          console.log("if", jwt_token)
         setChecked(true);
       }else{
-        console.log("else", jwt_token)
         router
           .replace({
             pathname: '/auth/login',
