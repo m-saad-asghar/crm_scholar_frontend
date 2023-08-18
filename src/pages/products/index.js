@@ -249,7 +249,8 @@
       fetch(baseUrl + 'change_status_product/' + data.id, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth_token}`,
         },
         body: JSON.stringify(data)
       })

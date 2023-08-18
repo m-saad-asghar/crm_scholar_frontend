@@ -13,6 +13,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
   import EditIcon from '@mui/icons-material/Edit';
   import Switch from '@mui/material/Switch';
   import { PaperTypePopup } from 'src/components/product/papertype_modal';
+  import { useSelector } from 'react-redux';
 import { minWidth } from '@mui/system';
 
 const tableHeaders = [
@@ -51,6 +52,7 @@ const usePaperTypesIds = (paperTypes) => {
 
 
 const PaperType = () => {
+  const auth_token = useSelector((state) => state.token);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -94,7 +96,8 @@ const PaperType = () => {
     fetch(baseUrl + 'get_paper_types', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
     })
       .then(response => response.json())
@@ -187,7 +190,8 @@ const PaperType = () => {
     fetch(baseUrl + 'change_status_paper_type/' + data.id, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })

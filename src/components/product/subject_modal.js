@@ -7,7 +7,9 @@ import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import { textAlign } from '@mui/system';
+import { useSelector } from 'react-redux';
 export const SubjectPopup = (props) => {
+  const auth_token = useSelector((state) => state.token);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [subjectName, setSubjectName] = useState('');
   
@@ -86,7 +88,8 @@ export const SubjectPopup = (props) => {
     fetch(baseUrl + 'add_new_subject', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })
@@ -113,13 +116,14 @@ export const SubjectPopup = (props) => {
     fetch(baseUrl + 'update_subject/' + currentId, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })
       .then(response => response.json())
       .then(data => {
-        console.log("data", data)
+        
         setIsSubjectLoading(false);
         if (data.success == 1){
           toast.success("Subject is Successfully Updated!")
@@ -182,8 +186,9 @@ export const SubjectPopup = (props) => {
           </Typography>
           <Grid item xs={12} sm={4} md={4} lg={4}
                 style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={submitSubject}>Submit</Button>
+            
             <Button variant="contained" onClick={closeSubject}>Cancel</Button>
+            <Button variant="contained" onClick={submitSubject}>Submit</Button>
           </Grid>
         </Box>
       </Modal>

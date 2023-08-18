@@ -7,7 +7,9 @@ import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import { textAlign } from '@mui/system';
+import { useSelector } from 'react-redux';
 export const PaperPopup = (props) => {
+  const auth_token = useSelector((state) => state.token);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [paperName, setPaperName] = useState('');
   const [paperLength, setPaperLength] = useState('');
@@ -61,12 +63,13 @@ const getPaperTypes = () => {
     fetch(baseUrl + 'get_paper_types', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth_token}`,
           },
     })
     .then(response => response.json())
       .then(data => {
-        
+        console.log(data.paper_types);
         setLoadPaperTypes(data.paper_types);
       })
       .catch(error => console.error(error));
@@ -138,7 +141,8 @@ const getPaperTypes = () => {
     fetch(baseUrl + 'add_new_paper', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })
@@ -165,7 +169,8 @@ const getPaperTypes = () => {
     fetch(baseUrl + 'update_paper/' + currentId, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth_token}`,
       },
       body: JSON.stringify(data)
     })
