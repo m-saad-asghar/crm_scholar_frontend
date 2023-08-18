@@ -78,7 +78,7 @@ export const TopNav = (props) => {
             direction="row"
             spacing={2}
           >
-            <Tooltip title="Contacts">
+            {/* <Tooltip title="Contacts">
               <IconButton>
                 <SvgIcon fontSize="small">
                   <UsersIcon />
@@ -97,7 +97,7 @@ export const TopNav = (props) => {
                   </SvgIcon>
                 </Badge>
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             <Avatar
               onClick={accountPopover.handleOpen}
               ref={accountPopover.anchorRef}
@@ -106,7 +106,8 @@ export const TopNav = (props) => {
                 height: 40,
                 width: 40
               }}
-              src="/assets/avatars/avatar-anika-visser.png"
+              src="/assets/logos/default_login.png"
+              // src="/assets/avatars/avatar-anika-visser.png"
             />
           </Stack>
         </Stack>

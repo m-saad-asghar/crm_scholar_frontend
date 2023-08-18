@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
@@ -12,6 +12,7 @@ export const AccountPopover = (props) => {
   const { anchorEl, onClose, open } = props;
   const router = useRouter();
   const auth = useAuth(); 
+  const user = JSON.parse(localStorage.getItem("user_data"));
 
   const expireToken = () => {
     fetch(baseUrl + 'auth/logout', {
@@ -22,7 +23,8 @@ export const AccountPopover = (props) => {
     })
       .then(response => response.json())
       .then(data => {
-        dispatch(logout());
+        localStorage.removeItem("jwt_token");
+        localStorage.removeItem("user_data");
       })
       .catch(error => {
         
@@ -63,7 +65,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          Anika Visser
+          {user.name}
         </Typography>
       </Box>
       <Divider />

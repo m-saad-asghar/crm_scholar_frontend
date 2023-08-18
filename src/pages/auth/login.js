@@ -69,11 +69,12 @@ const Page = () => {
             toast.error("Email and password is required")
           }
           if(data.success == 1){
-            const jwt_data = {
-              jwt_auth: data.jwt_token
-            }
-            dispatch(addData(jwt_data));
-            router.push('/');
+            const token_data = data.jwt_token;
+            const token = token_data.original.access_token;
+            const user = token_data.original.user;
+            localStorage.setItem('jwt_token', token);
+            localStorage.setItem('user_data', JSON.stringify(user));
+            router.push('/products');
           }
         })
         .catch(error => {
@@ -254,6 +255,24 @@ const Page = () => {
               </div>
             )}
           </div>
+       
+        <Typography
+        style={{marginTop: 20}}
+                color="text.secondary"
+                variant="body2"
+              >
+                Forgot Password?
+                &nbsp;
+                <Link
+                  component={NextLink}
+                  href="/auth/reset_password"
+                  underline="hover"
+                  variant="subtitle2"
+                >
+                  Click here to reset password
+                </Link>
+              </Typography>
+
         </Box>
       </Box>
     </>

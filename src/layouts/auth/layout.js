@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Logo } from 'src/components/logo';
+import { width } from '@mui/system';
 
 // TODO: Change subtitle text
 
@@ -42,7 +43,7 @@ export const Layout = (props) => {
           >
             <Box
               component={NextLink}
-              href="/"
+              href="/products"
               sx={{
                 display: 'inline-flex',
                 height: 32,
@@ -82,10 +83,10 @@ export const Layout = (props) => {
               Welcome to{' '}
               <Box
                 component="a"
-                sx={{ color: '#15B79E' }}
+                sx={{ color: '#b22b40' }}
                 target="_blank"
               >
-                Devias Kit
+                Scholar CMS
               </Box>
             </Typography>
             <Typography
@@ -93,11 +94,13 @@ export const Layout = (props) => {
               sx={{ mb: 3 }}
               variant="subtitle1"
             >
-              A professional kit that comes with ready-to-use MUI components.
+              Empowering Scholars, Simplifying Content Management.
             </Typography>
             <img
+            style={{height: '100%', width: '100%'}}
               alt=""
-              src="/assets/auth-illustration.svg"
+              src='/assets/logos/scholar.png'
+              // src="/assets/auth-illustration.svg"
             />
           </Box>
         </Grid>
