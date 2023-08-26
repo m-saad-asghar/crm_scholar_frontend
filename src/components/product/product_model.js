@@ -346,7 +346,6 @@
       })
         .then(response => response.json())
         .then(data => {
-          console.log("data", data)
           setIsProductLoading(false);
           if (data.success == 1){
             toast.success("Product is Successfully Updated!")

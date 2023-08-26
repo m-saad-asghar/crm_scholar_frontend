@@ -68,6 +68,9 @@ const Page = () => {
           if(data.success == "error"){
             toast.error("Email and password is required")
           }
+          if(data.success == "disable"){
+            toast.error("Your Account has been Disable")
+          }
           if(data.success == 1){
             const token_data = data.jwt_token;
             const token = token_data.original.access_token;
