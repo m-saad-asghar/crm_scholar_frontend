@@ -21,6 +21,7 @@ import ShopIcon from '@mui/icons-material/Shop';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PeopleIcon from '@mui/icons-material/People';
 
 
 export const items = [
@@ -188,6 +189,15 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <SettingsIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Users',
+    path: '/users',
+    icon: (
+      <SvgIcon fontSize="small">
+        <PeopleIcon />
       </SvgIcon>
     )
   },

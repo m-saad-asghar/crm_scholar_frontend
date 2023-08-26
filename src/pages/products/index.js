@@ -250,7 +250,7 @@
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
         body: JSON.stringify(data)
       })

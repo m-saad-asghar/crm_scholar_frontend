@@ -56,7 +56,12 @@ const ChangePassword = () => {
                 toast.error("Password and Repeat Password do not match")
               }
               if(data.success == 1){
-                routerNavigation.push('/auth/login');
+                const token_data = data.jwt_token;
+            const token = token_data.original.access_token;
+            const user = token_data.original.user;
+            localStorage.setItem('jwt_token', token);
+            localStorage.setItem('user_data', JSON.stringify(user));
+            router.push('/products');
                 toast.success("Password has been Successfully Change")
               }
             })

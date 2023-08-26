@@ -46,6 +46,9 @@ const ResetPassword = () => {
               if(data.success == "unauthorize"){
                 toast.error("Invalid Email!")
               }
+              if(data.success == "disable"){
+                toast.error("Your Account has been Disable")
+              }
               if(data.success == 1){
                 toast.success("Email has been send to your ID for reset password")
               }
