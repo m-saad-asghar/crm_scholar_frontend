@@ -53,7 +53,7 @@ const usePurchaseIds = (vouchers) => {
 };
 
 const PurchaseVoucher = () => {
-  const auth_token = useSelector((state) => state.token);
+  const jwt_token = localStorage.getItem('jwt_token');
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -185,7 +185,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })
@@ -215,7 +215,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })

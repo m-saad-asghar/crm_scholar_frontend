@@ -70,7 +70,7 @@ const useBatchesIds = (batches) => {
 
 
 const Batch = () => {
-  const auth_token = useSelector((state) => state.token);
+  const jwt_token = localStorage.getItem('jwt_token');
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -116,7 +116,7 @@ const Batch = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
     })
       .then(response => response.json())
@@ -260,7 +260,7 @@ const Batch = () => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })
