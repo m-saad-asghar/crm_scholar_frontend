@@ -52,7 +52,7 @@ const usePaperTypesIds = (paperTypes) => {
 
 
 const PaperType = () => {
-  const auth_token = useSelector((state) => state.token);
+  const jwt_token = localStorage.getItem('jwt_token');
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -97,7 +97,7 @@ const PaperType = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
     })
       .then(response => response.json())
@@ -191,7 +191,7 @@ const PaperType = () => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })

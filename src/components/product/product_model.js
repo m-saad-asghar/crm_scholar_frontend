@@ -8,7 +8,8 @@
   import MenuItem from '@mui/material/MenuItem';
   import { useSelector } from 'react-redux';
   export const ProductPopup = (props) => {
-    const auth_token = useSelector((state) => state.token);
+    
+    const jwt_token = localStorage.getItem('jwt_token');
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const [productBarCode, setProductBarCode] = useState('');
     const [productShortName, setProductShortName] = useState('');
@@ -53,6 +54,7 @@
     };
 
     useEffect(() => {
+      
       const data = props.currentData;
       setCurrentId((data && data.id) ? data.id : '')
       setProductBarCode((data && data.product_code != null && data.product_code != undefined) ? data.product_code : '')
@@ -87,7 +89,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
         .then(response => response.json())
@@ -102,7 +104,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
         .then(response => response.json())
@@ -117,7 +119,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
         .then(response => response.json())
@@ -132,7 +134,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
         .then(response => response.json())
@@ -147,7 +149,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
         .then(response => response.json())
@@ -313,7 +315,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
         body: JSON.stringify(data)
       })
@@ -340,7 +342,7 @@
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
         body: JSON.stringify(data)
       })

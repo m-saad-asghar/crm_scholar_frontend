@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { textAlign } from '@mui/system';
 import { useSelector } from 'react-redux';
 export const SheetPopup = (props) => {
-  const auth_token = useSelector((state) => state.token);
+  const jwt_token = localStorage.getItem('jwt_token');
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [sheetSizeName, setSheetSizeName] = useState('');
   const [sheetLength, setSheetLength] = useState('');
@@ -121,7 +121,7 @@ export const SheetPopup = (props) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })
@@ -149,7 +149,7 @@ export const SheetPopup = (props) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth_token}`,
+        'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })

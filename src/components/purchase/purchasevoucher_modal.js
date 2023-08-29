@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import PaperType from 'src/pages/products/papertype';
 //import { json } from 'stream/consumers';
 export const PurchasePopup = (props) => {
-  const auth_token = useSelector((state) => state.token);
+  const jwt_token = localStorage.getItem('jwt_token');
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const [tableData, setTableData] = useState([]);
   const [dbData, setDBData] = useState([]);
@@ -91,7 +91,7 @@ fetch(baseUrl + 'get_pv_voucher_data/' + Voucher, {
   method: 'POST',
   headers : {
     'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
   },
 })
 .then(response => response.json())
@@ -169,7 +169,7 @@ const getPPVendors = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
       .then(response => response.json())
@@ -184,7 +184,7 @@ const getPPVendors = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
       .then(response => response.json())
@@ -298,7 +298,7 @@ const getPaperTypes = () => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${auth_token}`,
+            'Authorization': `Bearer ${jwt_token}`,
           },
     })
     .then(response => response.json())
@@ -428,7 +428,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
         body: JSON.stringify(data)
       })
@@ -464,7 +464,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
       },
       body: JSON.stringify(data)
     })
@@ -533,7 +533,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
       .then(response => response.json())
@@ -554,7 +554,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
       .then(response => response.json())
@@ -569,7 +569,7 @@ const encodedSearchTerm = encodeURIComponent(searchTerm);
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth_token}`,
+          'Authorization': `Bearer ${jwt_token}`,
         },
       })
       .then(response => response.json())
@@ -646,7 +646,7 @@ fetch(baseUrl + 'get_paper_with_id/' + pid ,{
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${auth_token}`,
+    'Authorization': `Bearer ${jwt_token}`,
   },
 })
 .then(response => response.json())

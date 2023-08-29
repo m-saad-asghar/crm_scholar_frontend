@@ -31,9 +31,10 @@ export const POPopup = (props) => {
   const [godownID, setGodownID] = useState('0');
   const [loadGodowns, setLoadGodowns] = useState([]);
   
- 
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [pickupLocationID, setPickupLocationID] = useState('');
   
-  const [productQty, setProductQty] = useState('');
+
   const [productRate, setProductRate] = useState('');
   const [productAmount, setProductAmount] = useState('');
   const [totalAmount, setTotalAmount] = useState('0');
@@ -43,9 +44,7 @@ export const POPopup = (props) => {
   const [batchNos, setBatchNos] = useState('0');
 
   const [printOrder, setPrintOrder] = useState('');
-  const [paperQty, setPaperQty] = useState('');
-  const [paperProduct, setPaperProduct] = useState('');
-  const [paperProductID, setPaperProductID] = useState('');
+ 
 
   const [billingQty, setBillingQty] = useState('');
   const [platesQty, setPlatesQty] = useState('');
@@ -56,11 +55,12 @@ export const POPopup = (props) => {
   const [isBatchData, setIsBatchData] = useState(false);
 
   const [loadBatchData, setLoadBachData] = useState([]);
-  const [processData, setProcessData] = useState([]);
+ 
 
   const [voucherNo, setVoucherNo] = useState([]);
   
-  
+  const [laminationType, setLaminationType] = useState('');
+  const [laminationTypeID, setLaminationTypeID] = useState('');
   
   const [isDataLoading, setIsDataLoading] = useState(false);
   
@@ -80,25 +80,12 @@ export const POPopup = (props) => {
     borderColor: 'blue', // Set your desired border color
   };
   
-    const pressProcesses = [
-      {
-        id: 1,
-        process: 'Book Printing'
-      },
-      {
-        id: 2,
-        process: 'Title Printing',
-      },
-      {
-        id: 3,
-        process: 'Inner Printing',
-      },
-      {
-        id: 4,
-        process: 'Rule Printing',
-      },
-      
-    ]
+  const processData = [
+    {id: 7, process: 'Binding'},
+    
+    
+  ];
+  
   
 
   useEffect(() => {
@@ -122,7 +109,7 @@ export const POPopup = (props) => {
   const openPurchaseOrder = () => {
 
     
-      fetch(baseUrl + 'get_press_vendors',{
+      fetch(baseUrl + 'get_binder_vendors',{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,22 +126,7 @@ export const POPopup = (props) => {
       
       
       
-      fetch(baseUrl + 'get_godowns',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwt_token}`,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        setLoadGodowns(data.godowns);
-        
       
-      })
-      .catch(error => console.error(error));
-      
-     setProcessData(pressProcesses);
 
   };
   
@@ -170,7 +142,7 @@ export const POPopup = (props) => {
   
   
 const addNewPO = (data) => {
-    fetch(baseUrl + 'add_new_po_press', {
+    fetch(baseUrl + 'add_new_po_binding', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -205,8 +177,8 @@ const addNewPO = (data) => {
   
 
   const updatePO = (poinfo) => {
-    console.log('Update Batch: ' + JSON.stringify(poinfo));
-    fetch(baseUrl + 'update_po_press', {
+    
+    fetch(baseUrl + 'update_po_binding', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -252,7 +224,7 @@ const addNewPO = (data) => {
   }
   
 const setPODetail = (voucher_no) => {
-  fetch(baseUrl + 'get_po_press_detail/' + voucher_no, {
+  fetch(baseUrl + 'get_po_binding_detail/' + voucher_no, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -268,19 +240,18 @@ const setPODetail = (voucher_no) => {
           process_name: data.process_name,
           batch_no: data.batch_no,
           product_name: data.product_name,
-          paper_product: data.paper_product,
-          paper_qty: data.paper_qty,
           print_order: data.print_order,
-          plates_qty: data.plates,
-          product_rate: data.rate,
-          product_amount: data.amount,
-          godown_name: data.godown_name,
+          pickup_location: data.pickup_location,
+          product_rate: data.product_rate,
+          product_amount: data.product_amount,
+         
           temp_inventory_id: data.temp_inventory_id,
-          inventory_id: data.inventory_id,
+          
           process_id: data.process_id,
           product_id: data.product_id,
-          paper_id: data.paper_product,
-          godown_id: data.godown_id,
+          pickup_location_id: data.pickup_location_id,
+          
+          
           isbilled: data.isbilled,
           
         };
@@ -301,7 +272,7 @@ const setUpdatedData = () => {
 
   console.log('DB Data: ' + JSON.stringify(dbData));
 
-  const deletedEntries = dbDataOld.filter(original => !tableData.some(newData => original.inventory_id == newData.inventory_id));
+  const deletedEntries = dbDataOld.filter(original => !tableData.some(newData => original.temp_inventory_id == newData.temp_inventory_id));
 
   console.log('Deleted Enteries: ' + JSON.stringify(deletedEntries, null, 2))
 
@@ -309,7 +280,7 @@ const setUpdatedData = () => {
 
   //console.log('Updated Enteries: ' + JSON.stringify(updatedEntries, null, 2))
 
-  const insertedEntries = tableData.filter(newData => newData.inventory_id == 0);
+  const insertedEntries = tableData.filter(newData => newData.temp_inventory_id == 0);
 
   console.log('Insert Enteries: ' + JSON.stringify(insertedEntries, null, 2))
 
@@ -333,9 +304,8 @@ const setUpdatedData = () => {
     
     
     
-    setGodownID('0');
-    setGodown('0');
-    setProductQty('');
+    
+    
     setProductRate('');
     setProductAmount('');
     
@@ -389,19 +359,18 @@ const setUpdatedData = () => {
     process_name: processName,
     batch_no: batchNos,
     product_name: productName,
-    paper_product: paperProduct,
-    paper_qty: paperQty,
     print_order: printOrder,
-    plates_qty: platesQty,
+    
     product_rate: productRate,
     product_amount: productAmount,
-    godown_name: godown,
+    pickup_location: pickupLocation,
+    
     temp_inventory_id: 0,
-    inventory_id: 0,
+    
     process_id: processNameID,
     product_id: productNameID,
-    paper_product_id: paperProductID,
-    godown_id: godownID,
+    
+    pickup_location_id: pickupLocationID,
     isbilled: 0,
     
   };
@@ -417,24 +386,22 @@ const setUpdatedData = () => {
     setBatchNos('0');
     setProductName('');
     setPrintOrder('');
-    setPaperProduct('');
-    setPaperQty('');
-    setBillingQty('');
+    setPickupLocation('');
+    
     setProductRate('');
     setProductAmount('');
-    setPlatesQty('');
-    setGodown('0');
+   
+    
 
   }
   else{
     const indexToUpdate = tableData.findIndex(data => data.batch_no == newItem.batch_no && data.process_id == newItem.process_id);
     const dataToUpdate = tableData[indexToUpdate];
-    console.log('Data to Update: ' + JSON.stringify(dataToUpdate));
-    dataToUpdate.plates_qty = platesQty;
+    
+    
     dataToUpdate.product_rate = productRate;
     dataToUpdate.product_amount = productAmount;
-    dataToUpdate.godown_name = godown;
-    dataToUpdate.godown_id = godownID;
+    
 
     console.log('After Data to Update: ' + JSON.stringify(dataToUpdate));
 
@@ -443,14 +410,14 @@ const setUpdatedData = () => {
 
     console.log('Index: ' + indexToUpdate);
     setProductName('');
-    setProductQty('');
+    
     setProductRate('');
     setProductAmount('');
-    setProductGodown('0');
-    setProductGodownID('0');
+   setLaminationType('0');
+   setPickupLocation('');
+   setProcessName('0');
+   setBatchNos('0');
    
-    
-
   }    
         
 
@@ -491,19 +458,7 @@ const setUpdatedData = () => {
         validationerrors["batchNos"] = "Batch No. is required.";
       }
       
-      if (!godown || godown == '0'){
-        isValid = false;
-        validationerrors["godown"] = "Godown is required.";
-      }
-      
-      if (!platesQty){
-        isValid = false;
-        validationerrors["platesQty"] = "Plates is required.";
-      }
-      if (isNaN(platesQty) || Number(platesQty) <= 0) {
-        isValid = false;
-        validationerrors["platesQty"] = "Plates Qty must be a positive number.";
-      }
+    
       if (!productRate){
         isValid = false;
         validationerrors["productRate"] = "Product Rate is required.";
@@ -599,9 +554,9 @@ const setUpdatedData = () => {
 
     setBatchNos('0');
     setProductName('');
-    setPaperProduct('');
+    
     setPrintOrder('');
-    setPaperQty('');
+   
     
    
 
@@ -615,7 +570,7 @@ const setUpdatedData = () => {
   }
   const getBatchData = (batchno, process) => {
 if(batchno != 0 && process != 0){
-  fetch(baseUrl + 'get_batch_data_for_press/' + batchno + '/' + process,{
+  fetch(baseUrl + 'get_batch_data_for_binding/' + batchno + '/' + process,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -626,14 +581,15 @@ if(batchno != 0 && process != 0){
   .then(data => {
    if(data.success === 1){
   //  setIsBatchData(true);
-    setLoadBachData(data.batchData);
+  setLoadBachData(data.batchData);
 
-    setProductName(data.batchData[0]['productName']);
-    setProductNameID(data.batchData[0]['productID']);
-setPaperProduct(data.batchData[0]['paperProduct']);
-setPaperProductID(data.batchData[0]['paperProductID']);
+  setProductName(data.batchData[0]['productName']);
+  setProductNameID(data.batchData[0]['productID']);
+  setPickupLocation(data.batchData[0]['Received from']);
+  setPickupLocationID(data.batchData[0]['Received from ID']);
+
 setPrintOrder(data.batchData[0]['order']);
-setPaperQty(data.batchData[0]['paperQty']);
+
     
     console.log('Batch Data::: ' + loadBatchData);
    }
@@ -643,10 +599,9 @@ setPaperQty(data.batchData[0]['paperQty']);
       
       setProductName('');
       setProductNameID('0');
-setPaperProduct('');
-setPaperProductID('0');
+
 setPrintOrder('');
-setPaperQty('');
+setPickupLocation('');
       setLoadBachData([]);
       setBatchNos('0');
       
@@ -660,10 +615,9 @@ else{
   setIsBatchData(false);
   setProductName('');
   setProductNameID('0');
-setPaperProduct('');
-setPaperProductID('0');
+
 setPrintOrder('');
-setPaperQty('');
+
   setLoadBachData([]);
   
 
@@ -677,25 +631,12 @@ setPaperQty('');
   const onChangePrintOrder = (e) => {
     setPrintOrder(e.target.value);
   }
-  const onChangePaperQty = (e) => {
-    setPaperQty(e.target.value);
-  }
-  const onChangePaperProduct = (e) => {
-    setPaperProduct(e.target.value);
-  }
-  const onChangeBillingQty = (e) => {
-    setBillingQty(e.target.value);
-  }
-  const onChangePlatesQty = (e) => {
-    setPlatesQty(e.target.value);
-  }
-  const onChangeGodown = (e) => {
-    setGodown(e.target.value);
-  }
-  const onClickGodown = (id) => {
-setGodownID(id);
-  }
-
+  
+  
+  
+  const onChangePickupLocation = (e) => {
+    // setPickupLocation(e.target.value);
+   }
 
   return (
   <>
@@ -720,7 +661,7 @@ setGodownID(id);
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            + Add Purchase Order For Press
+            + Add Purchase Order For Binder
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 4 }}>
             {/*<FormControl>*/}
@@ -820,62 +761,14 @@ setGodownID(id);
                 helperText={validationerrors.printOrder || ""}/>
               </Grid>
               <Grid item xs={12} sm={3} md={3} lg={3}>
-                <InputLabel htmlFor="Billing_qty" style={{ position: 'unset' }}>Billing Qty
+                <InputLabel htmlFor="pickup_location" style={{ position: 'unset' }}>Pickup Location
                   </InputLabel>
-                <TextField id="billing_qty" aria-describedby="add-billing_qty"
-                       onChange={onChangeBillingQty} value={billingQty}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_product" style={{ position: 'unset' }}>Paper Product
-                  </InputLabel>
-                <TextField id="paper_product" aria-describedby="add-paper_product"
-                       onChange={onChangePaperProduct} value={paperProduct}
-                       error={Boolean(validationerrors.paperProduct)}
-                helperText={validationerrors.paperProduct || ""}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="paper_qty" style={{ position: 'unset' }}>Paper Qty
-                  </InputLabel>
-                <TextField id="paper_qty" aria-describedby="add-paper_qty"
-                       onChange={onChangePaperQty} value={paperQty}
-                       error={Boolean(validationerrors.paperQty)}
-                helperText={validationerrors.paperQty || ""}/>
-              </Grid>
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-              <TextField
-                  labelId="godown"
-                  id="godown"
-                  label="Godown"
-                  select
-                  style={{ minWidth: '95%' }}
-                  onChange={onChangeGodown}
-                  value={godown}
-                  error={Boolean(validationerrors.godown)}
-                helperText={validationerrors.godown || ""}
-                >
-                  <MenuItem value="0" onClick={() => onClickGodown(0)}>
-                    <em>Select Godown</em>
-                  </MenuItem>
-                  {
-                    loadGodowns.map((godown) => (
-                      <MenuItem key = {godown.id} value={godown.name}
-                      onClick={() => onClickGodown(godown.id)}>{godown.name}</MenuItem>
-                    ))
-                  }
-                  
-                </TextField>
-              </Grid>
-
-              <Grid item xs={12} sm={4} md={4} lg={4}>
-                <InputLabel htmlFor="plates_qty" style={{ position: 'unset' }}>Plates Qty
-                  </InputLabel>
-                <TextField id="plates_qty" aria-describedby="add-paper_qty"
-                       onChange={onChangePlatesQty} value={platesQty}
-                       error={Boolean(validationerrors.platesQty)}
-                helperText={validationerrors.platesQty || ""}/>
+                <TextField id="pickup_location" aria-describedby="add-pickup_location"
+                       onChange={onChangePickupLocation} value={pickupLocation}
+                       error={Boolean(validationerrors.pickupLocation)}
+                       helperText={validationerrors.pickupLocation || ""}/>
               </Grid>
               
-                           
               
               <Grid item xs={12} sm={4} md={4} lg={4}>
                 <InputLabel htmlFor="product_rate" style={{ position: 'unset' }}>Rate
@@ -910,13 +803,11 @@ setGodownID(id);
     
     <th>Process</th>
     <th>Product Name</th>
-    <th>Paper</th>
-    <th>Paper Qty</th>
+    
     <th>Print Order</th>
-    <th>Plates</th>
     <th>Rate</th>
     <th>Amount</th>
-    <th>Godown</th>
+    <th>Pickup Location</th>
     
   </tr>
 </thead>
@@ -931,13 +822,10 @@ setGodownID(id);
   <td>{rowData.batch_no}</td>
   <td>{rowData.process_name}</td>
   <td>{rowData.product_name}</td>
-  <td>{rowData.paper_product}</td>
-  <td>{rowData.paper_qty}</td>
   <td>{rowData.print_order}</td>
-  <td>{rowData.plates_qty}</td>
   <td>{rowData.product_rate}</td>
   <td>{rowData.product_amount}</td>
-  <td>{rowData.godown_name}</td>
+  <td>{rowData.pickup_location}</td>
   
   
 </tr>
